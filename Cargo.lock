@@ -44,7 +44,7 @@ dependencies = [
 [[package]]
 name = "hydra-dx-utils"
 version = "0.1.0"
-source = "git+https://github.com/galacticcouncil/hack.hydraDX-math?branch=main#1e11226e685ee369883ff6350395a097cbe76f4e"
+source = "git+https://github.com/galacticcouncil/hack.hydraDX-math?branch=main#559ab949d65199007f2c44f66338e8a87ddb304d"
 dependencies = [
  "primitive-types",
 ]

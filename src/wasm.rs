@@ -23,5 +23,33 @@ macro_rules! wasm_api {
                 None => "0".chars().collect::<String>(),
             }
         }
+
+        #[wasm_bindgen]
+        pub fn get_sell_price(s: String, b: String, a: String) -> String {
+            let sell_reserve = convert_to_u128(&s);
+            let buy_reserve = convert_to_u128(&b);
+            let amount = convert_to_u128(&a);
+
+            let result = calculate_sell_price(sell_reserve, buy_reserve, amount);
+
+            match result {
+                Some(val) => val.to_string().chars().collect::<String>(),
+                None => "0".chars().collect::<String>(),
+            }
+        }
+
+        #[wasm_bindgen]
+        pub fn get_buy_price(s: String, b: String, a: String) -> String {
+            let sell_reserve = convert_to_u128(&s);
+            let buy_reserve = convert_to_u128(&b);
+            let amount = convert_to_u128(&a);
+
+            let result = calculate_buy_price(sell_reserve, buy_reserve, amount);
+
+            match result {
+                Some(val) => val.to_string().chars().collect::<String>(),
+                None => "0".chars().collect::<String>(),
+            }
+        }
     };
 }
