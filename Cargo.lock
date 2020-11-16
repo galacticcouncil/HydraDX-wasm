@@ -37,14 +37,14 @@ dependencies = [
 name = "hack-hydra-dx-wasm"
 version = "0.1.0"
 dependencies = [
- "hydra-dx-utils",
+ "hydra-dx-math",
  "wasm-bindgen",
 ]
 
 [[package]]
-name = "hydra-dx-utils"
+name = "hydra-dx-math"
 version = "0.1.0"
-source = "git+https://github.com/galacticcouncil/hack.hydraDX-math?branch=main#559ab949d65199007f2c44f66338e8a87ddb304d"
+source = "git+https://github.com/galacticcouncil/hack.hydraDX-math?branch=main#5d2d41e6fae3b6824253be59c99296c4e33caa58"
 dependencies = [
  "primitive-types",
 ]
