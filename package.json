@@ -1,0 +1,6 @@
+{
+  "name": "hack-hydra-dx-wasm",
+  "version": "0.1.0",
+  "private": true,
+  "main": "build/hack_hydra_dx_wasm.js"
+}

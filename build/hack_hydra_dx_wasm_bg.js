@@ -1,5 +1,4 @@
-import * as wasm from './hack_hydra_dx_wasm_bg.wasm';
-
+// import * as wasm from './hack_hydra_dx_wasm_bg.wasm';
 const lTextDecoder = typeof TextDecoder === 'undefined' ? (0, module.require)('util').TextDecoder : TextDecoder;
 
 let cachedTextDecoder = new lTextDecoder('utf-8', { ignoreBOM: true, fatal: true });
@@ -8,6 +7,7 @@ cachedTextDecoder.decode();
 
 let cachegetUint8Memory0 = null;
 function getUint8Memory0() {
+    const wasm = await import('./hack_hydra_dx_wasm_bg.wasm');
     if (cachegetUint8Memory0 === null || cachegetUint8Memory0.buffer !== wasm.memory.buffer) {
         cachegetUint8Memory0 = new Uint8Array(wasm.memory.buffer);
     }
@@ -79,6 +79,7 @@ function passStringToWasm0(arg, malloc, realloc) {
 
 let cachegetInt32Memory0 = null;
 function getInt32Memory0() {
+    const wasm = await import('./hack_hydra_dx_wasm_bg.wasm');
     if (cachegetInt32Memory0 === null || cachegetInt32Memory0.buffer !== wasm.memory.buffer) {
         cachegetInt32Memory0 = new Int32Array(wasm.memory.buffer);
     }
@@ -92,6 +93,7 @@ function getInt32Memory0() {
 */
 export function get_buy_price(s, b, a) {
     try {
+        const wasm = await import('./hack_hydra_dx_wasm_bg.wasm');
         const retptr = wasm.__wbindgen_export_0.value - 16;
         wasm.__wbindgen_export_0.value = retptr;
         var ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -118,6 +120,7 @@ export function get_buy_price(s, b, a) {
 */
 export function get_sell_price(s, b, a) {
     try {
+        const wasm = await import('./hack_hydra_dx_wasm_bg.wasm');
         const retptr = wasm.__wbindgen_export_0.value - 16;
         wasm.__wbindgen_export_0.value = retptr;
         var ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -144,6 +147,7 @@ export function get_sell_price(s, b, a) {
 */
 export function get_spot_price(s, b, a) {
     try {
+        const wasm = await import('./hack_hydra_dx_wasm_bg.wasm');
         const retptr = wasm.__wbindgen_export_0.value - 16;
         wasm.__wbindgen_export_0.value = retptr;
         var ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
