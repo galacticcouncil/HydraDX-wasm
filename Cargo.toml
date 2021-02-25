@@ -9,7 +9,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 wasm-bindgen = {version = "0.2.63"}
-hydra-dx-math = {default-features = false, version = "0.1.0", git = "https://github.com/galacticcouncil/hydraDX-math", rev="e809dac5058316da7b59883956aed95a55e98001"}
+hydra-dx-math = {default-features = false, version = "0.1.0", git = "https://github.com/galacticcouncil/hydraDX-math", tag="v0.1.0"}
 
 [profile.release]
 opt-level = "s"
