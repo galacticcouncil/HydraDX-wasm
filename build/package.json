@@ -7,6 +7,7 @@
   "files": [
     "hack_hydra_dx_wasm_bg.wasm",
     "hack_hydra_dx_wasm.js",
+    "hack_hydra_dx_wasm_bg.js",
     "hack_hydra_dx_wasm.d.ts"
   ],
   "module": "hack_hydra_dx_wasm.js",
