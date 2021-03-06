@@ -6,7 +6,7 @@ let cachedTextDecoder = new lTextDecoder('utf-8', { ignoreBOM: true, fatal: true
 cachedTextDecoder.decode();
 
 let cachegetUint8Memory0 = null;
-function getUint8Memory0() {
+async function getUint8Memory0() {
     const wasm = await import('./hack_hydra_dx_wasm_bg.wasm');
     if (cachegetUint8Memory0 === null || cachegetUint8Memory0.buffer !== wasm.memory.buffer) {
         cachegetUint8Memory0 = new Uint8Array(wasm.memory.buffer);
