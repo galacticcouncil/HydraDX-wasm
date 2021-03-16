@@ -1,9 +1,9 @@
 {
   "name": "hack-hydra-dx-wasm",
   "collaborators": [
-    "Martin Hloska <martin.hloska@topmonks.com>"
+    "Martin Hloska <martin.hloska@gmail.com>"
   ],
-  "version": "0.1.0",
+  "version": "0.2.0",
   "files": [
     "hack_hydra_dx_wasm_bg.wasm",
     "hack_hydra_dx_wasm.js",

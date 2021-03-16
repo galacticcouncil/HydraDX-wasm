@@ -1,4 +1,4 @@
-# hack.hydraDX-math-helpers
+# HydraDX Math Wasm
 
 Install wasm-pack
 
@@ -7,9 +7,4 @@ Install wasm-pack
 
 Build
 
-`wasm-pack build --dev`
-
-
-Run example
-
-`cd demo && npm install && npm run start`
+`wasm-pack build `
