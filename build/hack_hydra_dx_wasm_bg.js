@@ -92,8 +92,9 @@ async function getInt32Memory0() {
 * @returns {string}
 */
 export async function get_buy_price(s, b, a) {
+    const wasm = await import('./hack_hydra_dx_wasm_bg.wasm');
+
     try {
-        const wasm = await import('./hack_hydra_dx_wasm_bg.wasm');
         const retptr = wasm.__wbindgen_export_0.value - 16;
         wasm.__wbindgen_export_0.value = retptr;
         var ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -119,8 +120,9 @@ export async function get_buy_price(s, b, a) {
 * @returns {string}
 */
 export async function get_sell_price(s, b, a) {
+    const wasm = await import('./hack_hydra_dx_wasm_bg.wasm');
+    
     try {
-        const wasm = await import('./hack_hydra_dx_wasm_bg.wasm');
         const retptr = wasm.__wbindgen_export_0.value - 16;
         wasm.__wbindgen_export_0.value = retptr;
         var ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
