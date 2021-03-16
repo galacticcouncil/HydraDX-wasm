@@ -88,7 +88,7 @@ function getStringFromWasm0(ptr, len) {
 * @param {string} a
 * @returns {string}
 */
-export function get_buy_price(s, b, a) {
+export function get_spot_price(s, b, a) {
     try {
         const retptr = wasm.__wbindgen_export_0.value - 16;
         wasm.__wbindgen_export_0.value = retptr;
@@ -98,7 +98,7 @@ export function get_buy_price(s, b, a) {
         var len1 = WASM_VECTOR_LEN;
         var ptr2 = passStringToWasm0(a, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len2 = WASM_VECTOR_LEN;
-        wasm.get_buy_price(retptr, ptr0, len0, ptr1, len1, ptr2, len2);
+        wasm.get_spot_price(retptr, ptr0, len0, ptr1, len1, ptr2, len2);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
@@ -140,7 +140,7 @@ export function get_sell_price(s, b, a) {
 * @param {string} a
 * @returns {string}
 */
-export function get_spot_price(s, b, a) {
+export function get_buy_price(s, b, a) {
     try {
         const retptr = wasm.__wbindgen_export_0.value - 16;
         wasm.__wbindgen_export_0.value = retptr;
@@ -150,7 +150,7 @@ export function get_spot_price(s, b, a) {
         var len1 = WASM_VECTOR_LEN;
         var ptr2 = passStringToWasm0(a, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len2 = WASM_VECTOR_LEN;
-        wasm.get_spot_price(retptr, ptr0, len0, ptr1, len1, ptr2, len2);
+        wasm.get_buy_price(retptr, ptr0, len0, ptr1, len1, ptr2, len2);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
