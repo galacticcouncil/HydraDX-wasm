@@ -2,5 +2,8 @@
   "name": "hack-hydra-dx-wasm",
   "version": "0.2.0",
   "private": true,
-  "main": "build/hack_hydra_dx_wasm.js"
+  "files": [ "build" ],
+  "main": "build/nodejs/hack_hydra_dx_wasm.js",
+  "browser": "build/web/hack_hydra_dx_wasm.js",
+  "module": "build/bundler/hack_hydra_dx_wasm.js"
 }
