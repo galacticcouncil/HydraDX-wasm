@@ -3,5 +3,5 @@
   "version": "0.2.0",
   "private": true,
   "files": [ "build" ],
-  "module": "build/bundler/hack_hydra_dx_wasm.js"
+  "main": "build/bundler/hack_hydra_dx_wasm.js"
 }
