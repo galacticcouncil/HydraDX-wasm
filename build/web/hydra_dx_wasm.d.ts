@@ -13,22 +13,22 @@ export function get_spot_price(s: string, b: string, a: string): string;
 * @param {string} a
 * @returns {string}
 */
-export function get_sell_price(s: string, b: string, a: string): string;
+export function calculate_out_given_in(s: string, b: string, a: string): string;
 /**
 * @param {string} s
 * @param {string} b
 * @param {string} a
 * @returns {string}
 */
-export function get_buy_price(s: string, b: string, a: string): string;
+export function calculate_in_given_out(s: string, b: string, a: string): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly get_spot_price: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly get_sell_price: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly get_buy_price: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly calculate_out_given_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
   readonly __wbindgen_free: (a: number, b: number) => void;

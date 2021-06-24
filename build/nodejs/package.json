@@ -1,15 +1,15 @@
 {
-  "name": "hack-hydra-dx-wasm",
+  "name": "hydra-dx-wasm",
   "collaborators": [
     "Martin Hloska <martin.hloska@gmail.com>"
   ],
-  "version": "0.2.0",
+  "version": "1.0.0",
   "files": [
-    "hack_hydra_dx_wasm_bg.wasm",
-    "hack_hydra_dx_wasm.js",
-    "hack_hydra_dx_wasm_bg.js",
-    "hack_hydra_dx_wasm.d.ts"
+    "hydra_dx_wasm_bg.wasm",
+    "hydra_dx_wasm.js",
+    "hydra_dx_wasm_bg.js",
+    "hydra_dx_wasm.d.ts"
   ],
-  "main": "hack_hydra_dx_wasm.js",
-  "types": "hack_hydra_dx_wasm.d.ts"
+  "main": "hydra_dx_wasm.js",
+  "types": "hydra_dx_wasm.d.ts"
 }
