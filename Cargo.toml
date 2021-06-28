@@ -21,3 +21,7 @@ opt-level = "s"
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = ["-Oz", "--enable-mutable-globals"]
+
+[features]
+xyk = []
+lbp = []
