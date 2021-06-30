@@ -1,8 +1,10 @@
 [package]
+authors = ['GalacticCouncil']
+edition = '2018'
+license = 'Apache 2.0'
 name = "hydra-dx-wasm"
-version = "1.0.0"
-authors = ["Martin Hloska <martin.hloska@gmail.com>"]
-edition = "2018"
+repository = 'https://github.com/galacticcouncil/hydradx-wasm'
+version = "2.0.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -25,3 +27,4 @@ wasm-opt = ["-Oz", "--enable-mutable-globals"]
 [features]
 xyk = []
 lbp = []
+
