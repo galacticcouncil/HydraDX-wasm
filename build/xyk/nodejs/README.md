@@ -7,4 +7,4 @@ Install wasm-pack
 
 Build
 
-`make build-release`
+`wasm-pack build `

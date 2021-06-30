@@ -1,8 +1,10 @@
 [package]
+authors = ['GalacticCouncil']
+edition = '2018'
+license = 'Apache 2.0'
 name = "hydra-dx-wasm"
-version = "1.0.0"
-authors = ["Martin Hloska <martin.hloska@gmail.com>"]
-edition = "2018"
+repository = 'https://github.com/galacticcouncil/hydradx-wasm'
+version = "2.0.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -11,7 +13,7 @@ crate-type = ["cdylib", "rlib"]
 wasm-bindgen = {version = "0.2.68"}
 wee_alloc = { version = "0.4.5", optional = true }
 
-hydra-dx-math = {default-features = false, git = "https://github.com/galacticcouncil/hydraDX-math", tag="v1.0.0"}
+hydra-dx-math = {version = "2.0.0"}
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
@@ -21,3 +23,8 @@ opt-level = "s"
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = ["-Oz", "--enable-mutable-globals"]
+
+[features]
+xyk = []
+lbp = []
+
