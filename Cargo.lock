@@ -59,9 +59,9 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hydra-dx-math"
-version = "2.0.0"
+version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d796834f59ab9c02c6f44749064f9049997ac53c1f9cdcc14b709b5fcbc80e0"
+checksum = "89da0625a7ca083062bd64b6787b6cbd71677b332dc20ea5a3d5dc6f14b48a1b"
 dependencies = [
  "lazy_static",
  "num-traits",
@@ -70,7 +70,7 @@ dependencies = [
 
 [[package]]
 name = "hydra-dx-wasm"
-version = "1.0.0"
+version = "2.0.0"
 dependencies = [
  "hydra-dx-math",
  "wasm-bindgen",
