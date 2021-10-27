@@ -87,8 +87,7 @@ function getStringFromWasm0(ptr, len) {
 */
 export function get_spot_price(s, b, a) {
     try {
-        const retptr = wasm.__wbindgen_export_0.value - 16;
-        wasm.__wbindgen_export_0.value = retptr;
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         var ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
         var ptr1 = passStringToWasm0(b, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -100,7 +99,7 @@ export function get_spot_price(s, b, a) {
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
     } finally {
-        wasm.__wbindgen_export_0.value += 16;
+        wasm.__wbindgen_add_to_stack_pointer(16);
         wasm.__wbindgen_free(r0, r1);
     }
 }
@@ -113,8 +112,7 @@ export function get_spot_price(s, b, a) {
 */
 export function calculate_out_given_in(s, b, a) {
     try {
-        const retptr = wasm.__wbindgen_export_0.value - 16;
-        wasm.__wbindgen_export_0.value = retptr;
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         var ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
         var ptr1 = passStringToWasm0(b, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -126,7 +124,7 @@ export function calculate_out_given_in(s, b, a) {
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
     } finally {
-        wasm.__wbindgen_export_0.value += 16;
+        wasm.__wbindgen_add_to_stack_pointer(16);
         wasm.__wbindgen_free(r0, r1);
     }
 }
@@ -139,8 +137,7 @@ export function calculate_out_given_in(s, b, a) {
 */
 export function calculate_in_given_out(s, b, a) {
     try {
-        const retptr = wasm.__wbindgen_export_0.value - 16;
-        wasm.__wbindgen_export_0.value = retptr;
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         var ptr0 = passStringToWasm0(s, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         var len0 = WASM_VECTOR_LEN;
         var ptr1 = passStringToWasm0(b, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -152,14 +149,13 @@ export function calculate_in_given_out(s, b, a) {
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
     } finally {
-        wasm.__wbindgen_export_0.value += 16;
+        wasm.__wbindgen_add_to_stack_pointer(16);
         wasm.__wbindgen_free(r0, r1);
     }
 }
 
 async function load(module, imports) {
     if (typeof Response === 'function' && module instanceof Response) {
-
         if (typeof WebAssembly.instantiateStreaming === 'function') {
             try {
                 return await WebAssembly.instantiateStreaming(module, imports);
@@ -178,7 +174,6 @@ async function load(module, imports) {
         return await WebAssembly.instantiate(bytes, imports);
 
     } else {
-
         const instance = await WebAssembly.instantiate(module, imports);
 
         if (instance instanceof WebAssembly.Instance) {
@@ -192,7 +187,7 @@ async function load(module, imports) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = import.meta.url.replace(/\.js$/, '_bg.wasm');
+        input = new URL('hydra_dx_wasm_bg.wasm', import.meta.url);
     }
     const imports = {};
 
@@ -200,6 +195,8 @@ async function init(input) {
     if (typeof input === 'string' || (typeof Request === 'function' && input instanceof Request) || (typeof URL === 'function' && input instanceof URL)) {
         input = fetch(input);
     }
+
+
 
     const { instance, module } = await load(await input, imports);
 
