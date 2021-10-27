@@ -1,6 +1,6 @@
 {
   "name": "hydra-dx-wasm",
-  "version": "0.2.0",
+  "version": "3.0.0",
   "private": true,
   "files": [ "build" ],
   "main": "build/nodejs/hydra_dx_wasm.js",
