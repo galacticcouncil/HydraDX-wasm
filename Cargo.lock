@@ -95,9 +95,9 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hydra-dx-math"
-version = "4.0.0"
+version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d88e6565507c334ac7725396365dd0709ccdd8ca8e71d5a87c283cda7b565855"
+checksum = "b83f4a82aca744458687f462d70e829280c3be0ef9d56c468a2e34f4c056359d"
 dependencies = [
  "fixed",
  "lazy_static",
