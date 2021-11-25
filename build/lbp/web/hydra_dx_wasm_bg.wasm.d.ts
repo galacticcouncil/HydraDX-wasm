@@ -1,7 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
-export function calculate_default_pool_trade_fee(a: number, b: number, c: number): void;
 export function calculate_pool_trade_fee(a: number, b: number, c: number, d: number, e: number): void;
 export function get_spot_price(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number): void;
 export function calculate_out_given_in(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number): void;
