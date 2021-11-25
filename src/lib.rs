@@ -245,3 +245,25 @@ mod tests {
         );
     }
 }
+
+pub mod fee {
+    use super::*;
+
+    #[wasm_bindgen]
+    pub fn calculate_default_pool_trade_fee(amount: String) -> String {
+        let amount = to_u128!(amount);
+
+        let result = hydra_dx_math::fee::calculate_default_pool_trade_fee(amount);
+
+        result.unwrap_or(0).to_string()
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_pool_trade_fee(amount: String, _fee: String) -> String {
+        let amount = to_u128!(amount);
+
+        let result = hydra_dx_math::fee::calculate_default_pool_trade_fee(amount);
+
+        result.unwrap_or(0).to_string()
+    }
+}

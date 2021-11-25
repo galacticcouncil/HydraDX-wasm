@@ -1,6 +1,17 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} amount
+* @returns {string}
+*/
+export function calculate_default_pool_trade_fee(amount: string): string;
+/**
+* @param {string} amount
+* @param {string} _fee
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(amount: string, _fee: string): string;
+/**
 * @param {string} s
 * @param {string} b
 * @param {string} s_w
@@ -41,6 +52,8 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly calculate_default_pool_trade_fee: (a: number, b: number, c: number) => void;
+  readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly get_spot_price: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_out_given_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;

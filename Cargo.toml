@@ -13,7 +13,8 @@ crate-type = ["cdylib", "rlib"]
 wasm-bindgen = {version = "0.2.68"}
 wee_alloc = { version = "0.4.5", optional = true }
 
-hydra-dx-math = {version = "4.0.0"}
+#hydra-dx-math = {version = "4.0.0"}
+hydra-dx-math = { path ="../HydraDX-math" }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"

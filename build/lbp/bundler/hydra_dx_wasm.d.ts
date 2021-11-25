@@ -1,6 +1,17 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} amount
+* @returns {string}
+*/
+export function calculate_default_pool_trade_fee(amount: string): string;
+/**
+* @param {string} amount
+* @param {string} _fee
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(amount: string, _fee: string): string;
+/**
 * @param {string} s
 * @param {string} b
 * @param {string} s_w
