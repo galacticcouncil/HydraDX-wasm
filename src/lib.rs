@@ -253,7 +253,7 @@ pub mod fee {
     pub fn calculate_pool_trade_fee(a: String, fee_numerator: u32, fee_denominator: u32) -> String {
         let amount = to_u128!(a);
 
-        let result = hydra_dx_math::fee::calculate_pool_trade_fee(amount, (fee_numerator, fee_denominator).into());
+        let result = hydra_dx_math::fee::calculate_pool_trade_fee(amount, (fee_numerator, fee_denominator));
 
         result.unwrap_or(0).to_string()
     }
