@@ -6,16 +6,10 @@ macro_rules! to_u128 {
     );
 }
 
-macro_rules! to_u32 {
-    ($($x:expr),+) => (
-        {($($x.parse::<u32>().unwrap_or(0)),+)}
-    );
-}
-
+#[cfg(feature = "xyk")]
 pub mod xyk {
     pub use super::*;
 
-    #[cfg(feature = "xyk")]
     #[wasm_bindgen]
     pub fn get_spot_price(s: String, b: String, a: String) -> String {
         let (sell_reserve, buy_reserve, amount) = to_u128!(s, b, a);
@@ -25,7 +19,6 @@ pub mod xyk {
         result.unwrap_or(0).to_string()
     }
 
-    #[cfg(feature = "xyk")]
     #[wasm_bindgen]
     pub fn calculate_out_given_in(s: String, b: String, a: String) -> String {
         let (sell_reserve, buy_reserve, amount) = to_u128!(s, b, a);
@@ -35,7 +28,6 @@ pub mod xyk {
         result.unwrap_or(0).to_string()
     }
 
-    #[cfg(feature = "xyk")]
     #[wasm_bindgen]
     pub fn calculate_in_given_out(s: String, b: String, a: String) -> String {
         let (sell_reserve, buy_reserve, amount) = to_u128!(s, b, a);
@@ -44,12 +36,54 @@ pub mod xyk {
 
         result.unwrap_or(0).to_string()
     }
+
+    #[test]
+    fn spot_price_works() {
+        assert_eq!(
+            xyk::get_spot_price(String::from("1000"), String::from("2000"), String::from("500")),
+            "1000"
+        );
+        assert_eq!(
+            xyk::get_spot_price(String::from("1000"), String::from("0"), String::from("500")),
+            "0"
+        );
+    }
+
+    #[test]
+    fn out_in_works() {
+        assert_eq!(
+            xyk::calculate_out_given_in(String::from("1000"), String::from("2000"), String::from("500")),
+            "666"
+        );
+        assert_eq!(
+            xyk::calculate_out_given_in(String::from("1"), String::from("0"), String::from("0")),
+            "0"
+        );
+    }
+
+    #[test]
+    fn in_out_works() {
+        assert_eq!(
+            xyk::calculate_in_given_out(String::from("1000"), String::from("2000"), String::from("500")),
+            "334"
+        );
+        assert_eq!(
+            xyk::calculate_in_given_out(String::from("0"), String::from("1"), String::from("0")),
+            "0"
+        );
+    }
 }
 
+#[cfg(feature = "lbp")]
 pub mod lbp {
     pub use super::*;
 
-    #[cfg(feature = "lbp")]
+    macro_rules! to_u32 {
+        ($($x:expr),+) => (
+            {($($x.parse::<u32>().unwrap_or(0)),+)}
+        );
+    }
+
     #[wasm_bindgen]
     pub fn get_spot_price(s: String, b: String, s_w: String, b_w: String, a: String) -> String {
         let (sell_reserve, buy_reserve, amount) = to_u128!(s, b, a);
@@ -61,7 +95,6 @@ pub mod lbp {
         result.unwrap_or(0).to_string()
     }
 
-    #[cfg(feature = "lbp")]
     #[wasm_bindgen]
     pub fn calculate_out_given_in(s: String, b: String, s_w: String, b_w: String, a: String) -> String {
         let (sell_reserve, buy_reserve, amount) = to_u128!(s, b, a);
@@ -73,7 +106,6 @@ pub mod lbp {
         result.unwrap_or(0).to_string()
     }
 
-    #[cfg(feature = "lbp")]
     #[wasm_bindgen]
     pub fn calculate_in_given_out(s: String, b: String, s_w: String, b_w: String, a: String) -> String {
         let (sell_reserve, buy_reserve, amount) = to_u128!(s, b, a);
@@ -85,7 +117,6 @@ pub mod lbp {
         result.unwrap_or(0).to_string()
     }
 
-    #[cfg(feature = "lbp")]
     #[wasm_bindgen]
     pub fn calculate_linear_weights(
         start_x: String,
@@ -100,62 +131,7 @@ pub mod lbp {
 
         result.unwrap_or(0).to_string()
     }
-}
 
-#[cfg(test)]
-mod tests {
-    #[cfg(feature = "xyk")]
-    use crate::xyk;
-
-    #[cfg(feature = "lbp")]
-    use crate::lbp;
-
-    #[test]
-    fn conversion() {
-        assert_eq!(to_u128!("128"), 128_u128);
-        assert_eq!(to_u128!("invalid"), 0_u128);
-    }
-
-    #[cfg(feature = "xyk")]
-    #[test]
-    fn spot_price_works() {
-        assert_eq!(
-            xyk::get_spot_price(String::from("1000"), String::from("2000"), String::from("500")),
-            "1000"
-        );
-        assert_eq!(
-            xyk::get_spot_price(String::from("1000"), String::from("0"), String::from("500")),
-            "0"
-        );
-    }
-
-    #[cfg(feature = "xyk")]
-    #[test]
-    fn outin_price_works() {
-        assert_eq!(
-            xyk::calculate_out_given_in(String::from("1000"), String::from("2000"), String::from("500")),
-            "666"
-        );
-        assert_eq!(
-            xyk::calculate_out_given_in(String::from("1"), String::from("0"), String::from("0")),
-            "0"
-        );
-    }
-
-    #[cfg(feature = "xyk")]
-    #[test]
-    fn inout_price_works() {
-        assert_eq!(
-            xyk::calculate_in_given_out(String::from("1000"), String::from("2000"), String::from("500")),
-            "334"
-        );
-        assert_eq!(
-            xyk::calculate_in_given_out(String::from("0"), String::from("1"), String::from("0")),
-            "0"
-        );
-    }
-
-    #[cfg(feature = "lbp")]
     #[test]
     fn spot_price_works() {
         assert_eq!(
@@ -180,7 +156,6 @@ mod tests {
         );
     }
 
-    #[cfg(feature = "lbp")]
     #[test]
     fn outin_price_works() {
         assert_eq!(
@@ -205,7 +180,6 @@ mod tests {
         );
     }
 
-    #[cfg(feature = "lbp")]
     #[test]
     fn inout_price_works() {
         assert_eq!(
@@ -230,7 +204,6 @@ mod tests {
         );
     }
 
-    #[cfg(feature = "lbp")]
     #[test]
     fn linear_weights_works() {
         assert_eq!(
@@ -246,6 +219,15 @@ mod tests {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn conversion() {
+        assert_eq!(to_u128!("128"), 128_u128);
+        assert_eq!(to_u128!("invalid"), 0_u128);
+    }
+}
+
 pub mod fee {
     use super::*;
 
@@ -257,6 +239,7 @@ pub mod fee {
 
         result.unwrap_or(0).to_string()
     }
+
     #[cfg(test)]
     mod tests {
         use super::*;

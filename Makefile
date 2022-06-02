@@ -27,5 +27,5 @@ build-bundler-release:
 
 .PHONY: tests
 tests: 
-	cargo test
+	cargo test --all-features
 

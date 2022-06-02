@@ -1,10 +1,10 @@
 [package]
 authors = ['GalacticCouncil']
-edition = '2018'
+edition = '2021'
 license = 'Apache 2.0'
 name = "hydra-dx-wasm"
 repository = 'https://github.com/galacticcouncil/hydradx-wasm'
-version = "3.0.0"
+version = "3.1.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -13,7 +13,6 @@ crate-type = ["cdylib", "rlib"]
 wasm-bindgen = {version = "0.2.68"}
 wee_alloc = { version = "0.4.5", optional = true }
 
-#hydra-dx-math = {version = "4.0.0"}
 hydra-dx-math = "4.1.0"
 
 [dev-dependencies]
