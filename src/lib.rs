@@ -219,6 +219,50 @@ pub mod lbp {
     }
 }
 
+#[cfg(feature = "stableswap")]
+pub mod stableswap {
+    pub use super::*;
+
+    #[wasm_bindgen]
+    pub fn get_spot_price(_reserve_in: String, _reserve_out: String, _amount: String) -> String {
+        0u128.to_string()
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_out_given_in(_reserve_in: String, _reserve_out: String, _amount_in: String) -> String {
+        0u128.to_string()
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_in_given_out(_reserve_in: String, _reserve_out: String, _amount_out: String) -> String {
+        0u128.to_string()
+    }
+
+    #[test]
+    fn out_in_works() {
+        assert_eq!(
+            calculate_out_given_in(String::from("1000"), String::from("2000"), String::from("500")),
+            "0"
+        );
+        assert_eq!(
+            calculate_out_given_in(String::from("1"), String::from("0"), String::from("0")),
+            "0"
+        );
+    }
+
+    #[test]
+    fn in_out_works() {
+        assert_eq!(
+            calculate_in_given_out(String::from("1000"), String::from("2000"), String::from("500")),
+            "0"
+        );
+        assert_eq!(
+            xyk::calculate_in_given_out(String::from("0"), String::from("1"), String::from("0")),
+            "0"
+        );
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

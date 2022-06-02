@@ -1,6 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
+/**
 * @param {string} s
 * @param {string} b
 * @param {string} s_w
@@ -36,10 +43,3 @@ export function calculate_in_given_out(s: string, b: string, s_w: string, b_w: s
 * @returns {string}
 */
 export function calculate_linear_weights(start_x: string, end_x: string, start_y: string, end_y: string, at: string): string;
-/**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
