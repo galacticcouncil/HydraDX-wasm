@@ -229,23 +229,47 @@ pub mod stableswap {
     }
 
     #[wasm_bindgen]
-    pub fn calculate_out_given_in(_reserve_in: String, _reserve_out: String, _amount_in: String) -> String {
+    pub fn calculate_out_given_in(
+        _reserve_in: String,
+        _reserve_out: String,
+        _amount_in: String,
+        _amplification: String,
+        _precision: String,
+    ) -> String {
         0u128.to_string()
     }
 
     #[wasm_bindgen]
-    pub fn calculate_in_given_out(_reserve_in: String, _reserve_out: String, _amount_out: String) -> String {
+    pub fn calculate_in_given_out(
+        _reserve_in: String,
+        _reserve_out: String,
+        _amount_out: String,
+        _amplification: String,
+        _precision: String,
+    ) -> String {
         0u128.to_string()
     }
 
     #[test]
     fn out_in_works() {
         assert_eq!(
-            calculate_out_given_in(String::from("1000"), String::from("2000"), String::from("500")),
+            calculate_out_given_in(
+                String::from("1000"),
+                String::from("2000"),
+                String::from("500"),
+                String::from("400"),
+                String::from("1")
+            ),
             "0"
         );
         assert_eq!(
-            calculate_out_given_in(String::from("1"), String::from("0"), String::from("0")),
+            calculate_out_given_in(
+                String::from("1"),
+                String::from("0"),
+                String::from("0"),
+                String::from("400"),
+                String::from("1")
+            ),
             "0"
         );
     }

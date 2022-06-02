@@ -11,16 +11,20 @@ export function get_spot_price(_reserve_in: string, _reserve_out: string, _amoun
 * @param {string} _reserve_in
 * @param {string} _reserve_out
 * @param {string} _amount_in
+* @param {string} _amplification
+* @param {string} _precision
 * @returns {string}
 */
-export function calculate_out_given_in(_reserve_in: string, _reserve_out: string, _amount_in: string): string;
+export function calculate_out_given_in(_reserve_in: string, _reserve_out: string, _amount_in: string, _amplification: string, _precision: string): string;
 /**
 * @param {string} _reserve_in
 * @param {string} _reserve_out
 * @param {string} _amount_out
+* @param {string} _amplification
+* @param {string} _precision
 * @returns {string}
 */
-export function calculate_in_given_out(_reserve_in: string, _reserve_out: string, _amount_out: string): string;
+export function calculate_in_given_out(_reserve_in: string, _reserve_out: string, _amount_out: string, _amplification: string, _precision: string): string;
 /**
 * @param {string} a
 * @param {number} fee_numerator
@@ -34,8 +38,8 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly get_spot_price: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly calculate_out_given_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly calculate_out_given_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
+  readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;

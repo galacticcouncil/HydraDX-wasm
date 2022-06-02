@@ -111,9 +111,11 @@ export function get_spot_price(_reserve_in, _reserve_out, _amount) {
 * @param {string} _reserve_in
 * @param {string} _reserve_out
 * @param {string} _amount_in
+* @param {string} _amplification
+* @param {string} _precision
 * @returns {string}
 */
-export function calculate_out_given_in(_reserve_in, _reserve_out, _amount_in) {
+export function calculate_out_given_in(_reserve_in, _reserve_out, _amount_in, _amplification, _precision) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passStringToWasm0(_reserve_in, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -122,7 +124,11 @@ export function calculate_out_given_in(_reserve_in, _reserve_out, _amount_in) {
         const len1 = WASM_VECTOR_LEN;
         const ptr2 = passStringToWasm0(_amount_in, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len2 = WASM_VECTOR_LEN;
-        wasm.calculate_out_given_in(retptr, ptr0, len0, ptr1, len1, ptr2, len2);
+        const ptr3 = passStringToWasm0(_amplification, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len3 = WASM_VECTOR_LEN;
+        const ptr4 = passStringToWasm0(_precision, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len4 = WASM_VECTOR_LEN;
+        wasm.calculate_out_given_in(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
@@ -136,9 +142,11 @@ export function calculate_out_given_in(_reserve_in, _reserve_out, _amount_in) {
 * @param {string} _reserve_in
 * @param {string} _reserve_out
 * @param {string} _amount_out
+* @param {string} _amplification
+* @param {string} _precision
 * @returns {string}
 */
-export function calculate_in_given_out(_reserve_in, _reserve_out, _amount_out) {
+export function calculate_in_given_out(_reserve_in, _reserve_out, _amount_out, _amplification, _precision) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passStringToWasm0(_reserve_in, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -147,7 +155,11 @@ export function calculate_in_given_out(_reserve_in, _reserve_out, _amount_out) {
         const len1 = WASM_VECTOR_LEN;
         const ptr2 = passStringToWasm0(_amount_out, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len2 = WASM_VECTOR_LEN;
-        wasm.calculate_in_given_out(retptr, ptr0, len0, ptr1, len1, ptr2, len2);
+        const ptr3 = passStringToWasm0(_amplification, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len3 = WASM_VECTOR_LEN;
+        const ptr4 = passStringToWasm0(_precision, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len4 = WASM_VECTOR_LEN;
+        wasm.calculate_in_given_out(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
