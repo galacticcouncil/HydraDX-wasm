@@ -4,7 +4,7 @@ edition = '2021'
 license = 'Apache 2.0'
 name = "hydra-dx-wasm"
 repository = 'https://github.com/galacticcouncil/hydradx-wasm'
-version = "3.2.0"
+version = "3.3.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -13,7 +13,7 @@ crate-type = ["cdylib", "rlib"]
 wasm-bindgen = {version = "0.2.68"}
 wee_alloc = { version = "0.4.5", optional = true }
 
-hydra-dx-math = "4.1.0"
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-math", rev="40ab7ae05679eb374df6f84388547b42b844822b"}
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"

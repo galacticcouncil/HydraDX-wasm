@@ -223,31 +223,58 @@ pub mod lbp {
 pub mod stableswap {
     pub use super::*;
 
+    const D_ITERATIONS: u8 = 128;
+    const Y_ITERATIONS: u8 = 64;
+
     #[wasm_bindgen]
-    pub fn get_spot_price(_reserve_in: String, _reserve_out: String, _amount: String) -> String {
-        0u128.to_string()
+    pub fn get_spot_price(reserve_in: String, reserve_out: String, amount: String) -> String {
+        let (sell_reserve, buy_reserve, amount) = to_u128!(reserve_in, reserve_out, amount);
+
+        let result = hydra_dx_math::xyk::calculate_spot_price(sell_reserve, buy_reserve, amount);
+
+        result.unwrap_or(0).to_string()
     }
 
     #[wasm_bindgen]
     pub fn calculate_out_given_in(
-        _reserve_in: String,
-        _reserve_out: String,
-        _amount_in: String,
-        _amplification: String,
-        _precision: String,
+        reserve_in: String,
+        reserve_out: String,
+        amount_in: String,
+        amplification: String,
+        precision: String,
     ) -> String {
-        0u128.to_string()
+        let (reserve_in, reserve_out, amount_in, amplification, precision) =
+            to_u128!(reserve_in, reserve_out, amount_in, amplification, precision);
+        let result = hydra_dx_math::stableswap::math::calculate_out_given_in::<D_ITERATIONS, Y_ITERATIONS>(
+            reserve_in,
+            reserve_out,
+            amount_in,
+            amplification,
+            precision,
+        );
+
+        result.unwrap_or(0).to_string()
     }
 
     #[wasm_bindgen]
     pub fn calculate_in_given_out(
-        _reserve_in: String,
-        _reserve_out: String,
-        _amount_out: String,
-        _amplification: String,
-        _precision: String,
+        reserve_in: String,
+        reserve_out: String,
+        amount_out: String,
+        amplification: String,
+        precision: String,
     ) -> String {
-        0u128.to_string()
+        let (reserve_in, reserve_out, amount_out, amplification, precision) =
+            to_u128!(reserve_in, reserve_out, amount_out, amplification, precision);
+        let result = hydra_dx_math::stableswap::math::calculate_in_given_out::<D_ITERATIONS, Y_ITERATIONS>(
+            reserve_in,
+            reserve_out,
+            amount_out,
+            amplification,
+            precision,
+        );
+
+        result.unwrap_or(0).to_string()
     }
 
     #[test]
@@ -260,7 +287,7 @@ pub mod stableswap {
                 String::from("400"),
                 String::from("1")
             ),
-            "0"
+            "497"
         );
         assert_eq!(
             calculate_out_given_in(
@@ -277,11 +304,34 @@ pub mod stableswap {
     #[test]
     fn in_out_works() {
         assert_eq!(
-            calculate_in_given_out(String::from("1000"), String::from("2000"), String::from("500")),
-            "0"
+            calculate_in_given_out(
+                String::from("1000"),
+                String::from("2000"),
+                String::from("500"),
+                String::from("100"),
+                String::from("1"),
+            ),
+            "503"
         );
         assert_eq!(
-            xyk::calculate_in_given_out(String::from("0"), String::from("1"), String::from("0")),
+            calculate_in_given_out(
+                String::from("0"),
+                String::from("1"),
+                String::from("0"),
+                "100".to_string(),
+                "1".to_string()
+            ),
+            "0"
+        );
+    }
+    #[test]
+    fn spot_price_works() {
+        assert_eq!(
+            get_spot_price(String::from("1000"), String::from("2000"), String::from("500")),
+            "1000"
+        );
+        assert_eq!(
+            get_spot_price(String::from("1000"), String::from("0"), String::from("500")),
             "0"
         );
     }
