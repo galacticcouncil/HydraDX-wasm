@@ -130,7 +130,7 @@ dependencies = [
 
 [[package]]
 name = "hydra-dx-wasm"
-version = "3.3.0"
+version = "3.4.0"
 dependencies = [
  "hydra-dx-math",
  "wasm-bindgen",

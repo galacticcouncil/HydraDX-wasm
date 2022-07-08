@@ -4,7 +4,7 @@ edition = '2021'
 license = 'Apache 2.0'
 name = "hydra-dx-wasm"
 repository = 'https://github.com/galacticcouncil/hydradx-wasm'
-version = "3.3.0"
+version = "3.4.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

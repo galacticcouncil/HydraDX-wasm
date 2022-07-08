@@ -37,6 +37,50 @@ pub mod xyk {
         result.unwrap_or(0).to_string()
     }
 
+    #[wasm_bindgen]
+    pub fn calculate_liquidity_in(reserve_a: String, reserve_b: String, amount_a: String) -> String {
+        let (reserve_a, reserve_b, amount_a) = to_u128!(reserve_a, reserve_b, amount_a);
+
+        let result = hydra_dx_math::xyk::calculate_liquidity_in(reserve_a, reserve_b, amount_a);
+
+        result.unwrap_or(0).to_string()
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_liquidity_out_asset_a(
+        reserve_a: String,
+        reserve_b: String,
+        shares: String,
+        total_shares: String,
+    ) -> String {
+        let (reserve_a, reserve_b, shares, total_shares) = to_u128!(reserve_a, reserve_b, shares, total_shares);
+
+        let result = hydra_dx_math::xyk::calculate_liquidity_out(reserve_a, reserve_b, shares, total_shares).ok();
+
+        if let Some(values) = result {
+            values.0.to_string()
+        } else {
+            "0".to_string()
+        }
+    }
+    #[wasm_bindgen]
+    pub fn calculate_liquidity_out_asset_b(
+        reserve_a: String,
+        reserve_b: String,
+        shares: String,
+        total_shares: String,
+    ) -> String {
+        let (reserve_a, reserve_b, shares, total_shares) = to_u128!(reserve_a, reserve_b, shares, total_shares);
+
+        let result = hydra_dx_math::xyk::calculate_liquidity_out(reserve_a, reserve_b, shares, total_shares).ok();
+
+        if let Some(values) = result {
+            values.1.to_string()
+        } else {
+            "0".to_string()
+        }
+    }
+
     #[test]
     fn spot_price_works() {
         assert_eq!(
@@ -69,6 +113,50 @@ pub mod xyk {
         );
         assert_eq!(
             xyk::calculate_in_given_out(String::from("0"), String::from("1"), String::from("0")),
+            "0"
+        );
+    }
+
+    #[test]
+    fn add_liquidity_works() {
+        assert_eq!(
+            xyk::calculate_liquidity_in(String::from("1000"), String::from("2000"), String::from("500")),
+            "1000"
+        );
+        assert_eq!(
+            xyk::calculate_liquidity_in(String::from("0"), String::from("1"), String::from("0")),
+            "0"
+        );
+    }
+
+    #[test]
+    fn remove_liquidity_works() {
+        assert_eq!(
+            xyk::calculate_liquidity_out_asset_a(
+                String::from("1000"),
+                String::from("2000"),
+                String::from("500"),
+                String::from("1000")
+            ),
+            "500"
+        );
+        assert_eq!(
+            xyk::calculate_liquidity_out_asset_b(
+                String::from("1000"),
+                String::from("2000"),
+                String::from("500"),
+                String::from("1000")
+            ),
+            "1000"
+        );
+
+        assert_eq!(
+            xyk::calculate_liquidity_out_asset_a(
+                String::from("0"),
+                String::from("1"),
+                String::from("0"),
+                String::from("0")
+            ),
             "0"
         );
     }
