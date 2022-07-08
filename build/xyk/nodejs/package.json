@@ -3,7 +3,7 @@
   "collaborators": [
     "GalacticCouncil"
   ],
-  "version": "3.3.0",
+  "version": "3.4.0",
   "license": "Apache 2.0",
   "repository": {
     "type": "git",
@@ -12,6 +12,7 @@
   "files": [
     "hydra_dx_wasm_bg.wasm",
     "hydra_dx_wasm.js",
+    "hydra_dx_wasm_bg.js",
     "hydra_dx_wasm.d.ts"
   ],
   "main": "hydra_dx_wasm.js",
