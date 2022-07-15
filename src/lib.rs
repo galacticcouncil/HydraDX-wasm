@@ -47,6 +47,15 @@ pub mod xyk {
     }
 
     #[wasm_bindgen]
+    pub fn calculate_shares(reserve_a: String, amount_a: String, total_shares: String) -> String {
+        let (reserve_a, amount_a, total_shares) = to_u128!(reserve_a, amount_a, total_shares);
+
+        let result = hydra_dx_math::xyk::calculate_shares(reserve_a, amount_a, total_shares);
+
+        result.unwrap_or(0).to_string()
+    }
+
+    #[wasm_bindgen]
     pub fn calculate_liquidity_out_asset_a(
         reserve_a: String,
         reserve_b: String,
@@ -121,7 +130,7 @@ pub mod xyk {
     fn add_liquidity_works() {
         assert_eq!(
             xyk::calculate_liquidity_in(String::from("1000"), String::from("2000"), String::from("500")),
-            "1000"
+            "1001"
         );
         assert_eq!(
             xyk::calculate_liquidity_in(String::from("0"), String::from("1"), String::from("0")),
@@ -157,6 +166,18 @@ pub mod xyk {
                 String::from("0"),
                 String::from("0")
             ),
+            "0"
+        );
+    }
+
+    #[test]
+    fn share_calc_works() {
+        assert_eq!(
+            xyk::calculate_shares(String::from("1000"), String::from("100"), String::from("2000")),
+            "200"
+        );
+        assert_eq!(
+            xyk::calculate_liquidity_in(String::from("0"), String::from("1"), String::from("0")),
             "0"
         );
     }
