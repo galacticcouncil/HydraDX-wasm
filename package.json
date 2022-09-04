@@ -1,9 +1,9 @@
 {
-  "name": "hydra-dx-wasm",
-  "version": "3.0.0",
-  "private": true,
-  "files": [ "build" ],
-  "main": "build/nodejs/hydra_dx_wasm.js",
-  "browser": "build/web/hydra_dx_wasm.js",
-  "module": "build/bundler/hydra_dx_wasm.js"
+  "name": "@galacticcouncil/math",
+  "version": "0.0.0-beta-1",
+  "sideEffects": false,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ]
 }
