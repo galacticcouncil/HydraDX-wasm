@@ -28,6 +28,18 @@ build-bundler-release:
 	rm ./build/xyk/bundler/LICENSE ./build/lbp/bundler/LICENSE ./build/stableswap/bundler/LICENSE
 	rm ./build/xyk/bundler/README.md ./build/lbp/bundler/README.md ./build/stableswap/bundler/README.md
 
+.PHONY: build-package 
+build-package: 
+	bash ./build-package.sh xyk
+	bash ./build-package.sh lbp
+	bash ./build-package.sh stableswap
+
+.PHONY: clean-package 
+clean-package: 
+	bash ./clean-package.sh xyk
+	bash ./clean-package.sh lbp
+	bash ./clean-package.sh stableswap
+
 .PHONY: tests
 tests: 
 	cargo test --all-features
