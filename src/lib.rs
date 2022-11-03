@@ -653,7 +653,8 @@ pub mod liquidity_mining {
 #[cfg(feature = "omnipool")]
 pub mod omnipool {
     pub use super::*;
-    use hydra_dx_math::omnipool::types::{AssetReserveState, I129};
+    use hydra_dx_math::omnipool::types::{AssetReserveState, Position as OmnipoolPosition, I129};
+    use sp_arithmetic::{FixedU128, Permill};
 
     macro_rules! parse_into {
         ($x:ty, $y:expr, $e:expr) => {{
@@ -687,6 +688,38 @@ pub mod omnipool {
         fn error() -> Self {
             MathResult {
                 result: "".to_string(),
+                error: true,
+            }
+        }
+    }
+
+    #[wasm_bindgen]
+    pub struct LiquidityOutResult {
+        amount: String,
+        lrna_amount: String,
+        error: bool,
+    }
+
+    #[wasm_bindgen]
+    impl LiquidityOutResult {
+        pub fn get_asset_amount(&self) -> String {
+            self.amount.clone()
+        }
+
+        pub fn get_lrna_amount(&self) -> String {
+            self.lrna_amount.clone()
+        }
+
+        pub fn is_error(&self) -> bool {
+            self.error
+        }
+    }
+
+    impl LiquidityOutResult {
+        fn error() -> Self {
+            LiquidityOutResult {
+                amount: "".to_string(),
+                lrna_amount: "".to_string(),
                 error: true,
             }
         }
@@ -729,10 +762,37 @@ pub mod omnipool {
     }
 
     #[wasm_bindgen]
+    pub struct Position {
+        amount: String,
+        shares: String,
+        price: String,
+    }
+
+    #[wasm_bindgen]
+    impl Position {
+        #[wasm_bindgen(constructor)]
+        pub fn new(amount: String, shares: String, price: String) -> Self {
+            Self { amount, shares, price }
+        }
+    }
+
+    impl TryFrom<Position> for OmnipoolPosition<u128> {
+        type Error = ();
+
+        fn try_from(value: Position) -> Result<Self, Self::Error> {
+            let amount = value.amount.parse::<u128>().map_err(|_| ())?;
+            let shares = value.shares.parse::<u128>().map_err(|_| ())?;
+            let price = value.price.parse::<FixedU128>().map_err(|_| ())?;
+
+            Ok(Self { amount, shares, price })
+        }
+    }
+
+    #[wasm_bindgen]
     pub fn calculate_shares(asset_state: AssetState, amount_in: String) -> MathResult {
         let amount = parse_into!(u128, amount_in, MathResult::error());
 
-        let state: AssetReserveState<u128> = if let Some(value) = asset_state.try_into().ok() {
+        let state: AssetReserveState<u128> = if let Ok(value) = asset_state.try_into() {
             value
         } else {
             return MathResult::error();
@@ -754,6 +814,128 @@ pub mod omnipool {
 
         MathResult {
             result: (*state_changes.asset.delta_shares).to_string(),
+            error: false,
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_liquidity_out(asset_state: AssetState, position: Position, shares: String) -> LiquidityOutResult {
+        let shares_amount = parse_into!(u128, shares, LiquidityOutResult::error());
+
+        let state: AssetReserveState<u128> = if let Ok(value) = asset_state.try_into() {
+            value
+        } else {
+            return LiquidityOutResult::error();
+        };
+
+        let position: OmnipoolPosition<u128> = if let Ok(value) = position.try_into() {
+            value
+        } else {
+            return LiquidityOutResult::error();
+        };
+
+        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_remove_liquidity_state_changes(
+            &state,
+            shares_amount,
+            &position,
+            I129 {
+                value: 0u128,
+                negative: false,
+            },
+            0u128,
+        ) {
+            r
+        } else {
+            return LiquidityOutResult::error();
+        };
+
+        LiquidityOutResult {
+            amount: (*state_changes.asset.delta_shares).to_string(),
+            lrna_amount: state_changes.lp_hub_amount.to_string(),
+            error: false,
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_out_given_in(
+        asset_in_state: AssetState,
+        asset_out_state: AssetState,
+        amount_in: String,
+        asset_fee: String,
+        protocol_fee: String,
+    ) -> MathResult {
+        let amount = parse_into!(u128, amount_in, MathResult::error());
+        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, MathResult::error()));
+        let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee, MathResult::error()));
+
+        let asset_in: AssetReserveState<u128> = if let Ok(value) = asset_in_state.try_into() {
+            value
+        } else {
+            return MathResult::error();
+        };
+        let asset_out: AssetReserveState<u128> = if let Ok(value) = asset_out_state.try_into() {
+            value
+        } else {
+            return MathResult::error();
+        };
+
+        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_sell_state_changes(
+            &asset_in,
+            &asset_out,
+            amount,
+            asset_fee,
+            protocol_fee,
+            0u128,
+        ) {
+            r
+        } else {
+            return MathResult::error();
+        };
+
+        MathResult {
+            result: (*state_changes.asset_out.delta_reserve).to_string(),
+            error: false,
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_in_given_out(
+        asset_in_state: AssetState,
+        asset_out_state: AssetState,
+        amount_out: String,
+        asset_fee: String,
+        protocol_fee: String,
+    ) -> MathResult {
+        let amount = parse_into!(u128, amount_out, MathResult::error());
+        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, MathResult::error()));
+        let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee, MathResult::error()));
+
+        let asset_in: AssetReserveState<u128> = if let Ok(value) = asset_in_state.try_into() {
+            value
+        } else {
+            return MathResult::error();
+        };
+        let asset_out: AssetReserveState<u128> = if let Ok(value) = asset_out_state.try_into() {
+            value
+        } else {
+            return MathResult::error();
+        };
+
+        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_buy_state_changes(
+            &asset_in,
+            &asset_out,
+            amount,
+            asset_fee,
+            protocol_fee,
+            0u128,
+        ) {
+            r
+        } else {
+            return MathResult::error();
+        };
+
+        MathResult {
+            result: (*state_changes.asset_in.delta_reserve).to_string(),
             error: false,
         }
     }
