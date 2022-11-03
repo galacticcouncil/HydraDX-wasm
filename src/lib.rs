@@ -1,3 +1,5 @@
+extern crate core;
+
 use wasm_bindgen::prelude::*;
 
 macro_rules! to_u128 {
@@ -328,6 +330,7 @@ pub mod lbp {
     }
 }
 
+/*
 #[cfg(feature = "stableswap")]
 pub mod stableswap {
     pub use super::*;
@@ -354,8 +357,8 @@ pub mod stableswap {
     ) -> String {
         let (reserve_in, reserve_out, amount_in, amplification, precision) =
             to_u128!(reserve_in, reserve_out, amount_in, amplification, precision);
-        let result = hydra_dx_math::stableswap::math::calculate_out_given_in::<D_ITERATIONS, Y_ITERATIONS>(
-            reserve_in,
+        let result = hydra_dx_math::stableswap::calculate_out_given_in::<D_ITERATIONS, Y_ITERATIONS>(
+            &[reserve_in, reserve_out],
             reserve_out,
             amount_in,
             amplification,
@@ -375,7 +378,7 @@ pub mod stableswap {
     ) -> String {
         let (reserve_in, reserve_out, amount_out, amplification, precision) =
             to_u128!(reserve_in, reserve_out, amount_out, amplification, precision);
-        let result = hydra_dx_math::stableswap::math::calculate_in_given_out::<D_ITERATIONS, Y_ITERATIONS>(
+        let result = hydra_dx_math::stableswap::calculate_in_given_out::<D_ITERATIONS, Y_ITERATIONS>(
             reserve_in,
             reserve_out,
             amount_out,
@@ -445,26 +448,27 @@ pub mod stableswap {
         );
     }
 }
-
-fn error() -> String {
-    "-1".to_string()
-}
-
-macro_rules! parse_into {
-    ($x:ty, $y:expr) => {{
-        let r = if let Some(x) = $y.parse::<$x>().ok() {
-            x
-        } else {
-            return error();
-        };
-        r
-    }};
-}
+*/
 
 #[cfg(feature = "liquidity-mining")]
 pub mod liquidity_mining {
     pub use super::*;
     use sp_arithmetic::fixed_point::FixedU128;
+
+    fn error() -> String {
+        "-1".to_string()
+    }
+
+    macro_rules! parse_into {
+        ($x:ty, $y:expr) => {{
+            let r = if let Some(x) = $y.parse::<$x>().ok() {
+                x
+            } else {
+                return error();
+            };
+            r
+        }};
+    }
 
     #[wasm_bindgen]
     pub fn calculate_loyalty_multiplier(
@@ -643,6 +647,115 @@ pub mod liquidity_mining {
             calculate_loyalty_multiplier("100".to_string(), "0.1".to_string(), "invalid".to_string()),
             "-1"
         );
+    }
+}
+
+#[cfg(feature = "omnipool")]
+pub mod omnipool {
+    pub use super::*;
+    use hydra_dx_math::omnipool::types::{AssetReserveState, I129};
+
+    macro_rules! parse_into {
+        ($x:ty, $y:expr, $e:expr) => {{
+            let r = if let Some(x) = $y.parse::<$x>().ok() {
+                x
+            } else {
+                return $e;
+            };
+            r
+        }};
+    }
+
+    #[wasm_bindgen]
+    pub struct MathResult {
+        result: String,
+        error: bool,
+    }
+
+    #[wasm_bindgen]
+    impl MathResult {
+        pub fn get_result(&self) -> String {
+            self.result.clone()
+        }
+
+        pub fn is_error(&self) -> bool {
+            self.error
+        }
+    }
+
+    impl MathResult {
+        fn error() -> Self {
+            MathResult {
+                result: "".to_string(),
+                error: true,
+            }
+        }
+    }
+
+    #[wasm_bindgen]
+    pub struct AssetState {
+        reserve: String,
+        hub_reserve: String,
+        shares: String,
+    }
+
+    #[wasm_bindgen]
+    impl AssetState {
+        #[wasm_bindgen(constructor)]
+        pub fn new(reserve: String, hub_reserve: String, shares: String) -> Self {
+            Self {
+                reserve,
+                hub_reserve,
+                shares,
+            }
+        }
+    }
+
+    impl TryFrom<AssetState> for AssetReserveState<u128> {
+        type Error = ();
+
+        fn try_from(value: AssetState) -> Result<Self, Self::Error> {
+            let reserve = value.reserve.parse::<u128>().map_err(|_| ())?;
+            let hub_reserve = value.hub_reserve.parse::<u128>().map_err(|_| ())?;
+            let shares = value.shares.parse::<u128>().map_err(|_| ())?;
+
+            Ok(Self {
+                reserve,
+                hub_reserve,
+                shares,
+                ..Default::default()
+            })
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_shares(asset_state: AssetState, amount_in: String) -> MathResult {
+        let amount = parse_into!(u128, amount_in, MathResult::error());
+
+        let state: AssetReserveState<u128> = if let Some(value) = asset_state.try_into().ok() {
+            value
+        } else {
+            return MathResult::error();
+        };
+
+        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_add_liquidity_state_changes(
+            &state,
+            amount,
+            I129 {
+                value: 0u128,
+                negative: false,
+            },
+            0u128,
+        ) {
+            r
+        } else {
+            return MathResult::error();
+        };
+
+        MathResult {
+            result: (*state_changes.asset.delta_shares).to_string(),
+            error: false,
+        }
     }
 }
 
