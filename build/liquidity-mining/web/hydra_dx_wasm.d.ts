@@ -59,6 +59,12 @@ export function calculate_reward(accumulated_rps_start: string, accumulated_rps_
 */
 export function calculate_adjusted_shares(shares: string, price_adjustment: string): string;
 /**
+* @param {string} valued_shares
+* @param {string} multiplier
+* @returns {string}
+*/
+export function calculate_global_farm_shares(valued_shares: string, multiplier: string): string;
+/**
 * @param {string} a
 * @param {number} fee_numerator
 * @param {number} fee_denominator
@@ -78,6 +84,7 @@ export interface InitOutput {
   readonly calculate_valued_shares: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_reward: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly calculate_adjusted_shares: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly calculate_global_farm_shares: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;
