@@ -1,6 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
+/**
 * @param {string} period
 * @param {string} initial_reward_percentage
 * @param {string} scale_coef
@@ -64,10 +71,3 @@ export function calculate_adjusted_shares(shares: string, price_adjustment: stri
 * @returns {string}
 */
 export function calculate_global_farm_shares(valued_shares: string, multiplier: string): string;
-/**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
