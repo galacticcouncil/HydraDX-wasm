@@ -59,6 +59,12 @@ export function calculate_reward(accumulated_rps_start: string, accumulated_rps_
 */
 export function calculate_adjusted_shares(shares: string, price_adjustment: string): string;
 /**
+* @param {string} valued_shares
+* @param {string} multiplier
+* @returns {string}
+*/
+export function calculate_global_farm_shares(valued_shares: string, multiplier: string): string;
+/**
 * @param {string} a
 * @param {number} fee_numerator
 * @param {number} fee_denominator

@@ -618,6 +618,20 @@ pub mod liquidity_mining {
         }
     }
 
+    #[wasm_bindgen]
+    pub fn calculate_global_farm_shares(valued_shares: String, multiplier: String) -> String {
+        let s= parse_into!(u128, valued_shares);
+        let m= FixedU128::from_float(parse_into!(f64, multiplier));
+
+        let result = hydra_dx_math::liquidity_mining::calculate_global_farm_shares(s, m);
+
+        if let Some(r) = result.ok() {
+            r.to_string()
+        } else {
+            error()
+        }
+    }
+
     #[test]
     fn calculate_loyalty_multiplier_should_work_when_input_is_correct() {
         assert_eq!(
