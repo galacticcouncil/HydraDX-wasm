@@ -346,7 +346,7 @@ pub mod stableswap {
 
         result.unwrap_or(0).to_string()
     }
-
+    
     #[wasm_bindgen]
     pub fn calculate_out_given_in(
         reserve_in: String,
@@ -357,8 +357,8 @@ pub mod stableswap {
     ) -> String {
         let (reserve_in, reserve_out, amount_in, amplification, precision) =
             to_u128!(reserve_in, reserve_out, amount_in, amplification, precision);
-        let result = hydra_dx_math::stableswap::calculate_out_given_in::<D_ITERATIONS, Y_ITERATIONS>(
-            &[reserve_in, reserve_out],
+       let result = hydra_dx_math::stableswap::math::calculate_out_given_in::<D_ITERATIONS, Y_ITERATIONS>(
+            reserve_in,
             reserve_out,
             amount_in,
             amplification,
@@ -477,7 +477,7 @@ pub mod liquidity_mining {
         scale_coef: String,
     ) -> String {
         let period = parse_into!(u128, period);
-        let reward_percentage = FixedU128::from_float(parse_into!(f64, initial_reward_percentage));
+        let reward_percentage = FixedU128::from_inner(parse_into!(u128, initial_reward_percentage));
         let scale_coef = parse_into!(u32, scale_coef);
 
         let result = hydra_dx_math::liquidity_mining::calculate_loyalty_multiplier::<u128>(
@@ -499,7 +499,7 @@ pub mod liquidity_mining {
         total_farm_shares_z: String,
         max_reward_per_period: String,
     ) -> String {
-        let yield_per_period = FixedU128::from_float(parse_into!(f64, yield_per_period));
+        let yield_per_period = FixedU128::from_inner(parse_into!(u128, yield_per_period));
         let farm_shares = parse_into!(u128, total_farm_shares_z);
         let reward = parse_into!(u128, max_reward_per_period);
 
@@ -518,7 +518,7 @@ pub mod liquidity_mining {
 
     #[wasm_bindgen]
     pub fn calculate_accumulated_rps(accumulated_rps_now: String, total_shares: String, reward: String) -> String {
-        let rps = FixedU128::from_float(parse_into!(f64, accumulated_rps_now));
+        let rps = FixedU128::from_inner(parse_into!(u128, accumulated_rps_now));
         let shares = parse_into!(u128, total_shares);
         let reward = parse_into!(u128, reward);
 
@@ -539,12 +539,12 @@ pub mod liquidity_mining {
         accumulated_rpvs_now: String,
         loyalty_multiplier: String,
     ) -> String {
-        let rps = FixedU128::from_float(parse_into!(f64, accumulated_rpvs));
+        let rps = FixedU128::from_inner(parse_into!(u128, accumulated_rpvs));
         let shares = parse_into!(u128, valued_shares);
         let rewards = parse_into!(u128, accumulated_claimed_rewards);
 
-        let rps_now = FixedU128::from_float(parse_into!(f64, accumulated_rpvs_now));
-        let multiplier = FixedU128::from_float(parse_into!(f64, loyalty_multiplier));
+        let rps_now = FixedU128::from_inner(parse_into!(u128, accumulated_rpvs_now));
+        let multiplier = FixedU128::from_inner(parse_into!(u128, loyalty_multiplier));
 
         let result = hydra_dx_math::liquidity_mining::calculate_user_reward(rps, shares, rewards, rps_now, multiplier);
 
@@ -562,12 +562,12 @@ pub mod liquidity_mining {
         accumulated_rpvs_now: String,
         loyalty_multiplier: String,
     ) -> String {
-        let rps = FixedU128::from_float(parse_into!(f64, accumulated_rpvs));
+        let rps = FixedU128::from_inner(parse_into!(u128, accumulated_rpvs));
         let shares = parse_into!(u128, valued_shares);
         let rewards = parse_into!(u128, accumulated_claimed_rewards);
 
-        let rps_now = FixedU128::from_float(parse_into!(f64, accumulated_rpvs_now));
-        let multiplier = FixedU128::from_float(parse_into!(f64, loyalty_multiplier));
+        let rps_now = FixedU128::from_inner(parse_into!(u128, accumulated_rpvs_now));
+        let multiplier = FixedU128::from_inner(parse_into!(u128, loyalty_multiplier));
 
         let result = hydra_dx_math::liquidity_mining::calculate_user_reward(rps, shares, rewards, rps_now, multiplier);
 
@@ -594,8 +594,8 @@ pub mod liquidity_mining {
 
     #[wasm_bindgen]
     pub fn calculate_reward(accumulated_rps_start: String, accumulated_rps_now: String, shares: String) -> String {
-        let rps_start = FixedU128::from_float(parse_into!(f64, accumulated_rps_start));
-        let rps_now = FixedU128::from_float(parse_into!(f64, accumulated_rps_now));
+        let rps_start = FixedU128::from_inner(parse_into!(u128, accumulated_rps_start));
+        let rps_now = FixedU128::from_inner(parse_into!(u128, accumulated_rps_now));
 
         let shares = parse_into!(u128, shares);
 
@@ -611,9 +611,23 @@ pub mod liquidity_mining {
     #[wasm_bindgen]
     pub fn calculate_adjusted_shares(shares: String, price_adjustment: String) -> String {
         let shares = parse_into!(u128, shares);
-        let price = FixedU128::from_float(parse_into!(f64, price_adjustment));
+        let price = FixedU128::from_inner(parse_into!(u128, price_adjustment));
 
         let result = hydra_dx_math::liquidity_mining::calculate_adjusted_shares(shares, price);
+
+        if let Some(r) = result.ok() {
+            r.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_global_farm_shares(valued_shares: String, multiplier: String) -> String {
+        let s = parse_into!(u128, valued_shares);
+        let m = FixedU128::from_inner(parse_into!(u128, multiplier));
+
+        let result = hydra_dx_math::liquidity_mining::calculate_global_farm_shares(s, m);
 
         if let Some(r) = result.ok() {
             r.to_string()
@@ -625,18 +639,18 @@ pub mod liquidity_mining {
     #[test]
     fn calculate_loyalty_multiplier_should_work_when_input_is_correct() {
         assert_eq!(
-            calculate_loyalty_multiplier("100".to_string(), "0.2".to_string(), "2".to_string()),
+            calculate_loyalty_multiplier("100".to_string(), "200000000000000000".to_string(), "2".to_string()),
             "0.9843137254901961"
         );
         assert_eq!(
-            calculate_loyalty_multiplier("100".to_string(), "1".to_string(), "2".to_string()),
+            calculate_loyalty_multiplier("100".to_string(), "1000000000000000000".to_string(), "2".to_string()),
             "1"
         );
     }
     #[test]
     fn calculate_loyalty_multiplier_should_fail_when_input_is_incorrect() {
         assert_eq!(
-            calculate_loyalty_multiplier("invalid".to_string(), "0.2".to_string(), "2".to_string()),
+            calculate_loyalty_multiplier("invalid".to_string(), "200000000000000000".to_string(), "2".to_string()),
             "-1"
         );
         assert_eq!(
@@ -644,7 +658,11 @@ pub mod liquidity_mining {
             "-1"
         );
         assert_eq!(
-            calculate_loyalty_multiplier("100".to_string(), "0.1".to_string(), "invalid".to_string()),
+            calculate_loyalty_multiplier(
+                "100".to_string(),
+                "100000000000000000".to_string(),
+                "invalid".to_string()
+            ),
             "-1"
         );
     }

@@ -80,6 +80,27 @@ function getStringFromWasm0(ptr, len) {
     return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
 }
 /**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a, fee_numerator, fee_denominator) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(a, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.calculate_pool_trade_fee(retptr, ptr0, len0, fee_numerator, fee_denominator);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(r0, r1);
+    }
+}
+
+/**
 * @param {string} period
 * @param {string} initial_reward_percentage
 * @param {string} scale_coef
@@ -286,17 +307,18 @@ export function calculate_adjusted_shares(shares, price_adjustment) {
 }
 
 /**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
+* @param {string} valued_shares
+* @param {string} multiplier
 * @returns {string}
 */
-export function calculate_pool_trade_fee(a, fee_numerator, fee_denominator) {
+export function calculate_global_farm_shares(valued_shares, multiplier) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        const ptr0 = passStringToWasm0(a, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const ptr0 = passStringToWasm0(valued_shares, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        wasm.calculate_pool_trade_fee(retptr, ptr0, len0, fee_numerator, fee_denominator);
+        const ptr1 = passStringToWasm0(multiplier, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        wasm.calculate_global_farm_shares(retptr, ptr0, len0, ptr1, len1);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
