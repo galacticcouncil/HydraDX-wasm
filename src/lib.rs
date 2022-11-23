@@ -346,7 +346,7 @@ pub mod stableswap {
 
         result.unwrap_or(0).to_string()
     }
-    
+
     #[wasm_bindgen]
     pub fn calculate_out_given_in(
         reserve_in: String,
@@ -956,6 +956,83 @@ pub mod omnipool {
             result: (*state_changes.asset_in.delta_reserve).to_string(),
             error: false,
         }
+    }
+
+    const SELL: u8 = 0b0000_0001;
+    const BUY: u8 = 0b0000_0010;
+    const ADD_LIQUIDITY: u8 = 0b0000_0100;
+    const REMOVE_LIQUIDITY: u8 = 0b0000_1000;
+
+    #[wasm_bindgen]
+    #[derive(Debug, Copy, Clone)]
+    pub struct Tradability {
+        bits: u8,
+    }
+
+    #[wasm_bindgen]
+    impl Tradability {
+        #[wasm_bindgen(constructor)]
+        pub fn new(bits: u8) -> Self {
+            Self { bits }
+        }
+        pub fn can_sell(&self) -> bool {
+            (self.bits & SELL) == SELL
+        }
+        pub fn can_buy(&self) -> bool {
+            (self.bits & BUY) == BUY
+        }
+        pub fn can_add_liquidity(&self) -> bool {
+            (self.bits & ADD_LIQUIDITY) == ADD_LIQUIDITY
+        }
+
+        pub fn can_remove_liquidity(&self) -> bool {
+            (self.bits & REMOVE_LIQUIDITY) == REMOVE_LIQUIDITY
+        }
+    }
+
+    #[test]
+    fn tradability_should_work_correctly() {
+        let t = Tradability::new(15);
+        assert!(t.can_sell());
+        assert!(t.can_buy());
+        assert!(t.can_add_liquidity());
+        assert!(t.can_remove_liquidity());
+
+        let t = Tradability::new(1);
+        assert!(t.can_sell());
+        assert!(!t.can_buy());
+        assert!(!t.can_add_liquidity());
+        assert!(!t.can_remove_liquidity());
+
+        let t = Tradability::new(3);
+        assert!(t.can_sell());
+        assert!(t.can_buy());
+        assert!(!t.can_add_liquidity());
+        assert!(!t.can_remove_liquidity());
+
+        let t = Tradability::new(4);
+        assert!(!t.can_sell());
+        assert!(!t.can_buy());
+        assert!(t.can_add_liquidity());
+        assert!(!t.can_remove_liquidity());
+
+        let t = Tradability::new(7);
+        assert!(t.can_sell());
+        assert!(t.can_buy());
+        assert!(t.can_add_liquidity());
+        assert!(!t.can_remove_liquidity());
+
+        let t = Tradability::new(8);
+        assert!(!t.can_sell());
+        assert!(!t.can_buy());
+        assert!(!t.can_add_liquidity());
+        assert!(t.can_remove_liquidity());
+
+        let t = Tradability::new(0);
+        assert!(!t.can_sell());
+        assert!(!t.can_buy());
+        assert!(!t.can_add_liquidity());
+        assert!(!t.can_remove_liquidity());
     }
 }
 

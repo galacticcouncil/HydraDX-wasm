@@ -1,6 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
+/**
 * @param {AssetState} asset_state
 * @param {string} amount_in
 * @returns {MathResult}
@@ -31,13 +38,6 @@ export function calculate_out_given_in(asset_in_state: AssetState, asset_out_sta
 * @returns {MathResult}
 */
 export function calculate_in_given_out(asset_in_state: AssetState, asset_out_state: AssetState, amount_out: string, asset_fee: string, protocol_fee: string): MathResult;
-/**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
 /**
 */
 export class AssetState {
@@ -89,4 +89,29 @@ export class Position {
 * @param {string} price
 */
   constructor(amount: string, shares: string, price: string);
+}
+/**
+*/
+export class Tradability {
+  free(): void;
+/**
+* @param {number} bits
+*/
+  constructor(bits: number);
+/**
+* @returns {boolean}
+*/
+  can_sell(): boolean;
+/**
+* @returns {boolean}
+*/
+  can_buy(): boolean;
+/**
+* @returns {boolean}
+*/
+  can_add_liquidity(): boolean;
+/**
+* @returns {boolean}
+*/
+  can_remove_liquidity(): boolean;
 }
