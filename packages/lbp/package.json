@@ -1,6 +1,6 @@
 {
   "name": "@galacticcouncil/math-lbp",
-  "version": "0.0.0-beta-1",
+  "version": "0.0.1",
   "description": "LBP pool math",
   "main": "index.js",
   "module": "index.esm.js",

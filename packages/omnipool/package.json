@@ -1,7 +1,7 @@
 {
-  "name": "@galacticcouncil/math-stableswap",
+  "name": "@galacticcouncil/math-omnipool",
   "version": "0.0.1",
-  "description": "Stableswap pool math",
+  "description": "Omnipool math",
   "main": "index.js",
   "module": "index.esm.js",
   "types": "index.d.ts"
