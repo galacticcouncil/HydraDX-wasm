@@ -1,0 +1,15 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@galacticcouncil/math-omnipool": "file:../packages/omnipool",
+    "@galacticcouncil/math-xyk": "file:../packages/xyk"
+  }
+}
