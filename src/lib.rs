@@ -668,7 +668,7 @@ pub mod liquidity_mining {
     }
 }
 
-#[cfg(feature = "omnipool")]
+#[cfg(feature = "omnipool-deprecated")]
 pub mod omnipool {
     pub use super::*;
     use hydra_dx_math::omnipool::types::{AssetReserveState, Position as OmnipoolPosition, I129};
@@ -988,6 +988,364 @@ pub mod omnipool {
         pub fn can_remove_liquidity(&self) -> bool {
             (self.bits & REMOVE_LIQUIDITY) == REMOVE_LIQUIDITY
         }
+    }
+
+    #[test]
+    fn tradability_should_work_correctly() {
+        let t = Tradability::new(15);
+        assert!(t.can_sell());
+        assert!(t.can_buy());
+        assert!(t.can_add_liquidity());
+        assert!(t.can_remove_liquidity());
+
+        let t = Tradability::new(1);
+        assert!(t.can_sell());
+        assert!(!t.can_buy());
+        assert!(!t.can_add_liquidity());
+        assert!(!t.can_remove_liquidity());
+
+        let t = Tradability::new(3);
+        assert!(t.can_sell());
+        assert!(t.can_buy());
+        assert!(!t.can_add_liquidity());
+        assert!(!t.can_remove_liquidity());
+
+        let t = Tradability::new(4);
+        assert!(!t.can_sell());
+        assert!(!t.can_buy());
+        assert!(t.can_add_liquidity());
+        assert!(!t.can_remove_liquidity());
+
+        let t = Tradability::new(7);
+        assert!(t.can_sell());
+        assert!(t.can_buy());
+        assert!(t.can_add_liquidity());
+        assert!(!t.can_remove_liquidity());
+
+        let t = Tradability::new(8);
+        assert!(!t.can_sell());
+        assert!(!t.can_buy());
+        assert!(!t.can_add_liquidity());
+        assert!(t.can_remove_liquidity());
+
+        let t = Tradability::new(0);
+        assert!(!t.can_sell());
+        assert!(!t.can_buy());
+        assert!(!t.can_add_liquidity());
+        assert!(!t.can_remove_liquidity());
+    }
+}
+
+#[cfg(feature = "omnipool")]
+pub mod omnipool {
+    pub use super::*;
+    use hydra_dx_math::omnipool::types::{AssetReserveState, Position as OmnipoolPosition, I129};
+    use sp_arithmetic::{FixedU128, Permill};
+
+    macro_rules! parse_into {
+        ($x:ty, $y:expr, $e:expr) => {{
+            let r = if let Some(x) = $y.parse::<$x>().ok() {
+                x
+            } else {
+                return $e;
+            };
+            r
+        }};
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_shares(
+        asset_reserve: String,
+        asset_hub_reserve: String,
+        asset_shares: String,
+        amount_in: String,
+    ) -> String {
+        let amount = parse_into!(u128, amount_in, "-1".to_string());
+        let reserve = parse_into!(u128, asset_reserve, "-1".to_string());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, "-1".to_string());
+        let shares = parse_into!(u128, asset_shares, "-1".to_string());
+
+        let state = AssetReserveState {
+            reserve,
+            hub_reserve,
+            shares,
+            ..Default::default()
+        };
+
+        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_add_liquidity_state_changes(
+            &state,
+            amount,
+            I129 {
+                value: 0u128,
+                negative: false,
+            },
+            0u128,
+        ) {
+            r
+        } else {
+            return "-1".to_string();
+        };
+
+        (*state_changes.asset.delta_shares).to_string()
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_liquidity_out(
+        asset_reserve: String,
+        asset_hub_reserve: String,
+        asset_shares: String,
+        position_amount: String,
+        position_shares: String,
+        position_price: String,
+        shares_to_remove: String,
+    ) -> String {
+        let reserve = parse_into!(u128, asset_reserve, "-1".to_string());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, "-1".to_string());
+        let shares = parse_into!(u128, asset_shares, "-1".to_string());
+        let position_amount = parse_into!(u128, position_amount, "-1".to_string());
+        let position_shares = parse_into!(u128, position_shares, "-1".to_string());
+        let position_price = parse_into!(FixedU128, position_price, "-1".to_string());
+        let shares_amount = parse_into!(u128, shares_to_remove, "-1".to_string());
+
+        let state = AssetReserveState {
+            reserve,
+            hub_reserve,
+            shares,
+            ..Default::default()
+        };
+
+        let position = OmnipoolPosition {
+            amount: position_amount,
+            shares: position_shares,
+            price: position_price,
+        };
+
+        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_remove_liquidity_state_changes(
+            &state,
+            shares_amount,
+            &position,
+            I129 {
+                value: 0u128,
+                negative: false,
+            },
+            0u128,
+        ) {
+            r
+        } else {
+            return "-1".to_string();
+        };
+
+        let amount_out = (*state_changes.asset.delta_shares).to_string();
+
+        amount_out
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_liquidity_lrna_out(
+        asset_reserve: String,
+        asset_hub_reserve: String,
+        asset_shares: String,
+        position_amount: String,
+        position_shares: String,
+        position_price: String,
+        shares_to_remove: String,
+    ) -> String {
+        let reserve = parse_into!(u128, asset_reserve, "-1".to_string());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, "-1".to_string());
+        let shares = parse_into!(u128, asset_shares, "-1".to_string());
+        let position_amount = parse_into!(u128, position_amount, "-1".to_string());
+        let position_shares = parse_into!(u128, position_shares, "-1".to_string());
+        let position_price = parse_into!(FixedU128, position_price, "-1".to_string());
+        let shares_amount = parse_into!(u128, shares_to_remove, "-1".to_string());
+
+        let state = AssetReserveState {
+            reserve,
+            hub_reserve,
+            shares,
+            ..Default::default()
+        };
+
+        let position = OmnipoolPosition {
+            amount: position_amount,
+            shares: position_shares,
+            price: position_price,
+        };
+
+        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_remove_liquidity_state_changes(
+            &state,
+            shares_amount,
+            &position,
+            I129 {
+                value: 0u128,
+                negative: false,
+            },
+            0u128,
+        ) {
+            r
+        } else {
+            return "-1".to_string();
+        };
+
+        let lrna_amount = state_changes.lp_hub_amount.to_string();
+
+        lrna_amount
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_out_given_in(
+        asset_in_reserve: String,
+        asset_in_hub_reserve: String,
+        asset_in_shares: String,
+        asset_out_reserve: String,
+        asset_out_hub_reserve: String,
+        asset_out_shares: String,
+        amount_in: String,
+        asset_fee: String,
+        protocol_fee: String,
+    ) -> String {
+        let reserve_in = parse_into!(u128, asset_in_reserve, "-1".to_string());
+        let hub_reserve_in = parse_into!(u128, asset_in_hub_reserve, "-1".to_string());
+        let shares_in = parse_into!(u128, asset_in_shares, "-1".to_string());
+
+        let reserve_out = parse_into!(u128, asset_out_reserve, "-1".to_string());
+        let hub_reserve_out = parse_into!(u128, asset_out_hub_reserve, "-1".to_string());
+        let shares_out = parse_into!(u128, asset_out_shares, "-1".to_string());
+
+        let amount = parse_into!(u128, amount_in, "-1".to_string());
+        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, "-1".to_string()));
+        let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee, "-1".to_string()));
+
+        let asset_in = AssetReserveState {
+            reserve: reserve_in,
+            hub_reserve: hub_reserve_in,
+            shares: shares_in,
+            ..Default::default()
+        };
+
+        let asset_out = AssetReserveState {
+            reserve: reserve_out,
+            hub_reserve: hub_reserve_out,
+            shares: shares_out,
+            ..Default::default()
+        };
+
+        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_sell_state_changes(
+            &asset_in,
+            &asset_out,
+            amount,
+            asset_fee,
+            protocol_fee,
+            0u128,
+        ) {
+            r
+        } else {
+            return "-1".to_string();
+        };
+
+        (*state_changes.asset_out.delta_reserve).to_string()
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_in_given_out(
+        asset_in_reserve: String,
+        asset_in_hub_reserve: String,
+        asset_in_shares: String,
+        asset_out_reserve: String,
+        asset_out_hub_reserve: String,
+        asset_out_shares: String,
+        amount_out: String,
+        asset_fee: String,
+        protocol_fee: String,
+    ) -> String {
+        let reserve_in = parse_into!(u128, asset_in_reserve, "-1".to_string());
+        let hub_reserve_in = parse_into!(u128, asset_in_hub_reserve, "-1".to_string());
+        let shares_in = parse_into!(u128, asset_in_shares, "-1".to_string());
+
+        let reserve_out = parse_into!(u128, asset_out_reserve, "-1".to_string());
+        let hub_reserve_out = parse_into!(u128, asset_out_hub_reserve, "-1".to_string());
+        let shares_out = parse_into!(u128, asset_out_shares, "-1".to_string());
+
+        let amount = parse_into!(u128, amount_out, "-1".to_string());
+        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, "-1".to_string()));
+        let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee, "-1".to_string()));
+
+        let asset_in = AssetReserveState {
+            reserve: reserve_in,
+            hub_reserve: hub_reserve_in,
+            shares: shares_in,
+            ..Default::default()
+        };
+
+        let asset_out = AssetReserveState {
+            reserve: reserve_out,
+            hub_reserve: hub_reserve_out,
+            shares: shares_out,
+            ..Default::default()
+        };
+
+        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_buy_state_changes(
+            &asset_in,
+            &asset_out,
+            amount,
+            asset_fee,
+            protocol_fee,
+            0u128,
+        ) {
+            r
+        } else {
+            return "-1".to_string();
+        };
+
+        (*state_changes.asset_in.delta_reserve).to_string()
+    }
+
+    const SELL: u8 = 0b0000_0001;
+    const BUY: u8 = 0b0000_0010;
+    const ADD_LIQUIDITY: u8 = 0b0000_0100;
+    const REMOVE_LIQUIDITY: u8 = 0b0000_1000;
+
+    #[derive(Debug, Copy, Clone)]
+    pub struct Tradability {
+        bits: u8,
+    }
+
+    impl Tradability {
+        pub fn new(bits: u8) -> Self {
+            Self { bits }
+        }
+        pub fn can_sell(&self) -> bool {
+            (self.bits & SELL) == SELL
+        }
+        pub fn can_buy(&self) -> bool {
+            (self.bits & BUY) == BUY
+        }
+        pub fn can_add_liquidity(&self) -> bool {
+            (self.bits & ADD_LIQUIDITY) == ADD_LIQUIDITY
+        }
+
+        pub fn can_remove_liquidity(&self) -> bool {
+            (self.bits & REMOVE_LIQUIDITY) == REMOVE_LIQUIDITY
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn is_sell_allowed(bits: u8) -> bool {
+        Tradability::new(bits).can_sell()
+    }
+
+    #[wasm_bindgen]
+    pub fn is_buy_allowed(bits: u8) -> bool {
+        Tradability::new(bits).can_buy()
+    }
+
+    #[wasm_bindgen]
+    pub fn is_add_liquidity_allowed(bits: u8) -> bool {
+        Tradability::new(bits).can_add_liquidity()
+    }
+
+    #[wasm_bindgen]
+    pub fn is_remove_liquidity_allowed(bits: u8) -> bool {
+        Tradability::new(bits).can_remove_liquidity()
     }
 
     #[test]

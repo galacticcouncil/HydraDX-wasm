@@ -10,12 +10,12 @@ version = "3.6.0"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-wasm-bindgen = {version = "0.2.68"}
-wee_alloc = { version = "0.4.5", optional = true }
+wasm-bindgen = "0.2.83"
+wee_alloc = "0.4.5"
 
-sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.28", default-features = false }
+sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.29", default-features = false }
 
-hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-math", rev="ca1437617ec78fae488b641a9f3db977581eb6d1"}
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-math", rev="54fe636a19f283de9afbd5b5015a951b25e11a6b"}
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
