@@ -51,7 +51,7 @@ clean-package:
 	bash ./clean-package.sh liquidity-mining
 	bash ./clean-package.sh omnipool
 
-.PHONY: tests
-tests: 
+.PHONY: test
+test:
 	cargo test --all-features
 

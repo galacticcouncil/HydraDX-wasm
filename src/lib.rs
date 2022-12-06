@@ -277,7 +277,7 @@ pub mod lbp {
                 String::from("2000"),
                 String::from("500")
             ),
-            "365"
+            "358"
         );
         assert_eq!(
             lbp::calculate_out_given_in(
@@ -301,7 +301,7 @@ pub mod lbp {
                 String::from("2000"),
                 String::from("500")
             ),
-            "773"
+            "782"
         );
         assert_eq!(
             lbp::calculate_in_given_out(
@@ -311,7 +311,7 @@ pub mod lbp {
                 String::from("2000"),
                 String::from("0")
             ),
-            "0"
+            "9"
         );
     }
 
