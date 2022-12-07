@@ -8,6 +8,10 @@ macro_rules! to_u128 {
     );
 }
 
+fn error() -> String {
+    "-1".to_string()
+}
+
 #[cfg(feature = "xyk")]
 pub mod xyk {
     pub use super::*;
@@ -74,6 +78,7 @@ pub mod xyk {
             "0".to_string()
         }
     }
+
     #[wasm_bindgen]
     pub fn calculate_liquidity_out_asset_b(
         reserve_a: String,
@@ -147,7 +152,7 @@ pub mod xyk {
                 String::from("1000"),
                 String::from("2000"),
                 String::from("500"),
-                String::from("1000")
+                String::from("1000"),
             ),
             "500"
         );
@@ -156,7 +161,7 @@ pub mod xyk {
                 String::from("1000"),
                 String::from("2000"),
                 String::from("500"),
-                String::from("1000")
+                String::from("1000"),
             ),
             "1000"
         );
@@ -166,7 +171,7 @@ pub mod xyk {
                 String::from("0"),
                 String::from("1"),
                 String::from("0"),
-                String::from("0")
+                String::from("0"),
             ),
             "0"
         );
@@ -251,7 +256,7 @@ pub mod lbp {
                 String::from("2000"),
                 String::from("1000"),
                 String::from("2000"),
-                String::from("500")
+                String::from("500"),
             ),
             "500"
         );
@@ -261,7 +266,7 @@ pub mod lbp {
                 String::from("0"),
                 String::from("1000"),
                 String::from("2000"),
-                String::from("500")
+                String::from("500"),
             ),
             "0"
         );
@@ -275,7 +280,7 @@ pub mod lbp {
                 String::from("2000"),
                 String::from("1000"),
                 String::from("2000"),
-                String::from("500")
+                String::from("500"),
             ),
             "358"
         );
@@ -285,7 +290,7 @@ pub mod lbp {
                 String::from("0"),
                 String::from("1000"),
                 String::from("2000"),
-                String::from("0")
+                String::from("0"),
             ),
             "0"
         );
@@ -299,7 +304,7 @@ pub mod lbp {
                 String::from("2000"),
                 String::from("1000"),
                 String::from("2000"),
-                String::from("500")
+                String::from("500"),
             ),
             "782"
         );
@@ -309,7 +314,7 @@ pub mod lbp {
                 String::from("1"),
                 String::from("1000"),
                 String::from("2000"),
-                String::from("0")
+                String::from("0"),
             ),
             "9"
         );
@@ -323,7 +328,7 @@ pub mod lbp {
                 String::from("200"),
                 String::from("1000"),
                 String::from("2000"),
-                String::from("170")
+                String::from("170"),
             ),
             "1700"
         );
@@ -455,10 +460,6 @@ pub mod liquidity_mining {
     pub use super::*;
     use sp_arithmetic::fixed_point::FixedU128;
 
-    fn error() -> String {
-        "-1".to_string()
-    }
-
     macro_rules! parse_into {
         ($x:ty, $y:expr) => {{
             let r = if let Some(x) = $y.parse::<$x>().ok() {
@@ -554,6 +555,7 @@ pub mod liquidity_mining {
             error()
         }
     }
+
     #[wasm_bindgen]
     pub fn calculate_user_unclaimed_reward(
         accumulated_rpvs: String,
@@ -647,6 +649,7 @@ pub mod liquidity_mining {
             "1"
         );
     }
+
     #[test]
     fn calculate_loyalty_multiplier_should_fail_when_input_is_incorrect() {
         assert_eq!(
@@ -661,7 +664,7 @@ pub mod liquidity_mining {
             calculate_loyalty_multiplier(
                 "100".to_string(),
                 "100000000000000000".to_string(),
-                "invalid".to_string()
+                "invalid".to_string(),
             ),
             "-1"
         );
@@ -1060,10 +1063,10 @@ pub mod omnipool {
         asset_shares: String,
         amount_in: String,
     ) -> String {
-        let amount = parse_into!(u128, amount_in, "-1".to_string());
-        let reserve = parse_into!(u128, asset_reserve, "-1".to_string());
-        let hub_reserve = parse_into!(u128, asset_hub_reserve, "-1".to_string());
-        let shares = parse_into!(u128, asset_shares, "-1".to_string());
+        let amount = parse_into!(u128, amount_in, error());
+        let reserve = parse_into!(u128, asset_reserve, error());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let shares = parse_into!(u128, asset_shares, error());
 
         let state = AssetReserveState {
             reserve,
@@ -1072,7 +1075,7 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_add_liquidity_state_changes(
+        if let Some(state_changes) = hydra_dx_math::omnipool::calculate_add_liquidity_state_changes(
             &state,
             amount,
             I129 {
@@ -1081,12 +1084,10 @@ pub mod omnipool {
             },
             0u128,
         ) {
-            r
+            (*state_changes.asset.delta_shares).to_string()
         } else {
-            return "-1".to_string();
-        };
-
-        (*state_changes.asset.delta_shares).to_string()
+            error()
+        }
     }
 
     #[wasm_bindgen]
@@ -1099,13 +1100,13 @@ pub mod omnipool {
         position_price: String,
         shares_to_remove: String,
     ) -> String {
-        let reserve = parse_into!(u128, asset_reserve, "-1".to_string());
-        let hub_reserve = parse_into!(u128, asset_hub_reserve, "-1".to_string());
-        let shares = parse_into!(u128, asset_shares, "-1".to_string());
-        let position_amount = parse_into!(u128, position_amount, "-1".to_string());
-        let position_shares = parse_into!(u128, position_shares, "-1".to_string());
-        let position_price = parse_into!(FixedU128, position_price, "-1".to_string());
-        let shares_amount = parse_into!(u128, shares_to_remove, "-1".to_string());
+        let reserve = parse_into!(u128, asset_reserve, error());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let shares = parse_into!(u128, asset_shares, error());
+        let position_amount = parse_into!(u128, position_amount, error());
+        let position_shares = parse_into!(u128, position_shares, error());
+        let position_price = parse_into!(FixedU128, position_price, error());
+        let shares_amount = parse_into!(u128, shares_to_remove, error());
 
         let state = AssetReserveState {
             reserve,
@@ -1120,7 +1121,7 @@ pub mod omnipool {
             price: position_price,
         };
 
-        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_remove_liquidity_state_changes(
+        if let Some(state_changes) = hydra_dx_math::omnipool::calculate_remove_liquidity_state_changes(
             &state,
             shares_amount,
             &position,
@@ -1130,14 +1131,10 @@ pub mod omnipool {
             },
             0u128,
         ) {
-            r
+            (*state_changes.asset.delta_reserve).to_string()
         } else {
-            return "-1".to_string();
-        };
-
-        let amount_out = (*state_changes.asset.delta_shares).to_string();
-
-        amount_out
+            error()
+        }
     }
 
     #[wasm_bindgen]
@@ -1150,13 +1147,13 @@ pub mod omnipool {
         position_price: String,
         shares_to_remove: String,
     ) -> String {
-        let reserve = parse_into!(u128, asset_reserve, "-1".to_string());
-        let hub_reserve = parse_into!(u128, asset_hub_reserve, "-1".to_string());
-        let shares = parse_into!(u128, asset_shares, "-1".to_string());
-        let position_amount = parse_into!(u128, position_amount, "-1".to_string());
-        let position_shares = parse_into!(u128, position_shares, "-1".to_string());
-        let position_price = parse_into!(FixedU128, position_price, "-1".to_string());
-        let shares_amount = parse_into!(u128, shares_to_remove, "-1".to_string());
+        let reserve = parse_into!(u128, asset_reserve, error());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let shares = parse_into!(u128, asset_shares, error());
+        let position_amount = parse_into!(u128, position_amount, error());
+        let position_shares = parse_into!(u128, position_shares, error());
+        let position_price = parse_into!(FixedU128, position_price, error());
+        let shares_amount = parse_into!(u128, shares_to_remove, error());
 
         let state = AssetReserveState {
             reserve,
@@ -1171,7 +1168,7 @@ pub mod omnipool {
             price: position_price,
         };
 
-        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_remove_liquidity_state_changes(
+        if let Some(state_changes) = hydra_dx_math::omnipool::calculate_remove_liquidity_state_changes(
             &state,
             shares_amount,
             &position,
@@ -1181,14 +1178,103 @@ pub mod omnipool {
             },
             0u128,
         ) {
-            r
+            state_changes.lp_hub_amount.to_string()
         } else {
-            return "-1".to_string();
-        };
+            error()
+        }
+    }
 
-        let lrna_amount = state_changes.lp_hub_amount.to_string();
+    #[cfg(test)]
+    mod tests {
+        use sp_arithmetic::FixedPointNumber;
+        use crate::omnipool::*;
 
-        lrna_amount
+        #[test]
+        fn rational_to_fixed_should_be_converted_by_bn_correctly() {
+            let n = 2267311920182547u128;
+            let d = 49639234739826304676022u128;
+            /*
+                const [n,d] = position.price.map(n => new BigNumber(n.toString()))
+                const fixed_price = n.dividedBy(d).multipliedBy(BN_10.pow(18)).toFixed(0, ROUND_CEIL)
+             */
+            let fixed_price = parse_into!(FixedU128, "45675803264", ());
+            let price = FixedU128::checked_from_rational(n, d).unwrap();
+            assert_eq!(price, fixed_price);
+        }
+
+        #[test]
+        // position 1 on rococo
+        fn liquidity_out_should_equal_provided_case_1() {
+            // Arrange
+            let provided_amount = "10000000000000000000".to_string();
+            let shares = "10074707027444081228".to_string();
+            let position_price = "45675803264".to_string();
+
+            let asset_reserve = "53403520037510677010114".to_string();
+            let asset_hub_reserve = "2108586865957437".to_string();
+            let asset_shares = "50010074707027444081228".to_string();
+
+            // Act
+            let lrna = calculate_liquidity_lrna_out(
+                asset_reserve.clone(),
+                asset_hub_reserve.clone(),
+                asset_shares.clone(),
+                provided_amount.clone(),
+                shares.clone(),
+                position_price.clone(),
+                shares.clone(),
+            );
+            let out = calculate_liquidity_out(
+                asset_reserve,
+                asset_hub_reserve,
+                asset_shares,
+                provided_amount.clone(),
+                shares.clone(),
+                position_price,
+                shares,
+            );
+
+            // Assert
+            assert_eq!(lrna, 0.to_string());
+            assert_eq!(out, "9976117319866596585");
+        }
+
+        #[test]
+        // position 3 on rococo
+        fn liquidity_out_should_equal_provided_case_2() {
+            // Arrange
+            let provided_amount = "100000000000".to_string();
+            let shares = "93781953587".to_string();
+            let position_price = "22566115813746724172".to_string();
+
+            let asset_reserve = "93635371032830".to_string();
+            let asset_hub_reserve = "2112986626989987".to_string();
+            let asset_shares = "87813080203587".to_string();
+
+            // Act
+            let lrna = calculate_liquidity_lrna_out(
+                asset_reserve.clone(),
+                asset_hub_reserve.clone(),
+                asset_shares.clone(),
+                provided_amount.clone(),
+                shares.clone(),
+                position_price.clone(),
+                shares.clone(),
+            );
+            let out = calculate_liquidity_out(
+                asset_reserve,
+                asset_hub_reserve,
+                asset_shares,
+                provided_amount.clone(),
+                shares.clone(),
+                position_price,
+                shares,
+            );
+
+            // Assert
+            assert_eq!(lrna, 0.to_string());
+            assert_eq!(out, "99999999998");
+        }
     }
 
     #[wasm_bindgen]
@@ -1203,17 +1289,17 @@ pub mod omnipool {
         asset_fee: String,
         protocol_fee: String,
     ) -> String {
-        let reserve_in = parse_into!(u128, asset_in_reserve, "-1".to_string());
-        let hub_reserve_in = parse_into!(u128, asset_in_hub_reserve, "-1".to_string());
-        let shares_in = parse_into!(u128, asset_in_shares, "-1".to_string());
+        let reserve_in = parse_into!(u128, asset_in_reserve, error());
+        let hub_reserve_in = parse_into!(u128, asset_in_hub_reserve, error());
+        let shares_in = parse_into!(u128, asset_in_shares, error());
 
-        let reserve_out = parse_into!(u128, asset_out_reserve, "-1".to_string());
-        let hub_reserve_out = parse_into!(u128, asset_out_hub_reserve, "-1".to_string());
-        let shares_out = parse_into!(u128, asset_out_shares, "-1".to_string());
+        let reserve_out = parse_into!(u128, asset_out_reserve, error());
+        let hub_reserve_out = parse_into!(u128, asset_out_hub_reserve, error());
+        let shares_out = parse_into!(u128, asset_out_shares, error());
 
-        let amount = parse_into!(u128, amount_in, "-1".to_string());
-        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, "-1".to_string()));
-        let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee, "-1".to_string()));
+        let amount = parse_into!(u128, amount_in, error());
+        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
+        let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee, error()));
 
         let asset_in = AssetReserveState {
             reserve: reserve_in,
@@ -1239,7 +1325,7 @@ pub mod omnipool {
         ) {
             r
         } else {
-            return "-1".to_string();
+            return error();
         };
 
         (*state_changes.asset_out.delta_reserve).to_string()
@@ -1257,17 +1343,17 @@ pub mod omnipool {
         asset_fee: String,
         protocol_fee: String,
     ) -> String {
-        let reserve_in = parse_into!(u128, asset_in_reserve, "-1".to_string());
-        let hub_reserve_in = parse_into!(u128, asset_in_hub_reserve, "-1".to_string());
-        let shares_in = parse_into!(u128, asset_in_shares, "-1".to_string());
+        let reserve_in = parse_into!(u128, asset_in_reserve, error());
+        let hub_reserve_in = parse_into!(u128, asset_in_hub_reserve, error());
+        let shares_in = parse_into!(u128, asset_in_shares, error());
 
-        let reserve_out = parse_into!(u128, asset_out_reserve, "-1".to_string());
-        let hub_reserve_out = parse_into!(u128, asset_out_hub_reserve, "-1".to_string());
-        let shares_out = parse_into!(u128, asset_out_shares, "-1".to_string());
+        let reserve_out = parse_into!(u128, asset_out_reserve, error());
+        let hub_reserve_out = parse_into!(u128, asset_out_hub_reserve, error());
+        let shares_out = parse_into!(u128, asset_out_shares, error());
 
-        let amount = parse_into!(u128, amount_out, "-1".to_string());
-        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, "-1".to_string()));
-        let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee, "-1".to_string()));
+        let amount = parse_into!(u128, amount_out, error());
+        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
+        let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee, error()));
 
         let asset_in = AssetReserveState {
             reserve: reserve_in,
@@ -1293,7 +1379,7 @@ pub mod omnipool {
         ) {
             r
         } else {
-            return "-1".to_string();
+            return error();
         };
 
         (*state_changes.asset_in.delta_reserve).to_string()
