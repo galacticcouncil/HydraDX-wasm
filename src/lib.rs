@@ -1462,6 +1462,40 @@ pub mod omnipool {
         }
     }
 
+    #[wasm_bindgen]
+    pub fn calculate_liquidity_hub_in(
+        asset_reserve: String,
+        asset_hub_reserve: String,
+        asset_shares: String,
+        amount_in: String,
+    ) -> String {
+        let amount = parse_into!(u128, amount_in, error());
+        let reserve = parse_into!(u128, asset_reserve, error());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let shares = parse_into!(u128, asset_shares, error());
+
+        let state = AssetReserveState {
+            reserve,
+            hub_reserve,
+            shares,
+            ..Default::default()
+        };
+
+        if let Some(state_changes) = hydra_dx_math::omnipool::calculate_add_liquidity_state_changes(
+            &state,
+            amount,
+            I129 {
+                value: 0u128,
+                negative: false,
+            },
+            0u128,
+        ) {
+            (*state_changes.asset.delta_hub_reserve).to_string()
+        } else {
+            error()
+        }
+    }
+
     const SELL: u8 = 0b0000_0001;
     const BUY: u8 = 0b0000_0010;
     const ADD_LIQUIDITY: u8 = 0b0000_0100;
