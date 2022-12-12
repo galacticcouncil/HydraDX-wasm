@@ -57,6 +57,29 @@ export function calculate_out_given_in(asset_in_reserve: string, asset_in_hub_re
 */
 export function calculate_in_given_out(asset_in_reserve: string, asset_in_hub_reserve: string, asset_in_shares: string, asset_out_reserve: string, asset_out_hub_reserve: string, asset_out_shares: string, amount_out: string, asset_fee: string, protocol_fee: string): string;
 /**
+* @param {string} asset_a_reserve
+* @param {string} asset_a_hub_reserve
+* @param {string} asset_b_reserve
+* @param {string} asset_b_hub_reserve
+* @returns {string}
+*/
+export function calculate_spot_price(asset_a_reserve: string, asset_a_hub_reserve: string, asset_b_reserve: string, asset_b_hub_reserve: string): string;
+/**
+* @param {string} asset_hub_reserve
+* @param {string} asset_cap
+* @param {string} total_hub_reserve
+* @returns {string}
+*/
+export function calculate_cap_difference(asset_hub_reserve: string, asset_cap: string, total_hub_reserve: string): string;
+/**
+* @param {string} asset_hub_reserve
+* @param {string} asset_cap
+* @param {string} hub_added
+* @param {string} total_hub_reserve
+* @returns {boolean}
+*/
+export function verify_asset_cap(asset_hub_reserve: string, asset_cap: string, hub_added: string, total_hub_reserve: string): boolean;
+/**
 * @param {number} bits
 * @returns {boolean}
 */
@@ -93,6 +116,9 @@ export interface InitOutput {
   readonly calculate_liquidity_lrna_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => void;
   readonly calculate_out_given_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => void;
   readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => void;
+  readonly calculate_spot_price: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
+  readonly calculate_cap_difference: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly verify_asset_cap: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
   readonly is_sell_allowed: (a: number) => number;
   readonly is_buy_allowed: (a: number) => number;
   readonly is_add_liquidity_allowed: (a: number) => number;

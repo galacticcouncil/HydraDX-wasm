@@ -6,6 +6,9 @@ export function calculate_liquidity_out(a: number, b: number, c: number, d: numb
 export function calculate_liquidity_lrna_out(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number): void;
 export function calculate_out_given_in(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number): void;
 export function calculate_in_given_out(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number): void;
+export function calculate_spot_price(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number): void;
+export function calculate_cap_difference(a: number, b: number, c: number, d: number, e: number, f: number, g: number): void;
+export function verify_asset_cap(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number): number;
 export function is_sell_allowed(a: number): number;
 export function is_buy_allowed(a: number): number;
 export function is_add_liquidity_allowed(a: number): number;
