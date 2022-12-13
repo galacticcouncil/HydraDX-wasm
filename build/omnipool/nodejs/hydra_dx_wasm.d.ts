@@ -1,6 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
+/**
 * @param {string} asset_reserve
 * @param {string} asset_hub_reserve
 * @param {string} asset_shares
@@ -80,6 +87,14 @@ export function calculate_cap_difference(asset_hub_reserve: string, asset_cap: s
 */
 export function verify_asset_cap(asset_hub_reserve: string, asset_cap: string, hub_added: string, total_hub_reserve: string): boolean;
 /**
+* @param {string} asset_reserve
+* @param {string} asset_hub_reserve
+* @param {string} asset_shares
+* @param {string} amount_in
+* @returns {string}
+*/
+export function calculate_liquidity_hub_in(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, amount_in: string): string;
+/**
 * @param {number} bits
 * @returns {boolean}
 */
@@ -99,10 +114,3 @@ export function is_add_liquidity_allowed(bits: number): boolean;
 * @returns {boolean}
 */
 export function is_remove_liquidity_allowed(bits: number): boolean;
-/**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
