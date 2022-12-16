@@ -1043,7 +1043,7 @@ pub mod omnipool {
 pub mod omnipool {
     pub use super::*;
     use hydra_dx_math::omnipool::types::{AssetReserveState, Position as OmnipoolPosition, I129};
-    use sp_arithmetic::{FixedU128, Permill};
+    use sp_arithmetic::{FixedPointNumber, FixedU128, Permill};
 
     macro_rules! parse_into {
         ($x:ty, $y:expr, $e:expr) => {{
@@ -1105,7 +1105,7 @@ pub mod omnipool {
         let shares = parse_into!(u128, asset_shares, error());
         let position_amount = parse_into!(u128, position_amount, error());
         let position_shares = parse_into!(u128, position_shares, error());
-        let position_price = parse_into!(FixedU128, position_price, error());
+        let position_price = parse_into!(u128, position_price, error());
         let shares_amount = parse_into!(u128, shares_to_remove, error());
 
         let state = AssetReserveState {
@@ -1118,7 +1118,7 @@ pub mod omnipool {
         let position = OmnipoolPosition {
             amount: position_amount,
             shares: position_shares,
-            price: position_price,
+            price: (position_price, FixedU128::DIV),
         };
 
         if let Some(state_changes) = hydra_dx_math::omnipool::calculate_remove_liquidity_state_changes(
@@ -1152,7 +1152,7 @@ pub mod omnipool {
         let shares = parse_into!(u128, asset_shares, error());
         let position_amount = parse_into!(u128, position_amount, error());
         let position_shares = parse_into!(u128, position_shares, error());
-        let position_price = parse_into!(FixedU128, position_price, error());
+        let position_price = parse_into!(u128, position_price, error());
         let shares_amount = parse_into!(u128, shares_to_remove, error());
 
         let state = AssetReserveState {
@@ -1165,7 +1165,7 @@ pub mod omnipool {
         let position = OmnipoolPosition {
             amount: position_amount,
             shares: position_shares,
-            price: position_price,
+            price: (position_price, FixedU128::DIV),
         };
 
         if let Some(state_changes) = hydra_dx_math::omnipool::calculate_remove_liquidity_state_changes(
@@ -1186,17 +1186,17 @@ pub mod omnipool {
 
     #[cfg(test)]
     mod tests {
-        use sp_arithmetic::FixedPointNumber;
         use crate::omnipool::*;
+        use sp_arithmetic::FixedPointNumber;
 
         #[test]
         fn rational_to_fixed_should_be_converted_by_bn_correctly() {
             let n = 2267311920182547u128;
             let d = 49639234739826304676022u128;
             /*
-                const [n,d] = position.price.map(n => new BigNumber(n.toString()))
-                const fixed_price = n.dividedBy(d).multipliedBy(BN_10.pow(18)).toFixed(0, ROUND_CEIL)
-             */
+               const [n,d] = position.price.map(n => new BigNumber(n.toString()))
+               const fixed_price = n.dividedBy(d).multipliedBy(BN_10.pow(18)).toFixed(0, ROUND_CEIL)
+            */
             let fixed_price = parse_into!(FixedU128, "45675803264", ());
             let price = FixedU128::checked_from_rational(n, d).unwrap();
             assert_eq!(price, fixed_price);
@@ -1383,6 +1383,117 @@ pub mod omnipool {
         };
 
         (*state_changes.asset_in.delta_reserve).to_string()
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_spot_price(
+        asset_a_reserve: String,
+        asset_a_hub_reserve: String,
+        asset_b_reserve: String,
+        asset_b_hub_reserve: String,
+    ) -> String {
+        let reserve_a = parse_into!(u128, asset_a_reserve, error());
+        let hub_reserve_a = parse_into!(u128, asset_a_hub_reserve, error());
+        let reserve_b = parse_into!(u128, asset_b_reserve, error());
+        let hub_reserve_b = parse_into!(u128, asset_b_hub_reserve, error());
+
+        let asset_a = AssetReserveState {
+            reserve: reserve_a,
+            hub_reserve: hub_reserve_a,
+            ..Default::default()
+        };
+
+        let asset_b = AssetReserveState {
+            reserve: reserve_b,
+            hub_reserve: hub_reserve_b,
+            ..Default::default()
+        };
+
+        if let Some(result) = hydra_dx_math::omnipool::calculate_spot_sprice(&asset_a, &asset_b) {
+            result.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_cap_difference(asset_hub_reserve: String, asset_cap: String, total_hub_reserve: String) -> String {
+        let asset_hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let asset_cap = parse_into!(u128, asset_cap, error());
+        let total_hub_reserve = parse_into!(u128, total_hub_reserve, error());
+
+        let asset_state = AssetReserveState {
+            hub_reserve: asset_hub_reserve,
+            ..Default::default()
+        };
+
+        if let Some(result) =
+            hydra_dx_math::omnipool::calculate_cap_difference(&asset_state, asset_cap, total_hub_reserve)
+        {
+            result.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn verify_asset_cap(
+        asset_hub_reserve: String,
+        asset_cap: String,
+        hub_added: String,
+        total_hub_reserve: String,
+    ) -> bool {
+        let asset_hub_reserve = parse_into!(u128, asset_hub_reserve, false);
+        let asset_cap = parse_into!(u128, asset_cap, false);
+        let total_hub_reserve = parse_into!(u128, total_hub_reserve, false);
+        let hub_added = parse_into!(u128, hub_added, false);
+
+        let asset_state = AssetReserveState {
+            hub_reserve: asset_hub_reserve,
+            ..Default::default()
+        };
+
+        if let Some(result) =
+            hydra_dx_math::omnipool::verify_asset_cap(&asset_state, asset_cap, hub_added, total_hub_reserve)
+        {
+            result
+        } else {
+            false
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_liquidity_hub_in(
+        asset_reserve: String,
+        asset_hub_reserve: String,
+        asset_shares: String,
+        amount_in: String,
+    ) -> String {
+        let amount = parse_into!(u128, amount_in, error());
+        let reserve = parse_into!(u128, asset_reserve, error());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let shares = parse_into!(u128, asset_shares, error());
+
+        let state = AssetReserveState {
+            reserve,
+            hub_reserve,
+            shares,
+            ..Default::default()
+        };
+
+        if let Some(state_changes) = hydra_dx_math::omnipool::calculate_add_liquidity_state_changes(
+            &state,
+            amount,
+            I129 {
+                value: 0u128,
+                negative: false,
+            },
+            0u128,
+        ) {
+            (*state_changes.asset.delta_hub_reserve).to_string()
+        } else {
+            error()
+        }
     }
 
     const SELL: u8 = 0b0000_0001;
