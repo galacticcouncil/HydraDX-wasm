@@ -72,12 +72,13 @@ export function calculate_in_given_out(asset_in_reserve: string, asset_in_hub_re
 */
 export function calculate_spot_price(asset_a_reserve: string, asset_a_hub_reserve: string, asset_b_reserve: string, asset_b_hub_reserve: string): string;
 /**
+* @param {string} asset_reserve
 * @param {string} asset_hub_reserve
 * @param {string} asset_cap
 * @param {string} total_hub_reserve
 * @returns {string}
 */
-export function calculate_cap_difference(asset_hub_reserve: string, asset_cap: string, total_hub_reserve: string): string;
+export function calculate_cap_difference(asset_reserve: string, asset_hub_reserve: string, asset_cap: string, total_hub_reserve: string): string;
 /**
 * @param {string} asset_hub_reserve
 * @param {string} asset_cap
@@ -126,7 +127,7 @@ export interface InitOutput {
   readonly calculate_out_given_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => void;
   readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => void;
   readonly calculate_spot_price: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
-  readonly calculate_cap_difference: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly calculate_cap_difference: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly verify_asset_cap: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
   readonly calculate_liquidity_hub_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly is_sell_allowed: (a: number) => number;

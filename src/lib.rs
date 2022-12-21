@@ -1417,12 +1417,14 @@ pub mod omnipool {
     }
 
     #[wasm_bindgen]
-    pub fn calculate_cap_difference(asset_hub_reserve: String, asset_cap: String, total_hub_reserve: String) -> String {
+    pub fn calculate_cap_difference(asset_reserve: String, asset_hub_reserve: String, asset_cap: String, total_hub_reserve: String) -> String {
         let asset_hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let asset_reserve = parse_into!(u128, asset_reserve, error());
         let asset_cap = parse_into!(u128, asset_cap, error());
         let total_hub_reserve = parse_into!(u128, total_hub_reserve, error());
 
         let asset_state = AssetReserveState {
+            reserve: asset_reserve,
             hub_reserve: asset_hub_reserve,
             ..Default::default()
         };

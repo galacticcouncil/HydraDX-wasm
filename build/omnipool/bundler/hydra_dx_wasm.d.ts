@@ -72,12 +72,13 @@ export function calculate_in_given_out(asset_in_reserve: string, asset_in_hub_re
 */
 export function calculate_spot_price(asset_a_reserve: string, asset_a_hub_reserve: string, asset_b_reserve: string, asset_b_hub_reserve: string): string;
 /**
+* @param {string} asset_reserve
 * @param {string} asset_hub_reserve
 * @param {string} asset_cap
 * @param {string} total_hub_reserve
 * @returns {string}
 */
-export function calculate_cap_difference(asset_hub_reserve: string, asset_cap: string, total_hub_reserve: string): string;
+export function calculate_cap_difference(asset_reserve: string, asset_hub_reserve: string, asset_cap: string, total_hub_reserve: string): string;
 /**
 * @param {string} asset_hub_reserve
 * @param {string} asset_cap
