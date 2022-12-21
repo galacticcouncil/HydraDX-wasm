@@ -1,6 +1,6 @@
 {
   "name": "@galacticcouncil/math",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "sideEffects": false,
   "type": "module",
   "workspaces": [
