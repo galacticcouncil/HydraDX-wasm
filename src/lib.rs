@@ -488,7 +488,7 @@ pub mod liquidity_mining {
         );
 
         if let Some(r) = result.ok() {
-            r.to_float().to_string()
+            r.to_string()
         } else {
             error()
         }
@@ -642,11 +642,11 @@ pub mod liquidity_mining {
     fn calculate_loyalty_multiplier_should_work_when_input_is_correct() {
         assert_eq!(
             calculate_loyalty_multiplier("100".to_string(), "200000000000000000".to_string(), "2".to_string()),
-            "0.9843137254901961"
+            "984313725490196078"
         );
         assert_eq!(
             calculate_loyalty_multiplier("100".to_string(), "1000000000000000000".to_string(), "2".to_string()),
-            "1"
+            "1000000000000000000"
         );
     }
 
