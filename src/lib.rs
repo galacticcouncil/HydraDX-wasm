@@ -1417,7 +1417,12 @@ pub mod omnipool {
     }
 
     #[wasm_bindgen]
-    pub fn calculate_cap_difference(asset_reserve: String, asset_hub_reserve: String, asset_cap: String, total_hub_reserve: String) -> String {
+    pub fn calculate_cap_difference(
+        asset_reserve: String,
+        asset_hub_reserve: String,
+        asset_cap: String,
+        total_hub_reserve: String,
+    ) -> String {
         let asset_hub_reserve = parse_into!(u128, asset_hub_reserve, error());
         let asset_reserve = parse_into!(u128, asset_reserve, error());
         let asset_cap = parse_into!(u128, asset_cap, error());
@@ -1461,6 +1466,46 @@ pub mod omnipool {
             result
         } else {
             false
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_tvl_cap_difference(
+        asset_reserve: String,
+        asset_hub_reserve: String,
+        stable_asset_reserve: String,
+        stable_asset_hub_reserve: String,
+        tvl_cap: String,
+        total_hub_reserve: String,
+    ) -> String {
+        let asset_hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let asset_reserve = parse_into!(u128, asset_reserve, error());
+        let stable_asset_hub_reserve = parse_into!(u128, stable_asset_hub_reserve, error());
+        let stable_asset_reserve = parse_into!(u128, stable_asset_reserve, error());
+        let tvl_cap = parse_into!(u128, tvl_cap, error());
+        let total_hub_reserve = parse_into!(u128, total_hub_reserve, error());
+
+        let asset_state = AssetReserveState {
+            reserve: asset_reserve,
+            hub_reserve: asset_hub_reserve,
+            ..Default::default()
+        };
+
+        let stable_asset_state = AssetReserveState {
+            reserve: stable_asset_reserve,
+            hub_reserve: stable_asset_hub_reserve,
+            ..Default::default()
+        };
+
+        if let Some(result) = hydra_dx_math::omnipool::calculate_tvl_cap_difference(
+            &asset_state,
+            &stable_asset_state,
+            tvl_cap,
+            total_hub_reserve,
+        ) {
+            result.to_string()
+        } else {
+            error()
         }
     }
 

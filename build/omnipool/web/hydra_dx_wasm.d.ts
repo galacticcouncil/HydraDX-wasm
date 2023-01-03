@@ -83,6 +83,16 @@ export function verify_asset_cap(asset_hub_reserve: string, asset_cap: string, h
 /**
 * @param {string} asset_reserve
 * @param {string} asset_hub_reserve
+* @param {string} stable_asset_reserve
+* @param {string} stable_asset_hub_reserve
+* @param {string} tvl_cap
+* @param {string} total_hub_reserve
+* @returns {string}
+*/
+export function calculate_tvl_cap_difference(asset_reserve: string, asset_hub_reserve: string, stable_asset_reserve: string, stable_asset_hub_reserve: string, tvl_cap: string, total_hub_reserve: string): string;
+/**
+* @param {string} asset_reserve
+* @param {string} asset_hub_reserve
 * @param {string} asset_shares
 * @param {string} amount_in
 * @returns {string}
@@ -128,6 +138,7 @@ export interface InitOutput {
   readonly calculate_spot_price: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly calculate_cap_difference: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly verify_asset_cap: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
+  readonly calculate_tvl_cap_difference: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number) => void;
   readonly calculate_liquidity_hub_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly is_sell_allowed: (a: number) => number;
   readonly is_buy_allowed: (a: number) => number;

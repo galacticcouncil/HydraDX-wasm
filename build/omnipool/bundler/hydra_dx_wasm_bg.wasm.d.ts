@@ -9,6 +9,7 @@ export function calculate_in_given_out(a: number, b: number, c: number, d: numbe
 export function calculate_spot_price(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number): void;
 export function calculate_cap_difference(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number): void;
 export function verify_asset_cap(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number): number;
+export function calculate_tvl_cap_difference(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number): void;
 export function calculate_liquidity_hub_in(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number): void;
 export function is_sell_allowed(a: number): number;
 export function is_buy_allowed(a: number): number;
