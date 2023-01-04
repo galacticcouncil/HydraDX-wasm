@@ -1332,6 +1332,46 @@ pub mod omnipool {
     }
 
     #[wasm_bindgen]
+    pub fn calculate_out_given_lrna_in(
+        asset_reserve: String,
+        asset_hub_reserve: String,
+        asset_shares: String,
+        amount_in: String,
+        asset_fee: String,
+    ) -> String {
+        let reserve = parse_into!(u128, asset_reserve, error());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let shares = parse_into!(u128, asset_shares, error());
+
+        let amount = parse_into!(u128, amount_in, error());
+        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
+
+        let asset = AssetReserveState {
+            reserve,
+            hub_reserve,
+            shares,
+            ..Default::default()
+        };
+
+        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_sell_hub_state_changes(
+            &asset,
+            amount,
+            asset_fee,
+            I129 {
+                value: 0,
+                negative: false,
+            },
+            0u128,
+        ) {
+            r
+        } else {
+            return error();
+        };
+
+        (*state_changes.asset.delta_reserve).to_string()
+    }
+
+    #[wasm_bindgen]
     pub fn calculate_in_given_out(
         asset_in_reserve: String,
         asset_in_hub_reserve: String,
@@ -1386,6 +1426,46 @@ pub mod omnipool {
     }
 
     #[wasm_bindgen]
+    pub fn calculate_lrna_in_given_out(
+        asset_reserve: String,
+        asset_hub_reserve: String,
+        asset_shares: String,
+        amount_out: String,
+        asset_fee: String,
+    ) -> String {
+        let reserve = parse_into!(u128, asset_reserve, error());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let shares = parse_into!(u128, asset_shares, error());
+
+        let amount = parse_into!(u128, amount_out, error());
+        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
+
+        let asset = AssetReserveState {
+            reserve,
+            hub_reserve,
+            shares,
+            ..Default::default()
+        };
+
+        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_buy_for_hub_asset_state_changes(
+            &asset,
+            amount,
+            asset_fee,
+            I129 {
+                value: 0,
+                negative: false,
+            },
+            0u128,
+        ) {
+            r
+        } else {
+            return error();
+        };
+
+        (*state_changes.asset.delta_hub_reserve).to_string()
+    }
+
+    #[wasm_bindgen]
     pub fn calculate_spot_price(
         asset_a_reserve: String,
         asset_a_hub_reserve: String,
@@ -1417,10 +1497,7 @@ pub mod omnipool {
     }
 
     #[wasm_bindgen]
-    pub fn calculate_lrna_spot_price(
-        asset_reserve: String,
-        asset_hub_reserve: String,
-    ) -> String {
+    pub fn calculate_lrna_spot_price(asset_reserve: String, asset_hub_reserve: String) -> String {
         let reserve = parse_into!(u128, asset_reserve, error());
         let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
 
