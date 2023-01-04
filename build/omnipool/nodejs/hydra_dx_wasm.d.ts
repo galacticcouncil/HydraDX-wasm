@@ -51,6 +51,15 @@ export function calculate_liquidity_lrna_out(asset_reserve: string, asset_hub_re
 */
 export function calculate_out_given_in(asset_in_reserve: string, asset_in_hub_reserve: string, asset_in_shares: string, asset_out_reserve: string, asset_out_hub_reserve: string, asset_out_shares: string, amount_in: string, asset_fee: string, protocol_fee: string): string;
 /**
+* @param {string} asset_reserve
+* @param {string} asset_hub_reserve
+* @param {string} asset_shares
+* @param {string} amount_in
+* @param {string} asset_fee
+* @returns {string}
+*/
+export function calculate_out_given_lrna_in(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, amount_in: string, asset_fee: string): string;
+/**
 * @param {string} asset_in_reserve
 * @param {string} asset_in_hub_reserve
 * @param {string} asset_in_shares
@@ -63,6 +72,15 @@ export function calculate_out_given_in(asset_in_reserve: string, asset_in_hub_re
 * @returns {string}
 */
 export function calculate_in_given_out(asset_in_reserve: string, asset_in_hub_reserve: string, asset_in_shares: string, asset_out_reserve: string, asset_out_hub_reserve: string, asset_out_shares: string, amount_out: string, asset_fee: string, protocol_fee: string): string;
+/**
+* @param {string} asset_reserve
+* @param {string} asset_hub_reserve
+* @param {string} asset_shares
+* @param {string} amount_out
+* @param {string} asset_fee
+* @returns {string}
+*/
+export function calculate_lrna_in_given_out(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, amount_out: string, asset_fee: string): string;
 /**
 * @param {string} asset_a_reserve
 * @param {string} asset_a_hub_reserve
