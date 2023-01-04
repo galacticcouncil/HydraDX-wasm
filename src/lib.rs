@@ -1417,6 +1417,27 @@ pub mod omnipool {
     }
 
     #[wasm_bindgen]
+    pub fn calculate_lrna_spot_price(
+        asset_reserve: String,
+        asset_hub_reserve: String,
+    ) -> String {
+        let reserve = parse_into!(u128, asset_reserve, error());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+
+        let asset = AssetReserveState {
+            reserve,
+            hub_reserve,
+            ..Default::default()
+        };
+
+        if let Some(result) = hydra_dx_math::omnipool::calculate_lrna_spot_sprice(&asset) {
+            result.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
     pub fn calculate_cap_difference(
         asset_reserve: String,
         asset_hub_reserve: String,

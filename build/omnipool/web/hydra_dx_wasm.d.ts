@@ -1,6 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
+/**
 * @param {string} asset_reserve
 * @param {string} asset_hub_reserve
 * @param {string} asset_shares
@@ -67,6 +74,12 @@ export function calculate_spot_price(asset_a_reserve: string, asset_a_hub_reserv
 /**
 * @param {string} asset_reserve
 * @param {string} asset_hub_reserve
+* @returns {string}
+*/
+export function calculate_lrna_spot_price(asset_reserve: string, asset_hub_reserve: string): string;
+/**
+* @param {string} asset_reserve
+* @param {string} asset_hub_reserve
 * @param {string} asset_cap
 * @param {string} total_hub_reserve
 * @returns {string}
@@ -118,24 +131,19 @@ export function is_add_liquidity_allowed(bits: number): boolean;
 * @returns {boolean}
 */
 export function is_remove_liquidity_allowed(bits: number): boolean;
-/**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_shares: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly calculate_liquidity_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => void;
   readonly calculate_liquidity_lrna_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => void;
   readonly calculate_out_given_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => void;
   readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => void;
   readonly calculate_spot_price: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
+  readonly calculate_lrna_spot_price: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_cap_difference: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly verify_asset_cap: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
   readonly calculate_tvl_cap_difference: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number) => void;
@@ -144,7 +152,6 @@ export interface InitOutput {
   readonly is_buy_allowed: (a: number) => number;
   readonly is_add_liquidity_allowed: (a: number) => number;
   readonly is_remove_liquidity_allowed: (a: number) => number;
-  readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
