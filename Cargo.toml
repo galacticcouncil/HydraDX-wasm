@@ -15,7 +15,7 @@ wee_alloc = "0.4.5"
 
 sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.29", default-features = false }
 
-hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-math", rev="082b102796d61e98f8c5192b3c4b6a2d3ea43830"}
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-math", rev="b5f0b1d34bc9695ca9b3ea563c2bf7bafa91a110"}
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
