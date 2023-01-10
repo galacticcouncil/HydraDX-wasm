@@ -1361,7 +1361,7 @@ pub mod omnipool {
                 value: 0,
                 negative: false,
             },
-            0u128,
+            1_000_000u128, // This is not relevant here,but it cant be 0
         ) {
             r
         } else {
@@ -1455,7 +1455,7 @@ pub mod omnipool {
                 value: 0,
                 negative: false,
             },
-            0u128,
+            1_000_000u128, // This is not relevant here,but it cant be 0
         ) {
             r
         } else {
