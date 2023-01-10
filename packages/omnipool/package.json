@@ -1,6 +1,6 @@
 {
   "name": "@galacticcouncil/math-omnipool",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "Omnipool math",
   "main": "index.js",
   "module": "index.esm.js",
