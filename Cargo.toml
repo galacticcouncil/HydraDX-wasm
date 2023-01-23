@@ -4,7 +4,7 @@ edition = '2021'
 license = 'Apache 2.0'
 name = "hydra-dx-wasm"
 repository = 'https://github.com/galacticcouncil/hydradx-wasm'
-version = "3.6.4"
+version = "3.7.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -15,7 +15,7 @@ wee_alloc = "0.4.5"
 
 sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.29", default-features = false }
 
-hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-math", rev="b5f0b1d34bc9695ca9b3ea563c2bf7bafa91a110"}
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-math", rev="fdf7d6cdfb6968b826e6035c20b261a78a733573"}
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"

@@ -637,6 +637,20 @@ pub mod liquidity_mining {
             error()
         }
     }
+    
+    #[wasm_bindgen]
+    pub fn calculate_rewards_for_periods(reward_per_period: String, periods_since_last_updated: String) -> String {
+        let reward_per_period = FixedU128::from_inner(parse_into!(u128, reward_per_period));
+        let periods_since_last_updated = parse_into!(u128, periods_since_last_updated);
+
+        let result = hydra_dx_math::liquidity_mining::calculate_rewards_for_periods(reward_per_period, periods_since_last_updated);
+
+        if let Some(r) = result.ok() {
+            r.to_string()
+        } else {
+            error()
+        }
+    }
 
     #[test]
     fn calculate_loyalty_multiplier_should_work_when_input_is_correct() {

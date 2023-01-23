@@ -71,3 +71,9 @@ export function calculate_adjusted_shares(shares: string, price_adjustment: stri
 * @returns {string}
 */
 export function calculate_global_farm_shares(valued_shares: string, multiplier: string): string;
+/**
+* @param {string} reward_per_period
+* @param {string} periods_since_last_updated
+* @returns {string}
+*/
+export function calculate_rewards_for_periods(reward_per_period: string, periods_since_last_updated: string): string;
