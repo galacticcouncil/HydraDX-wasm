@@ -71,6 +71,12 @@ export function calculate_adjusted_shares(shares: string, price_adjustment: stri
 * @returns {string}
 */
 export function calculate_global_farm_shares(valued_shares: string, multiplier: string): string;
+/**
+* @param {string} reward_per_period
+* @param {string} periods_since_last_updated
+* @returns {string}
+*/
+export function calculate_rewards_for_periods(reward_per_period: string, periods_since_last_updated: string): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -86,6 +92,7 @@ export interface InitOutput {
   readonly calculate_reward: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly calculate_adjusted_shares: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_global_farm_shares: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly calculate_rewards_for_periods: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;

@@ -11,6 +11,7 @@ export function calculate_valued_shares(a: number, b: number, c: number, d: numb
 export function calculate_reward(a: number, b: number, c: number, d: number, e: number, f: number, g: number): void;
 export function calculate_adjusted_shares(a: number, b: number, c: number, d: number, e: number): void;
 export function calculate_global_farm_shares(a: number, b: number, c: number, d: number, e: number): void;
+export function calculate_rewards_for_periods(a: number, b: number, c: number, d: number, e: number): void;
 export function __wbindgen_add_to_stack_pointer(a: number): number;
 export function __wbindgen_malloc(a: number): number;
 export function __wbindgen_realloc(a: number, b: number, c: number): number;

@@ -331,6 +331,28 @@ module.exports.calculate_global_farm_shares = function(valued_shares, multiplier
     }
 };
 
+/**
+* @param {string} reward_per_period
+* @param {string} periods_since_last_updated
+* @returns {string}
+*/
+module.exports.calculate_rewards_for_periods = function(reward_per_period, periods_since_last_updated) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(reward_per_period, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(periods_since_last_updated, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        wasm.calculate_rewards_for_periods(retptr, ptr0, len0, ptr1, len1);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(r0, r1);
+    }
+};
+
 const path = require('path').join(__dirname, 'hydra_dx_wasm_bg.wasm');
 const bytes = require('fs').readFileSync(path);
 
