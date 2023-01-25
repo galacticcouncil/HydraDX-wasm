@@ -1,6 +1,6 @@
 {
   "name": "@galacticcouncil/math-xyk",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "XYK pool math",
   "main": "index.js",
   "module": "index.esm.js",
