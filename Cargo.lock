@@ -104,6 +104,7 @@ dependencies = [
  "az",
  "bytemuck",
  "half",
+ "num-traits",
  "typenum",
 ]
 
@@ -137,12 +138,14 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 [[package]]
 name = "hydra-dx-math"
 version = "5.1.4"
-source = "git+https://github.com/galacticcouncil/HydraDX-math?rev=fdf7d6cdfb6968b826e6035c20b261a78a733573#fdf7d6cdfb6968b826e6035c20b261a78a733573"
+source = "git+https://github.com/galacticcouncil/HydraDX-math?rev=b73a30dd9febd46ba15f765a923c88f0c3c5ce0e#b73a30dd9febd46ba15f765a923c88f0c3c5ce0e"
 dependencies = [
  "fixed",
  "num-traits",
  "parity-scale-codec",
  "primitive-types",
+ "scale-info",
+ "serde",
  "sp-arithmetic",
  "sp-std",
 ]
