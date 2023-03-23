@@ -616,7 +616,28 @@ pub mod liquidity_mining {
         let result = hydra_dx_math::liquidity_mining::calculate_yield_farm_rewards(y_rpz, g_rpz, m, vs);
 
         if let Some(v) = result.ok() {
-            format!("{},{}", v.0.to_string(), v.1.to_string())
+            v.1.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_yield_farm_delta_rpvs(
+        yield_farm_rpz: String,
+        global_farm_rpz: String,
+        multiplier: String,
+        total_valued_shares: String,
+    ) -> String {
+        let y_rpz = FixedU128::from_inner(parse_into!(u128, yield_farm_rpz));
+        let g_rpz = FixedU128::from_inner(parse_into!(u128, global_farm_rpz));
+        let m = FixedU128::from_inner(parse_into!(u128, multiplier));
+        let vs = parse_into!(u128, total_valued_shares);
+
+        let result = hydra_dx_math::liquidity_mining::calculate_yield_farm_rewards(y_rpz, g_rpz, m, vs);
+
+        if let Some(v) = result.ok() {
+            v.0.to_string()
         } else {
             error()
         }
@@ -680,7 +701,7 @@ pub mod liquidity_mining {
                 "1000000000000000000".to_string(),
                 "932564".to_string()
             ),
-            "275000000000000000000,256455100"
+            "256455100"
         );
 
         assert_eq!(
@@ -690,7 +711,30 @@ pub mod liquidity_mining {
                 "1000000000000000000".to_string(),
                 "85100506".to_string()
             ),
-            "46000000000000000000,3914623276"
+            "3914623276"
+        );
+    }
+
+    #[test]
+    fn calculate_yield_farm_delta_rpvs_should_work_when_input_is_correct() {
+        assert_eq!(
+            calculate_yield_farm_delta_rpvs(
+                "82000000000000000000".to_string(),
+                "357000000000000000000".to_string(),
+                "1000000000000000000".to_string(),
+                "932564".to_string()
+            ),
+            "275000000000000000000"
+        );
+
+        assert_eq!(
+            calculate_yield_farm_delta_rpvs(
+                "2491000000000000000000".to_string(),
+                "2537000000000000000000".to_string(),
+                "1000000000000000000".to_string(),
+                "85100506".to_string()
+            ),
+            "46000000000000000000"
         );
     }
 
