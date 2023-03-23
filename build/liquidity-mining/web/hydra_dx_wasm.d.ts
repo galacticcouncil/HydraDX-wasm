@@ -67,6 +67,14 @@ export function calculate_global_farm_shares(valued_shares: string, multiplier: 
 */
 export function calculate_yield_farm_rewards(yield_farm_rpz: string, global_farm_rpz: string, multiplier: string, total_valued_shares: string): string;
 /**
+* @param {string} yield_farm_rpz
+* @param {string} global_farm_rpz
+* @param {string} multiplier
+* @param {string} total_valued_shares
+* @returns {string}
+*/
+export function calculate_yield_farm_delta_rpvs(yield_farm_rpz: string, global_farm_rpz: string, multiplier: string, total_valued_shares: string): string;
+/**
 * @param {string} total_shares_z
 * @param {string} price_adjustment
 * @param {string} yield_per_period
@@ -89,6 +97,7 @@ export interface InitOutput {
   readonly calculate_reward: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly calculate_global_farm_shares: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_yield_farm_rewards: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
+  readonly calculate_yield_farm_delta_rpvs: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly calculate_global_farm_rewards: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;
