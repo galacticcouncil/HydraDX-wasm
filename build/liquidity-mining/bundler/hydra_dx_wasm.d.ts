@@ -15,13 +15,6 @@ export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_d
 */
 export function calculate_loyalty_multiplier(period: string, initial_reward_percentage: string, scale_coef: string): string;
 /**
-* @param {string} yield_per_period
-* @param {string} total_farm_shares_z
-* @param {string} max_reward_per_period
-* @returns {string}
-*/
-export function calculate_global_farm_reward_per_period(yield_per_period: string, total_farm_shares_z: string, max_reward_per_period: string): string;
-/**
 * @param {string} accumulated_rps_now
 * @param {string} total_shares
 * @param {string} reward
@@ -60,20 +53,33 @@ export function calculate_valued_shares(shares: string, incentivized_asset_balan
 */
 export function calculate_reward(accumulated_rps_start: string, accumulated_rps_now: string, shares: string): string;
 /**
-* @param {string} shares
-* @param {string} price_adjustment
-* @returns {string}
-*/
-export function calculate_adjusted_shares(shares: string, price_adjustment: string): string;
-/**
 * @param {string} valued_shares
 * @param {string} multiplier
 * @returns {string}
 */
 export function calculate_global_farm_shares(valued_shares: string, multiplier: string): string;
 /**
-* @param {string} reward_per_period
-* @param {string} periods_since_last_updated
+* @param {string} yield_farm_rpz
+* @param {string} global_farm_rpz
+* @param {string} multiplier
+* @param {string} total_valued_shares
 * @returns {string}
 */
-export function calculate_rewards_for_periods(reward_per_period: string, periods_since_last_updated: string): string;
+export function calculate_yield_farm_rewards(yield_farm_rpz: string, global_farm_rpz: string, multiplier: string, total_valued_shares: string): string;
+/**
+* @param {string} yield_farm_rpz
+* @param {string} global_farm_rpz
+* @param {string} multiplier
+* @param {string} total_valued_shares
+* @returns {string}
+*/
+export function calculate_yield_farm_delta_rpvs(yield_farm_rpz: string, global_farm_rpz: string, multiplier: string, total_valued_shares: string): string;
+/**
+* @param {string} total_shares_z
+* @param {string} price_adjustment
+* @param {string} yield_per_period
+* @param {string} max_reward_per_period
+* @param {string} periods_since_last_update
+* @returns {string}
+*/
+export function calculate_global_farm_rewards(total_shares_z: string, price_adjustment: string, yield_per_period: string, max_reward_per_period: string, periods_since_last_update: string): string;
