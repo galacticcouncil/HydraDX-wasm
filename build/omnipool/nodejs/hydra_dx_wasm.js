@@ -4,10 +4,10 @@ const { TextEncoder, TextDecoder } = require(`util`);
 
 let WASM_VECTOR_LEN = 0;
 
-let cachedUint8Memory0 = new Uint8Array();
+let cachedUint8Memory0 = null;
 
 function getUint8Memory0() {
-    if (cachedUint8Memory0.byteLength === 0) {
+    if (cachedUint8Memory0 === null || cachedUint8Memory0.byteLength === 0) {
         cachedUint8Memory0 = new Uint8Array(wasm.memory.buffer);
     }
     return cachedUint8Memory0;
@@ -66,10 +66,10 @@ function passStringToWasm0(arg, malloc, realloc) {
     return ptr;
 }
 
-let cachedInt32Memory0 = new Int32Array();
+let cachedInt32Memory0 = null;
 
 function getInt32Memory0() {
-    if (cachedInt32Memory0.byteLength === 0) {
+    if (cachedInt32Memory0 === null || cachedInt32Memory0.byteLength === 0) {
         cachedInt32Memory0 = new Int32Array(wasm.memory.buffer);
     }
     return cachedInt32Memory0;
@@ -132,33 +132,21 @@ module.exports.calculate_shares = function(asset_reserve, asset_hub_reserve, ass
 };
 
 /**
-* @param {string} asset_reserve
-* @param {string} asset_hub_reserve
-* @param {string} asset_shares
-* @param {string} position_amount
-* @param {string} position_shares
-* @param {string} position_price
-* @param {string} shares_to_remove
+* @param {string} spot_price
+* @param {string} oracle_price
+* @param {string} min_withdrawal_fee
 * @returns {string}
 */
-module.exports.calculate_liquidity_out = function(asset_reserve, asset_hub_reserve, asset_shares, position_amount, position_shares, position_price, shares_to_remove) {
+module.exports.calculate_withdrawal_fee = function(spot_price, oracle_price, min_withdrawal_fee) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        const ptr0 = passStringToWasm0(asset_reserve, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const ptr0 = passStringToWasm0(spot_price, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passStringToWasm0(asset_hub_reserve, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const ptr1 = passStringToWasm0(oracle_price, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        const ptr2 = passStringToWasm0(asset_shares, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const ptr2 = passStringToWasm0(min_withdrawal_fee, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len2 = WASM_VECTOR_LEN;
-        const ptr3 = passStringToWasm0(position_amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len3 = WASM_VECTOR_LEN;
-        const ptr4 = passStringToWasm0(position_shares, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len4 = WASM_VECTOR_LEN;
-        const ptr5 = passStringToWasm0(position_price, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len5 = WASM_VECTOR_LEN;
-        const ptr6 = passStringToWasm0(shares_to_remove, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len6 = WASM_VECTOR_LEN;
-        wasm.calculate_liquidity_out(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4, ptr5, len5, ptr6, len6);
+        wasm.calculate_withdrawal_fee(retptr, ptr0, len0, ptr1, len1, ptr2, len2);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
@@ -176,9 +164,10 @@ module.exports.calculate_liquidity_out = function(asset_reserve, asset_hub_reser
 * @param {string} position_shares
 * @param {string} position_price
 * @param {string} shares_to_remove
+* @param {string} withdrawal_fee
 * @returns {string}
 */
-module.exports.calculate_liquidity_lrna_out = function(asset_reserve, asset_hub_reserve, asset_shares, position_amount, position_shares, position_price, shares_to_remove) {
+module.exports.calculate_liquidity_out = function(asset_reserve, asset_hub_reserve, asset_shares, position_amount, position_shares, position_price, shares_to_remove, withdrawal_fee) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passStringToWasm0(asset_reserve, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -195,7 +184,49 @@ module.exports.calculate_liquidity_lrna_out = function(asset_reserve, asset_hub_
         const len5 = WASM_VECTOR_LEN;
         const ptr6 = passStringToWasm0(shares_to_remove, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len6 = WASM_VECTOR_LEN;
-        wasm.calculate_liquidity_lrna_out(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4, ptr5, len5, ptr6, len6);
+        const ptr7 = passStringToWasm0(withdrawal_fee, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len7 = WASM_VECTOR_LEN;
+        wasm.calculate_liquidity_out(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4, ptr5, len5, ptr6, len6, ptr7, len7);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(r0, r1);
+    }
+};
+
+/**
+* @param {string} asset_reserve
+* @param {string} asset_hub_reserve
+* @param {string} asset_shares
+* @param {string} position_amount
+* @param {string} position_shares
+* @param {string} position_price
+* @param {string} shares_to_remove
+* @param {string} withdrawal_fee
+* @returns {string}
+*/
+module.exports.calculate_liquidity_lrna_out = function(asset_reserve, asset_hub_reserve, asset_shares, position_amount, position_shares, position_price, shares_to_remove, withdrawal_fee) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(asset_reserve, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(asset_hub_reserve, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(asset_shares, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ptr3 = passStringToWasm0(position_amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len3 = WASM_VECTOR_LEN;
+        const ptr4 = passStringToWasm0(position_shares, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len4 = WASM_VECTOR_LEN;
+        const ptr5 = passStringToWasm0(position_price, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len5 = WASM_VECTOR_LEN;
+        const ptr6 = passStringToWasm0(shares_to_remove, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len6 = WASM_VECTOR_LEN;
+        const ptr7 = passStringToWasm0(withdrawal_fee, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len7 = WASM_VECTOR_LEN;
+        wasm.calculate_liquidity_lrna_out(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4, ptr5, len5, ptr6, len6, ptr7, len7);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
