@@ -1191,6 +1191,18 @@ pub mod omnipool {
     }
 
     #[wasm_bindgen]
+    pub fn calculate_withdrawal_fee(spot_price: String, oracle_price: String, min_withdrawal_fee: String) -> String {
+        let spot_price = FixedU128::from_rational(parse_into!(u128, spot_price, error()), FixedU128::DIV);
+        let oracle_price = FixedU128::from_rational(parse_into!(u128, oracle_price, error()), FixedU128::DIV);
+        let min_fee = Permill::from_float(parse_into!(f64, min_withdrawal_fee, error()));
+
+        let Some(fee) = hydra_dx_math::omnipool::calculate_withdrawal_fee(spot_price, oracle_price, min_fee) else {
+            return error();
+        };
+        fee.to_string()
+    }
+
+    #[wasm_bindgen]
     pub fn calculate_liquidity_out(
         asset_reserve: String,
         asset_hub_reserve: String,
