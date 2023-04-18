@@ -1199,6 +1199,7 @@ pub mod omnipool {
         position_shares: String,
         position_price: String,
         shares_to_remove: String,
+        withdrawal_fee: String,
     ) -> String {
         let reserve = parse_into!(u128, asset_reserve, error());
         let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
@@ -1207,6 +1208,7 @@ pub mod omnipool {
         let position_shares = parse_into!(u128, position_shares, error());
         let position_price = parse_into!(u128, position_price, error());
         let shares_amount = parse_into!(u128, shares_to_remove, error());
+        let withdrawal_fee = FixedU128::from_rational(parse_into!(u128, withdrawal_fee, error()), FixedU128::DIV);
 
         let state = AssetReserveState {
             reserve,
@@ -1230,6 +1232,7 @@ pub mod omnipool {
                 negative: false,
             },
             0u128,
+            withdrawal_fee,
         ) {
             (*state_changes.asset.delta_reserve).to_string()
         } else {
@@ -1246,6 +1249,7 @@ pub mod omnipool {
         position_shares: String,
         position_price: String,
         shares_to_remove: String,
+        withdrawal_fee: String,
     ) -> String {
         let reserve = parse_into!(u128, asset_reserve, error());
         let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
@@ -1254,6 +1258,7 @@ pub mod omnipool {
         let position_shares = parse_into!(u128, position_shares, error());
         let position_price = parse_into!(u128, position_price, error());
         let shares_amount = parse_into!(u128, shares_to_remove, error());
+        let withdrawal_fee = FixedU128::from_rational(parse_into!(u128, withdrawal_fee, error()), FixedU128::DIV);
 
         let state = AssetReserveState {
             reserve,
@@ -1277,6 +1282,7 @@ pub mod omnipool {
                 negative: false,
             },
             0u128,
+            withdrawal_fee,
         ) {
             state_changes.lp_hub_amount.to_string()
         } else {
@@ -1323,6 +1329,7 @@ pub mod omnipool {
                 shares.clone(),
                 position_price.clone(),
                 shares.clone(),
+                "0".to_string(),
             );
             let out = calculate_liquidity_out(
                 asset_reserve,
@@ -1332,6 +1339,7 @@ pub mod omnipool {
                 shares.clone(),
                 position_price,
                 shares,
+                "0".to_string(),
             );
 
             // Assert
@@ -1360,6 +1368,7 @@ pub mod omnipool {
                 shares.clone(),
                 position_price.clone(),
                 shares.clone(),
+                "0".to_string(),
             );
             let out = calculate_liquidity_out(
                 asset_reserve,
@@ -1369,6 +1378,7 @@ pub mod omnipool {
                 shares.clone(),
                 position_price,
                 shares,
+                "0".to_string(),
             );
 
             // Assert
