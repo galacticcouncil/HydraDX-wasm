@@ -1,13 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
-/**
 * @param {string} asset_reserve
 * @param {string} asset_hub_reserve
 * @param {string} asset_shares
@@ -16,16 +9,12 @@ export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_d
 */
 export function calculate_shares(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, amount_in: string): string;
 /**
-* @param {string} asset_reserve
-* @param {string} asset_hub_reserve
-* @param {string} asset_shares
-* @param {string} position_amount
-* @param {string} position_shares
-* @param {string} position_price
-* @param {string} shares_to_remove
+* @param {string} spot_price
+* @param {string} oracle_price
+* @param {string} min_withdrawal_fee
 * @returns {string}
 */
-export function calculate_liquidity_out(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, position_amount: string, position_shares: string, position_price: string, shares_to_remove: string): string;
+export function calculate_withdrawal_fee(spot_price: string, oracle_price: string, min_withdrawal_fee: string): string;
 /**
 * @param {string} asset_reserve
 * @param {string} asset_hub_reserve
@@ -34,9 +23,22 @@ export function calculate_liquidity_out(asset_reserve: string, asset_hub_reserve
 * @param {string} position_shares
 * @param {string} position_price
 * @param {string} shares_to_remove
+* @param {string} withdrawal_fee
 * @returns {string}
 */
-export function calculate_liquidity_lrna_out(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, position_amount: string, position_shares: string, position_price: string, shares_to_remove: string): string;
+export function calculate_liquidity_out(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, position_amount: string, position_shares: string, position_price: string, shares_to_remove: string, withdrawal_fee: string): string;
+/**
+* @param {string} asset_reserve
+* @param {string} asset_hub_reserve
+* @param {string} asset_shares
+* @param {string} position_amount
+* @param {string} position_shares
+* @param {string} position_price
+* @param {string} shares_to_remove
+* @param {string} withdrawal_fee
+* @returns {string}
+*/
+export function calculate_liquidity_lrna_out(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, position_amount: string, position_shares: string, position_price: string, shares_to_remove: string, withdrawal_fee: string): string;
 /**
 * @param {string} asset_in_reserve
 * @param {string} asset_in_hub_reserve
@@ -149,15 +151,22 @@ export function is_add_liquidity_allowed(bits: number): boolean;
 * @returns {boolean}
 */
 export function is_remove_liquidity_allowed(bits: number): boolean;
+/**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_shares: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
-  readonly calculate_liquidity_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => void;
-  readonly calculate_liquidity_lrna_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => void;
+  readonly calculate_withdrawal_fee: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly calculate_liquidity_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number) => void;
+  readonly calculate_liquidity_lrna_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number) => void;
   readonly calculate_out_given_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => void;
   readonly calculate_out_given_lrna_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => void;
@@ -172,6 +181,7 @@ export interface InitOutput {
   readonly is_buy_allowed: (a: number) => number;
   readonly is_add_liquidity_allowed: (a: number) => number;
   readonly is_remove_liquidity_allowed: (a: number) => number;
+  readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
