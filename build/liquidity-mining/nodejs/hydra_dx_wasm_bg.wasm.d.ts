@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
+export function fixed_from_rational(a: number, b: number, c: number, d: number, e: number): void;
 export function calculate_loyalty_multiplier(a: number, b: number, c: number, d: number, e: number, f: number, g: number): void;
 export function calculate_accumulated_rps(a: number, b: number, c: number, d: number, e: number, f: number, g: number): void;
 export function calculate_user_reward(a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number): void;

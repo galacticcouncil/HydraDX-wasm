@@ -458,7 +458,7 @@ pub mod stableswap {
 #[cfg(feature = "liquidity-mining")]
 pub mod liquidity_mining {
     pub use super::*;
-    use sp_arithmetic::fixed_point::FixedU128;
+    use sp_arithmetic::{fixed_point::FixedU128, FixedPointNumber};
 
     macro_rules! parse_into {
         ($x:ty, $y:expr) => {{
@@ -469,6 +469,14 @@ pub mod liquidity_mining {
             };
             r
         }};
+    }
+
+    #[wasm_bindgen]
+    pub fn fixed_from_rational(a: String, b: String) -> String {
+        match FixedU128::checked_from_rational(parse_into!(u128, a), parse_into!(u128, b)) {
+            Some(v) => v.to_string(),
+            None => error(),
+        }
     }
 
     #[wasm_bindgen]
@@ -766,6 +774,31 @@ pub mod liquidity_mining {
                 "100000000000000000".to_string(),
                 "invalid".to_string(),
             ),
+            "-1"
+        );
+    }
+
+    #[test]
+    fn fixed_from_rational_should_work() {
+        assert_eq!(
+            fixed_from_rational("1".to_string(), "5".to_string()),
+            "200000000000000000"
+        );
+
+        assert_eq!(fixed_from_rational("1".to_string(), "0".to_string()), "-1");
+
+        assert_eq!(
+            fixed_from_rational("5343".to_string(), "5".to_string()),
+            "1068600000000000000000"
+        );
+
+        assert_eq!(
+            fixed_from_rational("93846346337460743".to_string(), "100000000".to_string()),
+            "938463463374607430000000000"
+        );
+
+        assert_eq!(
+            fixed_from_rational("340282366920938463463374607431768211455".to_string(), "10".to_string()),
             "-1"
         );
     }
