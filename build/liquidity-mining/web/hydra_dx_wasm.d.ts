@@ -1,6 +1,12 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} a
+* @param {string} b
+* @returns {string}
+*/
+export function fixed_from_rational(a: string, b: string): string;
+/**
 * @param {string} period
 * @param {string} initial_reward_percentage
 * @param {string} scale_coef
@@ -88,6 +94,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly fixed_from_rational: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_loyalty_multiplier: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly calculate_accumulated_rps: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly calculate_user_reward: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;

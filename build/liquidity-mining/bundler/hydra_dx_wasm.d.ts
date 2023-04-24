@@ -1,6 +1,12 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} a
+* @param {string} b
+* @returns {string}
+*/
+export function fixed_from_rational(a: string, b: string): string;
+/**
 * @param {string} period
 * @param {string} initial_reward_percentage
 * @param {string} scale_coef
