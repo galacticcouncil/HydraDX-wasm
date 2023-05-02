@@ -458,7 +458,7 @@ pub mod stableswap {
 #[cfg(feature = "liquidity-mining")]
 pub mod liquidity_mining {
     pub use super::*;
-    use sp_arithmetic::fixed_point::FixedU128;
+    use sp_arithmetic::{fixed_point::FixedU128, FixedPointNumber};
 
     macro_rules! parse_into {
         ($x:ty, $y:expr) => {{
@@ -469,6 +469,14 @@ pub mod liquidity_mining {
             };
             r
         }};
+    }
+
+    #[wasm_bindgen]
+    pub fn fixed_from_rational(a: String, b: String) -> String {
+        match FixedU128::checked_from_rational(parse_into!(u128, a), parse_into!(u128, b)) {
+            Some(v) => v.to_string(),
+            None => error(),
+        }
     }
 
     #[wasm_bindgen]
@@ -485,29 +493,6 @@ pub mod liquidity_mining {
             period,
             reward_percentage,
             scale_coef,
-        );
-
-        if let Some(r) = result.ok() {
-            r.to_string()
-        } else {
-            error()
-        }
-    }
-
-    #[wasm_bindgen]
-    pub fn calculate_global_farm_reward_per_period(
-        yield_per_period: String,
-        total_farm_shares_z: String,
-        max_reward_per_period: String,
-    ) -> String {
-        let yield_per_period = FixedU128::from_inner(parse_into!(u128, yield_per_period));
-        let farm_shares = parse_into!(u128, total_farm_shares_z);
-        let reward = parse_into!(u128, max_reward_per_period);
-
-        let result = hydra_dx_math::liquidity_mining::calculate_global_farm_reward_per_period(
-            yield_per_period,
-            farm_shares,
-            reward,
         );
 
         if let Some(r) = result.ok() {
@@ -611,20 +596,6 @@ pub mod liquidity_mining {
     }
 
     #[wasm_bindgen]
-    pub fn calculate_adjusted_shares(shares: String, price_adjustment: String) -> String {
-        let shares = parse_into!(u128, shares);
-        let price = FixedU128::from_inner(parse_into!(u128, price_adjustment));
-
-        let result = hydra_dx_math::liquidity_mining::calculate_adjusted_shares(shares, price);
-
-        if let Some(r) = result.ok() {
-            r.to_string()
-        } else {
-            error()
-        }
-    }
-
-    #[wasm_bindgen]
     pub fn calculate_global_farm_shares(valued_shares: String, multiplier: String) -> String {
         let s = parse_into!(u128, valued_shares);
         let m = FixedU128::from_inner(parse_into!(u128, multiplier));
@@ -637,19 +608,142 @@ pub mod liquidity_mining {
             error()
         }
     }
-    
+
     #[wasm_bindgen]
-    pub fn calculate_rewards_for_periods(reward_per_period: String, periods_since_last_updated: String) -> String {
-        let reward_per_period = FixedU128::from_inner(parse_into!(u128, reward_per_period));
-        let periods_since_last_updated = parse_into!(u128, periods_since_last_updated);
+    pub fn calculate_yield_farm_rewards(
+        yield_farm_rpz: String,
+        global_farm_rpz: String,
+        multiplier: String,
+        total_valued_shares: String,
+    ) -> String {
+        let y_rpz = FixedU128::from_inner(parse_into!(u128, yield_farm_rpz));
+        let g_rpz = FixedU128::from_inner(parse_into!(u128, global_farm_rpz));
+        let m = FixedU128::from_inner(parse_into!(u128, multiplier));
+        let vs = parse_into!(u128, total_valued_shares);
 
-        let result = hydra_dx_math::liquidity_mining::calculate_rewards_for_periods(reward_per_period, periods_since_last_updated);
+        let result = hydra_dx_math::liquidity_mining::calculate_yield_farm_rewards(y_rpz, g_rpz, m, vs);
 
-        if let Some(r) = result.ok() {
-            r.to_string()
+        if let Some(v) = result.ok() {
+            v.1.to_string()
         } else {
             error()
         }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_yield_farm_delta_rpvs(
+        yield_farm_rpz: String,
+        global_farm_rpz: String,
+        multiplier: String,
+        total_valued_shares: String,
+    ) -> String {
+        let y_rpz = FixedU128::from_inner(parse_into!(u128, yield_farm_rpz));
+        let g_rpz = FixedU128::from_inner(parse_into!(u128, global_farm_rpz));
+        let m = FixedU128::from_inner(parse_into!(u128, multiplier));
+        let vs = parse_into!(u128, total_valued_shares);
+
+        let result = hydra_dx_math::liquidity_mining::calculate_yield_farm_rewards(y_rpz, g_rpz, m, vs);
+
+        if let Some(v) = result.ok() {
+            v.0.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_global_farm_rewards(
+        total_shares_z: String,
+        price_adjustment: String,
+        yield_per_period: String,
+        max_reward_per_period: String,
+        periods_since_last_update: String,
+    ) -> String {
+        let ts = parse_into!(u128, total_shares_z);
+        let p_adj = FixedU128::from_inner(parse_into!(u128, price_adjustment));
+        let ypp = FixedU128::from_inner(parse_into!(u128, yield_per_period));
+        let max_rew_per_period = parse_into!(u128, max_reward_per_period);
+        let periods = parse_into!(u128, periods_since_last_update);
+
+        let result =
+            hydra_dx_math::liquidity_mining::calculate_global_farm_rewards(ts, p_adj, ypp, max_rew_per_period, periods);
+
+        if let Some(v) = result.ok() {
+            v.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[test]
+    fn calculate_global_farm_rewards_should_work_when_input_is_correct() {
+        assert_eq!(
+            calculate_global_farm_rewards(
+                "17989865464312".to_string(),
+                "1000000000000000000".to_string(),
+                "138571428600000000".to_string(),
+                "59898".to_string(),
+                "1".to_string()
+            ),
+            "59898"
+        );
+
+        assert_eq!(
+            calculate_global_farm_rewards(
+                "35189".to_string(),
+                "1000000000000000000".to_string(),
+                "133333333300000000".to_string(),
+                "468787897".to_string(),
+                "10".to_string()
+            ),
+            "46918"
+        );
+    }
+
+    #[test]
+    fn calculate_yield_farm_rewards_should_work_when_input_is_correct() {
+        assert_eq!(
+            calculate_yield_farm_rewards(
+                "82000000000000000000".to_string(),
+                "357000000000000000000".to_string(),
+                "1000000000000000000".to_string(),
+                "932564".to_string()
+            ),
+            "256455100"
+        );
+
+        assert_eq!(
+            calculate_yield_farm_rewards(
+                "2491000000000000000000".to_string(),
+                "2537000000000000000000".to_string(),
+                "1000000000000000000".to_string(),
+                "85100506".to_string()
+            ),
+            "3914623276"
+        );
+    }
+
+    #[test]
+    fn calculate_yield_farm_delta_rpvs_should_work_when_input_is_correct() {
+        assert_eq!(
+            calculate_yield_farm_delta_rpvs(
+                "82000000000000000000".to_string(),
+                "357000000000000000000".to_string(),
+                "1000000000000000000".to_string(),
+                "932564".to_string()
+            ),
+            "275000000000000000000"
+        );
+
+        assert_eq!(
+            calculate_yield_farm_delta_rpvs(
+                "2491000000000000000000".to_string(),
+                "2537000000000000000000".to_string(),
+                "1000000000000000000".to_string(),
+                "85100506".to_string()
+            ),
+            "46000000000000000000"
+        );
     }
 
     #[test]
@@ -680,6 +774,31 @@ pub mod liquidity_mining {
                 "100000000000000000".to_string(),
                 "invalid".to_string(),
             ),
+            "-1"
+        );
+    }
+
+    #[test]
+    fn fixed_from_rational_should_work() {
+        assert_eq!(
+            fixed_from_rational("1".to_string(), "5".to_string()),
+            "200000000000000000"
+        );
+
+        assert_eq!(fixed_from_rational("1".to_string(), "0".to_string()), "-1");
+
+        assert_eq!(
+            fixed_from_rational("5343".to_string(), "5".to_string()),
+            "1068600000000000000000"
+        );
+
+        assert_eq!(
+            fixed_from_rational("93846346337460743".to_string(), "100000000".to_string()),
+            "938463463374607430000000000"
+        );
+
+        assert_eq!(
+            fixed_from_rational("340282366920938463463374607431768211455".to_string(), "10".to_string()),
             "-1"
         );
     }
@@ -1105,6 +1224,15 @@ pub mod omnipool {
     }
 
     #[wasm_bindgen]
+    pub fn calculate_withdrawal_fee(spot_price: String, oracle_price: String, min_withdrawal_fee: String) -> String {
+        let spot_price = FixedU128::from_rational(parse_into!(u128, spot_price, error()), FixedU128::DIV);
+        let oracle_price = FixedU128::from_rational(parse_into!(u128, oracle_price, error()), FixedU128::DIV);
+        let min_fee = Permill::from_float(parse_into!(f64, min_withdrawal_fee, error()));
+
+        hydra_dx_math::omnipool::calculate_withdrawal_fee(spot_price, oracle_price, min_fee).to_string()
+    }
+
+    #[wasm_bindgen]
     pub fn calculate_liquidity_out(
         asset_reserve: String,
         asset_hub_reserve: String,
@@ -1113,6 +1241,7 @@ pub mod omnipool {
         position_shares: String,
         position_price: String,
         shares_to_remove: String,
+        withdrawal_fee: String,
     ) -> String {
         let reserve = parse_into!(u128, asset_reserve, error());
         let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
@@ -1121,6 +1250,7 @@ pub mod omnipool {
         let position_shares = parse_into!(u128, position_shares, error());
         let position_price = parse_into!(u128, position_price, error());
         let shares_amount = parse_into!(u128, shares_to_remove, error());
+        let withdrawal_fee = FixedU128::from_rational(parse_into!(u128, withdrawal_fee, error()), FixedU128::DIV);
 
         let state = AssetReserveState {
             reserve,
@@ -1144,6 +1274,7 @@ pub mod omnipool {
                 negative: false,
             },
             0u128,
+            withdrawal_fee,
         ) {
             (*state_changes.asset.delta_reserve).to_string()
         } else {
@@ -1160,6 +1291,7 @@ pub mod omnipool {
         position_shares: String,
         position_price: String,
         shares_to_remove: String,
+        withdrawal_fee: String,
     ) -> String {
         let reserve = parse_into!(u128, asset_reserve, error());
         let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
@@ -1168,6 +1300,7 @@ pub mod omnipool {
         let position_shares = parse_into!(u128, position_shares, error());
         let position_price = parse_into!(u128, position_price, error());
         let shares_amount = parse_into!(u128, shares_to_remove, error());
+        let withdrawal_fee = FixedU128::from_rational(parse_into!(u128, withdrawal_fee, error()), FixedU128::DIV);
 
         let state = AssetReserveState {
             reserve,
@@ -1191,6 +1324,7 @@ pub mod omnipool {
                 negative: false,
             },
             0u128,
+            withdrawal_fee,
         ) {
             state_changes.lp_hub_amount.to_string()
         } else {
@@ -1237,6 +1371,7 @@ pub mod omnipool {
                 shares.clone(),
                 position_price.clone(),
                 shares.clone(),
+                "0".to_string(),
             );
             let out = calculate_liquidity_out(
                 asset_reserve,
@@ -1246,6 +1381,7 @@ pub mod omnipool {
                 shares.clone(),
                 position_price,
                 shares,
+                "0".to_string(),
             );
 
             // Assert
@@ -1274,6 +1410,7 @@ pub mod omnipool {
                 shares.clone(),
                 position_price.clone(),
                 shares.clone(),
+                "0".to_string(),
             );
             let out = calculate_liquidity_out(
                 asset_reserve,
@@ -1283,6 +1420,7 @@ pub mod omnipool {
                 shares.clone(),
                 position_price,
                 shares,
+                "0".to_string(),
             );
 
             // Assert

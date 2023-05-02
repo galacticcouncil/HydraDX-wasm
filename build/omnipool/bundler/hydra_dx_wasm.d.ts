@@ -1,13 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
-/**
 * @param {string} asset_reserve
 * @param {string} asset_hub_reserve
 * @param {string} asset_shares
@@ -16,16 +9,12 @@ export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_d
 */
 export function calculate_shares(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, amount_in: string): string;
 /**
-* @param {string} asset_reserve
-* @param {string} asset_hub_reserve
-* @param {string} asset_shares
-* @param {string} position_amount
-* @param {string} position_shares
-* @param {string} position_price
-* @param {string} shares_to_remove
+* @param {string} spot_price
+* @param {string} oracle_price
+* @param {string} min_withdrawal_fee
 * @returns {string}
 */
-export function calculate_liquidity_out(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, position_amount: string, position_shares: string, position_price: string, shares_to_remove: string): string;
+export function calculate_withdrawal_fee(spot_price: string, oracle_price: string, min_withdrawal_fee: string): string;
 /**
 * @param {string} asset_reserve
 * @param {string} asset_hub_reserve
@@ -34,9 +23,22 @@ export function calculate_liquidity_out(asset_reserve: string, asset_hub_reserve
 * @param {string} position_shares
 * @param {string} position_price
 * @param {string} shares_to_remove
+* @param {string} withdrawal_fee
 * @returns {string}
 */
-export function calculate_liquidity_lrna_out(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, position_amount: string, position_shares: string, position_price: string, shares_to_remove: string): string;
+export function calculate_liquidity_out(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, position_amount: string, position_shares: string, position_price: string, shares_to_remove: string, withdrawal_fee: string): string;
+/**
+* @param {string} asset_reserve
+* @param {string} asset_hub_reserve
+* @param {string} asset_shares
+* @param {string} position_amount
+* @param {string} position_shares
+* @param {string} position_price
+* @param {string} shares_to_remove
+* @param {string} withdrawal_fee
+* @returns {string}
+*/
+export function calculate_liquidity_lrna_out(asset_reserve: string, asset_hub_reserve: string, asset_shares: string, position_amount: string, position_shares: string, position_price: string, shares_to_remove: string, withdrawal_fee: string): string;
 /**
 * @param {string} asset_in_reserve
 * @param {string} asset_in_hub_reserve
@@ -149,3 +151,10 @@ export function is_add_liquidity_allowed(bits: number): boolean;
 * @returns {boolean}
 */
 export function is_remove_liquidity_allowed(bits: number): boolean;
+/**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
