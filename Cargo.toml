@@ -27,10 +27,11 @@ opt-level = "s"
 wasm-opt = ["-Oz", "--enable-mutable-globals"]
 
 [features]
-default = ["std"]
+default = ["std", "ema"]
 std = ["sp-arithmetic/std"]
 xyk = []
 lbp = []
 stableswap = []
 liquidity-mining = []
 omnipool = []
+ema = []
