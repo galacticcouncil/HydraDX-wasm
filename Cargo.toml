@@ -27,7 +27,7 @@ opt-level = "s"
 wasm-opt = ["-Oz", "--enable-mutable-globals"]
 
 [features]
-default = ["std", "ema"]
+default = ["std"]
 std = ["sp-arithmetic/std"]
 xyk = []
 lbp = []

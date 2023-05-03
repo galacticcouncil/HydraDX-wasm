@@ -1982,27 +1982,6 @@ pub mod ema_low_precision {
         balance.to_string()
     }
 
-    // /// Calculate the iterated exponential moving average for the givenEmaVolumes.
-    // /// `iterations` is the number of iterations of the EMA to calculate.
-    // /// `prev` is the previous oracle value; the incoming value is always zero.
-    // /// `smoothing` is the smoothing factor of the EMA.
-    // pub fn iterated_volume_ema(iterations: u32, prev: EmaVolume, smoothing: Fraction) -> EmaVolume {
-    //     volume_weighted_average(prev, (0, 0, 0, 0), exp_smoothing(smoothing, iterations))
-    // }
-
-    // /// Calculate the iterated exponential moving average for the given balances.
-    // /// `iterations` is the number of iterations of the EMA to calculate.
-    // /// `prev` is the previous oracle value, `incoming` is the new value to integrate.
-    // /// `smoothing` is the smoothing factor of the EMA.
-    // pub fn iterated_liquidity_ema(
-    //     iterations: u32,
-    //     prev: EmaLiquidity,
-    //     incoming: EmaLiquidity,
-    //     smoothing: Fraction,
-    // ) -> EmaLiquidity {
-    //     liquidity_weighted_average(prev, incoming, exp_smoothing(smoothing, iterations))
-    // }
-
     #[test]
     fn iterated_price_ema_should_work() {
         use hydra_dx_math::ema::smoothing_from_period;

@@ -1,0 +1,19 @@
+{
+  "name": "hydra-dx-wasm",
+  "collaborators": [
+    "GalacticCouncil"
+  ],
+  "version": "4.0.0",
+  "license": "Apache 2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/galacticcouncil/hydradx-wasm"
+  },
+  "files": [
+    "hydra_dx_wasm_bg.wasm",
+    "hydra_dx_wasm.js",
+    "hydra_dx_wasm.d.ts"
+  ],
+  "main": "hydra_dx_wasm.js",
+  "types": "hydra_dx_wasm.d.ts"
+}
