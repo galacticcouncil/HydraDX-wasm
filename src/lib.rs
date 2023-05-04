@@ -1943,19 +1943,29 @@ pub mod fee {
 }
 
 #[cfg(feature = "ema")]
-pub mod ema_low_precision {
+pub mod ema {
     pub use super::*;
-    use hydra_dx_math::types::Balance;
-    use hydra_dx_math::types::Fraction;
     use hydra_dx_math::ema::EmaPrice;
+    use hydra_dx_math::types::{Balance, Fraction};
     use sp_arithmetic::FixedU128;
 
     /// Calculate the iterated exponential moving average for the given prices.
-    /// `iterations` is the number of iterations of the EMA to calculate.
-    /// `prev` is the previous oracle value, `incoming` is the new value to integrate.
-    /// `smoothing` is the smoothing factor of the EMA.
+    /// + `iterations` is the number of iterations of the EMA to calculate (expected to be a serialized `u32`).
+    /// + `prev_n` and `prev_d` are the previous oracle value, `incoming_n` and `incoming_d` are the new value to
+    ///   integrate (expected to be serialized `u128` values).
+    /// + `smoothing` is the smoothing factor of the EMA (expected to be a serialized `u128` that gets interpreted as a
+    ///   `Fraction`).
+    ///
+    /// Returns the new oracle value as a serialized `FixedU128` (lower precision than the input).
     #[wasm_bindgen]
-    pub fn iterated_price_ema(iterations: String, prev_n: String, prev_d: String, incoming_n: String, incoming_d: String, smoothing: String) -> String {
+    pub fn low_precision_iterated_price_ema(
+        iterations: String,
+        prev_n: String,
+        prev_d: String,
+        incoming_n: String,
+        incoming_d: String,
+        smoothing: String,
+    ) -> String {
         let Ok(iterations) = iterations.parse::<u32>() else { return error() };
         let Ok(prev_n) = prev_n.parse::<u128>() else { return error() };
         let Ok(prev_d) = prev_d.parse::<u128>() else { return error() };
@@ -1969,9 +1979,13 @@ pub mod ema_low_precision {
     }
 
     /// Calculate the iterated exponential moving average for the given balances.
-    /// `iterations` is the number of iterations of the EMA to calculate.
-    /// `prev` is the previous oracle value, `incoming` is the new value to integrate.
-    /// `smoothing` is the smoothing factor of the EMA.
+    /// + `iterations` is the number of iterations of the EMA to calculate (expected to be a serialized `u32`).
+    /// + `prev` is the previous oracle value, `incoming` is the new value to integrate (expected to be serialized
+    ///   `u128` values).
+    /// + `smoothing` is the smoothing factor of the EMA (expected to be a serialized `u128` that gets interpreted as a
+    ///   `Fraction`).
+    ///
+    /// Returns the new oracle value as a serialized `u128`.
     #[wasm_bindgen]
     pub fn iterated_balance_ema(iterations: String, prev: String, incoming: String, smoothing: String) -> String {
         let Ok(iterations) = iterations.parse::<u32>() else { return error() };
@@ -1982,28 +1996,42 @@ pub mod ema_low_precision {
         balance.to_string()
     }
 
-    #[test]
-    fn iterated_price_ema_should_work() {
+    #[cfg(test)]
+    mod tests {
+        use super::*;
         use hydra_dx_math::ema::smoothing_from_period;
-        let smoothing = smoothing_from_period(7);
 
-        let start_price = EmaPrice::new(4, 1);
-        let incoming_price = EmaPrice::new(8, 1);
-        let next_price = iterated_price_ema(1u32.to_string(), start_price.n.to_string(), start_price.d.to_string(), incoming_price.n.to_string(), incoming_price.d.to_string(), smoothing.to_bits().to_string());
-        let expected = FixedU128::from((5, 1)).to_string();
-        assert_eq!(next_price, expected);
-    }
+        #[test]
+        fn iterated_price_ema_should_work() {
+            let smoothing = smoothing_from_period(7);
+            let start_price = EmaPrice::new(4, 1);
+            let incoming_price = EmaPrice::new(8, 1);
+            let next_price = low_precision_iterated_price_ema(
+                1u32.to_string(),
+                start_price.n.to_string(),
+                start_price.d.to_string(),
+                incoming_price.n.to_string(),
+                incoming_price.d.to_string(),
+                smoothing.to_bits().to_string(),
+            );
+            let expected = FixedU128::from((5, 1)).to_string();
+            assert_eq!(next_price, expected);
+        }
 
-    #[test]
-    fn iterated_balance_ema_should_work() {
-        use hydra_dx_math::ema::smoothing_from_period;
-        let smoothing = smoothing_from_period(7);
-
-        let start = 4;
-        let incoming = 8;
-        let res = iterated_balance_ema(1u32.to_string(), start.to_string(), incoming.to_string(), smoothing.to_bits().to_string());
-        let expected = 5;
-        let res = res.parse::<u128>().unwrap();
-        assert_eq!(res, expected);
+        #[test]
+        fn iterated_balance_ema_should_work() {
+            let smoothing = smoothing_from_period(7);
+            let start = 4;
+            let incoming = 8;
+            let res = iterated_balance_ema(
+                1u32.to_string(),
+                start.to_string(),
+                incoming.to_string(),
+                smoothing.to_bits().to_string(),
+            );
+            let expected = 5;
+            let res = res.parse::<u128>().unwrap();
+            assert_eq!(res, expected);
+        }
     }
 }
