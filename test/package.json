@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@galacticcouncil/math-ema": "file:../packages/ema",
     "@galacticcouncil/math-lbp": "file:../packages/lbp",
     "@galacticcouncil/math-liquidity-mining": "file:../packages/liquidity-mining",
     "@galacticcouncil/math-omnipool": "file:../packages/omnipool",
