@@ -81,31 +81,14 @@ function getStringFromWasm0(ptr, len) {
     return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
 }
 /**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a, fee_numerator, fee_denominator) {
-    try {
-        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        const ptr0 = passStringToWasm0(a, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        wasm.calculate_pool_trade_fee(retptr, ptr0, len0, fee_numerator, fee_denominator);
-        var r0 = getInt32Memory0()[retptr / 4 + 0];
-        var r1 = getInt32Memory0()[retptr / 4 + 1];
-        return getStringFromWasm0(r0, r1);
-    } finally {
-        wasm.__wbindgen_add_to_stack_pointer(16);
-        wasm.__wbindgen_free(r0, r1);
-    }
-}
-
-/**
 * Calculate the iterated exponential moving average for the given prices.
-* `iterations` is the number of iterations of the EMA to calculate.
-* `prev` is the previous oracle value, `incoming` is the new value to integrate.
-* `smoothing` is the smoothing factor of the EMA.
+* + `iterations` is the number of iterations of the EMA to calculate (expected to be a serialized `u32`).
+* + `prev_n` and `prev_d` are the previous oracle value, `incoming_n` and `incoming_d` are the new value to
+*   integrate (expected to be serialized `u128` values).
+* + `smoothing` is the smoothing factor of the EMA (expected to be a serialized `u128` that gets interpreted as a
+*   `Fraction`).
+*
+* Returns the new oracle value as a serialized `FixedU128` (lower precision than the input).
 * @param {string} iterations
 * @param {string} prev_n
 * @param {string} prev_d
@@ -114,7 +97,7 @@ export function calculate_pool_trade_fee(a, fee_numerator, fee_denominator) {
 * @param {string} smoothing
 * @returns {string}
 */
-export function iterated_price_ema(iterations, prev_n, prev_d, incoming_n, incoming_d, smoothing) {
+export function low_precision_iterated_price_ema(iterations, prev_n, prev_d, incoming_n, incoming_d, smoothing) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passStringToWasm0(iterations, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -129,7 +112,7 @@ export function iterated_price_ema(iterations, prev_n, prev_d, incoming_n, incom
         const len4 = WASM_VECTOR_LEN;
         const ptr5 = passStringToWasm0(smoothing, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len5 = WASM_VECTOR_LEN;
-        wasm.iterated_price_ema(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4, ptr5, len5);
+        wasm.low_precision_iterated_price_ema(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4, ptr5, len5);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
@@ -141,9 +124,13 @@ export function iterated_price_ema(iterations, prev_n, prev_d, incoming_n, incom
 
 /**
 * Calculate the iterated exponential moving average for the given balances.
-* `iterations` is the number of iterations of the EMA to calculate.
-* `prev` is the previous oracle value, `incoming` is the new value to integrate.
-* `smoothing` is the smoothing factor of the EMA.
+* + `iterations` is the number of iterations of the EMA to calculate (expected to be a serialized `u32`).
+* + `prev` is the previous oracle value, `incoming` is the new value to integrate (expected to be serialized
+*   `u128` values).
+* + `smoothing` is the smoothing factor of the EMA (expected to be a serialized `u128` that gets interpreted as a
+*   `Fraction`).
+*
+* Returns the new oracle value as a serialized `u128`.
 * @param {string} iterations
 * @param {string} prev
 * @param {string} incoming
@@ -162,6 +149,27 @@ export function iterated_balance_ema(iterations, prev, incoming, smoothing) {
         const ptr3 = passStringToWasm0(smoothing, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len3 = WASM_VECTOR_LEN;
         wasm.iterated_balance_ema(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(r0, r1);
+    }
+}
+
+/**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a, fee_numerator, fee_denominator) {
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(a, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.calculate_pool_trade_fee(retptr, ptr0, len0, fee_numerator, fee_denominator);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
