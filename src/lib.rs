@@ -1965,7 +1965,7 @@ pub mod ema_low_precision {
         let incoming = EmaPrice::new(incoming_n, incoming_d);
         let Ok(smoothing) = smoothing.parse::<u128>().map(Fraction::from_bits) else { return error() };
         let price = hydra_dx_math::ema::iterated_price_ema(iterations, prev, incoming, smoothing);
-        FixedU128::from_rational(price.n, price.d).into_inner().to_string()
+        FixedU128::from_rational(price.n, price.d).to_string()
     }
 
     /// Calculate the iterated exponential moving average for the given balances.
