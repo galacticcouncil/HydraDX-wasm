@@ -1990,8 +1990,7 @@ pub mod ema_low_precision {
         let start_price = EmaPrice::new(4, 1);
         let incoming_price = EmaPrice::new(8, 1);
         let next_price = iterated_price_ema(1u32.to_string(), start_price.n.to_string(), start_price.d.to_string(), incoming_price.n.to_string(), incoming_price.d.to_string(), smoothing.to_bits().to_string());
-        let expected = FixedU128::from((5, 1));
-        let next_price = FixedU128::from_inner(next_price.parse::<u128>().unwrap());
+        let expected = FixedU128::from((5, 1)).to_string();
         assert_eq!(next_price, expected);
     }
 
