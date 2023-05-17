@@ -17,3 +17,7 @@ console.log(" bindings", Object.keys(xyk).length);
 console.log("omnipool");
 const omnipool = require('@galacticcouncil/math-omnipool');
 console.log(" bindings", Object.keys(omnipool).length);
+
+console.log("ema");
+const ema = require('@galacticcouncil/math-ema');
+console.log(" bindings", Object.keys(ema).length);
