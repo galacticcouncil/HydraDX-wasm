@@ -335,44 +335,91 @@ pub mod lbp {
     }
 }
 
-/*
 #[cfg(feature = "stableswap")]
 pub mod stableswap {
     pub use super::*;
 
+    use serde::{Deserialize, Serialize};
+
+    macro_rules! parse_into {
+        ($x:ty, $y:expr) => {{
+            let r = if let Some(x) = $y.parse::<$x>().ok() {
+                x
+            } else {
+                return error();
+            };
+            r
+        }};
+    }
     const D_ITERATIONS: u8 = 128;
     const Y_ITERATIONS: u8 = 64;
 
-    #[wasm_bindgen]
-    pub fn get_spot_price(reserve_in: String, reserve_out: String, amount: String) -> String {
-        let (sell_reserve, buy_reserve, amount) = to_u128!(reserve_in, reserve_out, amount);
-
-        let result = hydra_dx_math::xyk::calculate_spot_price(sell_reserve, buy_reserve, amount);
-
-        result.unwrap_or(0).to_string()
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct AssetBalance {
+        asset_id: u32,
+        reserve: u128,
     }
 
     #[wasm_bindgen]
     pub fn calculate_out_given_in(
-        reserve_in: String,
-        reserve_out: String,
+        reserves: String,
+        asset_in: u32,
+        asset_out: u32,
         amount_in: String,
         amplification: String,
-        precision: String,
     ) -> String {
-        let (reserve_in, reserve_out, amount_in, amplification, precision) =
-            to_u128!(reserve_in, reserve_out, amount_in, amplification, precision);
-       let result = hydra_dx_math::stableswap::math::calculate_out_given_in::<D_ITERATIONS, Y_ITERATIONS>(
-            reserve_in,
-            reserve_out,
+        let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
+        if reserves.is_err() {
+            return error();
+        }
+        let mut reserves = reserves.unwrap();
+        reserves.sort_by_key(|v| v.asset_id);
+
+        let idx_in = reserves.iter().position(|v| v.asset_id == asset_in);
+        let idx_out = reserves.iter().position(|v| v.asset_id == asset_out);
+
+        if idx_in.is_none() || idx_out.is_none() {
+            return error();
+        }
+
+        let amount_in = parse_into!(u128, amount_in);
+        let amplification = parse_into!(u128, amplification);
+
+        let balances: Vec<u128> = reserves.iter().map(|v| v.reserve).collect();
+
+        let result = hydra_dx_math::stableswap::calculate_out_given_in::<D_ITERATIONS, Y_ITERATIONS>(
+            &balances,
+            idx_in.unwrap(),
+            idx_out.unwrap(),
             amount_in,
             amplification,
-            precision,
         );
 
-        result.unwrap_or(0).to_string()
+        if result.is_some() {
+            result.unwrap().to_string()
+        } else {
+            error()
+        }
     }
 
+    #[test]
+    fn test_json_input() {
+        let data = r#"
+        [{
+            "asset_id": 1,
+            "reserve": 1000000000000
+        },
+        {
+            "asset_id": 0,
+            "reserve": 1000000000000
+        }
+        ]"#;
+        let result = calculate_out_given_in(data.to_string(), 0, 1, "1000000000".to_string(), "1".to_string());
+
+        assert_eq!(result, "999666774".to_string());
+    }
+
+    /*
     #[wasm_bindgen]
     pub fn calculate_in_given_out(
         reserve_in: String,
@@ -441,19 +488,9 @@ pub mod stableswap {
             "0"
         );
     }
-    #[test]
-    fn spot_price_works() {
-        assert_eq!(
-            get_spot_price(String::from("1000"), String::from("2000"), String::from("500")),
-            "1000"
-        );
-        assert_eq!(
-            get_spot_price(String::from("1000"), String::from("0"), String::from("500")),
-            "0"
-        );
-    }
+
+     */
 }
-*/
 
 #[cfg(feature = "liquidity-mining")]
 pub mod liquidity_mining {
