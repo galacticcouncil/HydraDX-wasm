@@ -451,6 +451,30 @@ pub mod stableswap {
         }
     }
 
+    #[wasm_bindgen]
+    pub fn calculate_amplification(
+        initial_amplification: String,
+        final_amplification: String,
+        initial_block: String,
+        final_block: String,
+        current_block: String,
+    ) -> String {
+        let initial_amplification = parse_into!(u128, initial_amplification);
+        let final_amplification = parse_into!(u128, final_amplification);
+        let initial_block = parse_into!(u128, initial_block);
+        let final_block = parse_into!(u128, final_block);
+        let current_block = parse_into!(u128, current_block);
+
+        hydra_dx_math::stableswap::calculate_amplification(
+            initial_amplification,
+            final_amplification,
+            initial_block,
+            final_block,
+            current_block,
+        )
+        .to_string()
+    }
+
     #[test]
     fn test_json_input() {
         let data = r#"
