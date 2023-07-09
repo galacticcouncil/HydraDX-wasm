@@ -340,6 +340,7 @@ pub mod stableswap {
     pub use super::*;
 
     use serde::{Deserialize, Serialize};
+    use sp_arithmetic::Permill;
 
     macro_rules! parse_into {
         ($x:ty, $y:expr) => {{
@@ -367,6 +368,7 @@ pub mod stableswap {
         asset_out: u32,
         amount_in: String,
         amplification: String,
+        fee: String,
     ) -> String {
         let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
         if reserves.is_err() {
@@ -384,19 +386,66 @@ pub mod stableswap {
 
         let amount_in = parse_into!(u128, amount_in);
         let amplification = parse_into!(u128, amplification);
+        let fee = Permill::from_float(parse_into!(f64, fee));
 
         let balances: Vec<u128> = reserves.iter().map(|v| v.reserve).collect();
 
-        let result = hydra_dx_math::stableswap::calculate_out_given_in::<D_ITERATIONS, Y_ITERATIONS>(
+        let result = hydra_dx_math::stableswap::calculate_out_given_in_with_fee::<D_ITERATIONS, Y_ITERATIONS>(
             &balances,
             idx_in.unwrap(),
             idx_out.unwrap(),
             amount_in,
             amplification,
+            fee,
         );
 
         if result.is_some() {
-            result.unwrap().to_string()
+            result.unwrap().0.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_in_given_out(
+        reserves: String,
+        asset_in: u32,
+        asset_out: u32,
+        amount_out: String,
+        amplification: String,
+        fee: String,
+    ) -> String {
+        let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
+        if reserves.is_err() {
+            return error();
+        }
+        let mut reserves = reserves.unwrap();
+        reserves.sort_by_key(|v| v.asset_id);
+
+        let idx_in = reserves.iter().position(|v| v.asset_id == asset_in);
+        let idx_out = reserves.iter().position(|v| v.asset_id == asset_out);
+
+        if idx_in.is_none() || idx_out.is_none() {
+            return error();
+        }
+
+        let amount_out = parse_into!(u128, amount_out);
+        let amplification = parse_into!(u128, amplification);
+        let fee = Permill::from_float(parse_into!(f64, fee));
+
+        let balances: Vec<u128> = reserves.iter().map(|v| v.reserve).collect();
+
+        let result = hydra_dx_math::stableswap::calculate_in_given_out_with_fee::<D_ITERATIONS, Y_ITERATIONS>(
+            &balances,
+            idx_in.unwrap(),
+            idx_out.unwrap(),
+            amount_out,
+            amplification,
+            fee,
+        );
+
+        if result.is_some() {
+            result.unwrap().0.to_string()
         } else {
             error()
         }
@@ -414,7 +463,14 @@ pub mod stableswap {
             "reserve": 1000000000000
         }
         ]"#;
-        let result = calculate_out_given_in(data.to_string(), 0, 1, "1000000000".to_string(), "1".to_string());
+        let result = calculate_out_given_in(
+            data.to_string(),
+            0,
+            1,
+            "1000000000".to_string(),
+            "1".to_string(),
+            "0".to_string(),
+        );
 
         assert_eq!(result, "999666774".to_string());
     }
