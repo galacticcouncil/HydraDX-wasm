@@ -475,6 +475,37 @@ pub mod stableswap {
         .to_string()
     }
 
+    #[wasm_bindgen]
+    pub fn calculate_shares(reserves: String, assets: String, amplification: String, share_issuance: String) -> String {
+        let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
+        if reserves.is_err() {
+            return error();
+        }
+        let mut reserves = reserves.unwrap();
+        reserves.sort_by_key(|v| v.asset_id);
+
+        //let idx_in = reserves.iter().position(|v| v.asset_id == asset_in);
+        let balances: Vec<u128> = reserves.iter().map(|v| v.reserve).collect();
+
+        let updated_reserves = balances.clone();
+
+        let amplification = parse_into!(u128, amplification);
+        let issuance = parse_into!(u128, share_issuance);
+
+        let result = hydra_dx_math::stableswap::calculate_shares::<D_ITERATIONS>(
+            &balances,
+            &updated_reserves,
+            amplification,
+            issuance,
+        );
+
+        if result.is_some() {
+            result.unwrap().to_string()
+        } else {
+            error()
+        }
+    }
+
     #[test]
     fn test_json_input() {
         let data = r#"
