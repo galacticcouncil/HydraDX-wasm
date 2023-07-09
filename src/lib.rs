@@ -338,6 +338,7 @@ pub mod lbp {
 #[cfg(feature = "stableswap")]
 pub mod stableswap {
     pub use super::*;
+    use std::collections::HashMap;
 
     use serde::{Deserialize, Serialize};
     use sp_arithmetic::Permill;
@@ -355,10 +356,10 @@ pub mod stableswap {
     const D_ITERATIONS: u8 = 128;
     const Y_ITERATIONS: u8 = 64;
 
-    #[derive(Serialize, Deserialize, Debug)]
+    #[derive(Serialize, Deserialize, Copy, Clone, Debug)]
     pub struct AssetBalance {
         asset_id: u32,
-        reserve: u128,
+        amount: u128,
     }
 
     #[wasm_bindgen]
@@ -388,7 +389,7 @@ pub mod stableswap {
         let amplification = parse_into!(u128, amplification);
         let fee = Permill::from_float(parse_into!(f64, fee));
 
-        let balances: Vec<u128> = reserves.iter().map(|v| v.reserve).collect();
+        let balances: Vec<u128> = reserves.iter().map(|v| v.amount).collect();
 
         let result = hydra_dx_math::stableswap::calculate_out_given_in_with_fee::<D_ITERATIONS, Y_ITERATIONS>(
             &balances,
@@ -433,7 +434,7 @@ pub mod stableswap {
         let amplification = parse_into!(u128, amplification);
         let fee = Permill::from_float(parse_into!(f64, fee));
 
-        let balances: Vec<u128> = reserves.iter().map(|v| v.reserve).collect();
+        let balances: Vec<u128> = reserves.iter().map(|v| v.amount).collect();
 
         let result = hydra_dx_math::stableswap::calculate_in_given_out_with_fee::<D_ITERATIONS, Y_ITERATIONS>(
             &balances,
@@ -484,17 +485,37 @@ pub mod stableswap {
         let mut reserves = reserves.unwrap();
         reserves.sort_by_key(|v| v.asset_id);
 
-        //let idx_in = reserves.iter().position(|v| v.asset_id == asset_in);
-        let balances: Vec<u128> = reserves.iter().map(|v| v.reserve).collect();
+        let assets: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&assets);
+        if assets.is_err() {
+            return error();
+        }
+        let assets = assets.unwrap();
+        if assets.len() > reserves.len() {
+            return error();
+        }
 
-        let updated_reserves = balances.clone();
+        let mut updated_reserves = reserves.clone();
 
+        let mut liquidity: HashMap<u32, u128> = HashMap::new();
+        for a in assets.iter() {
+            let r = liquidity.insert(a.asset_id, a.amount);
+            if r.is_some() {
+                return error();
+            }
+        }
+        for reserve in updated_reserves.iter_mut() {
+            if let Some(v) = liquidity.get(&reserve.asset_id) {
+                reserve.amount += v;
+            }
+        }
+        let balances: Vec<u128> = reserves.iter().map(|v| v.amount).collect();
+        let updated_balances: Vec<u128> = updated_reserves.iter().map(|v| v.amount).collect();
         let amplification = parse_into!(u128, amplification);
         let issuance = parse_into!(u128, share_issuance);
 
         let result = hydra_dx_math::stableswap::calculate_shares::<D_ITERATIONS>(
             &balances,
-            &updated_reserves,
+            &updated_balances,
             amplification,
             issuance,
         );
@@ -506,16 +527,60 @@ pub mod stableswap {
         }
     }
 
+    #[wasm_bindgen]
+    pub fn calculate_liquidity_out_one_asset(
+        reserves: String,
+        shares: String,
+        asset_out: u32,
+        amplification: String,
+        share_issuance: String,
+        withdraw_fee: String,
+    ) -> String {
+        let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
+        if reserves.is_err() {
+            return error();
+        }
+        let mut reserves = reserves.unwrap();
+        reserves.sort_by_key(|v| v.asset_id);
+
+        let idx_out = reserves.iter().position(|v| v.asset_id == asset_out);
+        if idx_out.is_none() {
+            return error();
+        }
+
+        let shares_out = parse_into!(u128, shares);
+        let amplification = parse_into!(u128, amplification);
+        let issuance = parse_into!(u128, share_issuance);
+        let fee = Permill::from_float(parse_into!(f64, withdraw_fee));
+
+        let balances: Vec<u128> = reserves.iter().map(|v| v.amount).collect();
+
+        let result = hydra_dx_math::stableswap::calculate_withdraw_one_asset::<D_ITERATIONS, Y_ITERATIONS>(
+            &balances,
+            shares_out,
+            idx_out.unwrap(),
+            issuance,
+            amplification,
+            fee,
+        );
+
+        if result.is_some() {
+            result.unwrap().0.to_string()
+        } else {
+            error()
+        }
+    }
+
     #[test]
     fn test_json_input() {
         let data = r#"
         [{
             "asset_id": 1,
-            "reserve": 1000000000000
+            "amount": 1000000000000
         },
         {
             "asset_id": 0,
-            "reserve": 1000000000000
+            "amount": 1000000000000
         }
         ]"#;
         let result = calculate_out_given_in(
