@@ -16,8 +16,10 @@ serde = { version = "1.0.169", features = ["derive"] }
 serde_json = "1.0.100"
 
 sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
+sp-runtime  = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
 
-hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="ed714e5039e0ab6d7dc556084177244b676b2a2f"}
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="382a8870362fd02589da6f23f4791cb605773b96"}
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
@@ -30,7 +32,9 @@ wasm-opt = ["-Oz", "--enable-mutable-globals"]
 
 [features]
 default = ["std"]
-std = ["sp-arithmetic/std"]
+std = ["sp-arithmetic/std",
+"sp-core/std",
+"sp-runtime/std"]
 xyk = []
 lbp = []
 stableswap = []
