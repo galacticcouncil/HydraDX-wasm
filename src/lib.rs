@@ -401,8 +401,8 @@ pub mod stableswap {
             fee,
         );
 
-        if result.is_some() {
-            result.unwrap().0.to_string()
+        if let Some(r) = result {
+            r.0.to_string()
         } else {
             error()
         }
@@ -446,8 +446,8 @@ pub mod stableswap {
             fee,
         );
 
-        if result.is_some() {
-            result.unwrap().0.to_string()
+        if let Some(r) = result {
+            r.0.to_string()
         } else {
             error()
         }
@@ -521,8 +521,8 @@ pub mod stableswap {
             issuance,
         );
 
-        if result.is_some() {
-            result.unwrap().to_string()
+        if let Some(r) = result {
+            r.to_string()
         } else {
             error()
         }
@@ -584,8 +584,8 @@ pub mod stableswap {
             fee,
         );
 
-        if result.is_some() {
-            result.unwrap().0.to_string()
+        if let Some(r) = result {
+            r.0.to_string()
         } else {
             error()
         }
