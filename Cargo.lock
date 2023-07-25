@@ -143,8 +143,8 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hydra-dx-math"
-version = "7.1.0"
-source = "git+https://github.com/galacticcouncil/HydraDX-math?rev=3f972128a1b86c3708550f90783dd4cfadd556c8#3f972128a1b86c3708550f90783dd4cfadd556c8"
+version = "7.5.0"
+source = "git+https://github.com/galacticcouncil/HydraDX-node?rev=a1fa93ac93da7173893e0ee32bb0c8d6396f6dbd#a1fa93ac93da7173893e0ee32bb0c8d6396f6dbd"
 dependencies = [
  "fixed",
  "num-traits",
@@ -162,6 +162,7 @@ version = "4.1.0"
 dependencies = [
  "hydra-dx-math",
  "sp-arithmetic",
+ "sp-std",
  "wasm-bindgen",
  "wasm-bindgen-test",
  "wee_alloc",

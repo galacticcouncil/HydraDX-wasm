@@ -14,8 +14,9 @@ wasm-bindgen = "0.2.83"
 wee_alloc = "0.4.5"
 
 sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
 
-hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-math", rev="3f972128a1b86c3708550f90783dd4cfadd556c8"}
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="a1fa93ac93da7173893e0ee32bb0c8d6396f6dbd"}
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
@@ -28,10 +29,11 @@ wasm-opt = ["-Oz", "--enable-mutable-globals"]
 
 [features]
 default = ["std"]
-std = ["sp-arithmetic/std"]
+std = ["sp-arithmetic/std", "sp-std/std"]
 xyk = []
 lbp = []
 stableswap = []
 liquidity-mining = []
 omnipool = []
 ema = []
+staking = []
