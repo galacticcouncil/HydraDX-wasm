@@ -244,6 +244,27 @@ module.exports.calculate_shares = function(reserves, assets, amplification, shar
 };
 
 /**
+* @param {number} share_asset_id
+* @returns {string}
+*/
+module.exports.pool_account_name = function(share_asset_id) {
+    let deferred1_0;
+    let deferred1_1;
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.pool_account_name(retptr, share_asset_id);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        deferred1_0 = r0;
+        deferred1_1 = r1;
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+    }
+};
+
+/**
 * @param {string} reserves
 * @param {string} shares
 * @param {number} asset_out

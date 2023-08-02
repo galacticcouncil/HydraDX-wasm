@@ -45,6 +45,11 @@ export function calculate_amplification(initial_amplification: string, final_amp
 */
 export function calculate_shares(reserves: string, assets: string, amplification: string, share_issuance: string): string;
 /**
+* @param {number} share_asset_id
+* @returns {string}
+*/
+export function pool_account_name(share_asset_id: number): string;
+/**
 * @param {string} reserves
 * @param {string} shares
 * @param {number} asset_out

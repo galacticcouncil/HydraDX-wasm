@@ -342,6 +342,11 @@ pub mod stableswap {
 
     use serde::{Deserialize, Serialize};
     use sp_arithmetic::Permill;
+    #[cfg(test)]
+    use sp_core::crypto::UncheckedFrom;
+    #[cfg(test)]
+    use sp_core::Hasher;
+    #[cfg(test)]
     use sp_runtime::traits::IdentifyAccount;
 
     macro_rules! parse_into {
@@ -528,23 +533,26 @@ pub mod stableswap {
         }
     }
 
-    use sp_core::crypto::UncheckedFrom;
-    use sp_runtime::traits::Hash;
     #[wasm_bindgen]
-    pub fn derive_pool_account(share_asset_id: u32) -> String {
+    pub fn pool_account_name(share_asset_id: u32) -> String {
         let mut name = "sts".as_bytes().to_vec();
         name.extend_from_slice(&(share_asset_id).to_le_bytes());
-        let hashed = sp_runtime::traits::BlakeTwo256::hash(&name[..]);
-        let account = <<sp_runtime::MultiSignature as sp_runtime::traits::Verify>::Signer as IdentifyAccount>::AccountId::unchecked_from(hashed);
-        account.to_string()
+        unsafe {
+            let result = String::from_utf8_unchecked(name);
+            return result;
+        }
     }
 
     #[test]
     fn test_account_derive() {
         let share_asset_id: u32 = 2000;
-        let account = derive_pool_account(share_asset_id);
-        assert_eq!(account, "5CmwA9nfiBThjkLw1PSBbEQmZMdGMtd3WHtxJLy4hdT6LtRu".to_string());
-        //assert_eq!(account,"7JJnazA8nHpy1yqg2ZugX9zh8YdSWjqyU3XiDhUPRawLFeMw".to_string()); // same as previous but 63 prefix
+        let account_name = pool_account_name(share_asset_id);
+        let hashed = sp_runtime::traits::BlakeTwo256::hash(&account_name.as_bytes());
+        let account = <<sp_runtime::MultiSignature as sp_runtime::traits::Verify>::Signer as IdentifyAccount>::AccountId::unchecked_from(hashed);
+        assert_eq!(
+            account.to_string(),
+            "5CmwA9nfiBThjkLw1PSBbEQmZMdGMtd3WHtxJLy4hdT6LtRu".to_string()
+        );
     }
 
     #[wasm_bindgen]

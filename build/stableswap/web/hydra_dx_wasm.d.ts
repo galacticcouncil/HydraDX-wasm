@@ -45,6 +45,11 @@ export function calculate_amplification(initial_amplification: string, final_amp
 */
 export function calculate_shares(reserves: string, assets: string, amplification: string, share_issuance: string): string;
 /**
+* @param {number} share_asset_id
+* @returns {string}
+*/
+export function pool_account_name(share_asset_id: number): string;
+/**
 * @param {string} reserves
 * @param {string} shares
 * @param {number} asset_out
@@ -64,6 +69,7 @@ export interface InitOutput {
   readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_amplification: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_shares: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
+  readonly pool_account_name: (a: number, b: number) => void;
   readonly calculate_liquidity_out_one_asset: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
