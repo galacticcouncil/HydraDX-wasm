@@ -1,13 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
-/**
 * @param {string} reserves
 * @param {number} asset_in
 * @param {number} asset_out
@@ -59,3 +52,10 @@ export function pool_account_name(share_asset_id: number): string;
 * @returns {string}
 */
 export function calculate_liquidity_out_one_asset(reserves: string, shares: string, asset_out: number, amplification: string, share_issuance: string, withdraw_fee: string): string;
+/**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;

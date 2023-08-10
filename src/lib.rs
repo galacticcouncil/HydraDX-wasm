@@ -340,7 +340,7 @@ pub mod stableswap {
     pub use super::*;
     use std::collections::HashMap;
 
-    use serde::{Deserialize, Serialize};
+    use serde::Deserialize;
     use sp_arithmetic::Permill;
     #[cfg(test)]
     use sp_core::crypto::UncheckedFrom;
@@ -348,6 +348,8 @@ pub mod stableswap {
     use sp_core::Hasher;
     #[cfg(test)]
     use sp_runtime::traits::IdentifyAccount;
+
+    use serde_aux::prelude::*;
 
     macro_rules! parse_into {
         ($x:ty, $y:expr) => {{
@@ -362,9 +364,10 @@ pub mod stableswap {
     const D_ITERATIONS: u8 = 128;
     const Y_ITERATIONS: u8 = 64;
 
-    #[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+    #[derive(Deserialize, Copy, Clone, Debug)]
     pub struct AssetBalance {
         asset_id: u32,
+        #[serde(deserialize_with = "deserialize_number_from_string")]
         amount: u128,
     }
 
@@ -600,15 +603,15 @@ pub mod stableswap {
     }
 
     #[test]
-    fn test_json_input() {
+    fn calculate_out_givein_should_work_when_correct_json_format_provided() {
         let data = r#"
         [{
             "asset_id": 1,
-            "amount": 1000000000000
+            "amount": "1000000000000"
         },
         {
             "asset_id": 0,
-            "amount": 1000000000000
+            "amount": "1000000000000"
         }
         ]"#;
         let result = calculate_out_given_in(
@@ -623,77 +626,31 @@ pub mod stableswap {
         assert_eq!(result, "999666774".to_string());
     }
 
-    /*
-    #[wasm_bindgen]
-    pub fn calculate_in_given_out(
-        reserve_in: String,
-        reserve_out: String,
-        amount_out: String,
-        amplification: String,
-        precision: String,
-    ) -> String {
-        let (reserve_in, reserve_out, amount_out, amplification, precision) =
-            to_u128!(reserve_in, reserve_out, amount_out, amplification, precision);
-        let result = hydra_dx_math::stableswap::calculate_in_given_out::<D_ITERATIONS, Y_ITERATIONS>(
-            reserve_in,
-            reserve_out,
-            amount_out,
-            amplification,
-            precision,
-        );
-
-        result.unwrap_or(0).to_string()
-    }
-
     #[test]
-    fn out_in_works() {
-        assert_eq!(
-            calculate_out_given_in(
-                String::from("1000"),
-                String::from("2000"),
-                String::from("500"),
-                String::from("400"),
-                String::from("1")
-            ),
-            "497"
-        );
-        assert_eq!(
-            calculate_out_given_in(
-                String::from("1"),
-                String::from("0"),
-                String::from("0"),
-                String::from("400"),
-                String::from("1")
-            ),
-            "0"
-        );
-    }
+    fn calculate_shares_should_work_when_correct_json_format_provided() {
+        let data = r#"
+        [{
+            "asset_id": 0,
+            "amount":"90000000000"
+        },
+        {
+            "asset_id": 1,
+            "amount": "5000000000000000000000"
+        }
+        ]"#;
+        let assets = r#"
+            [{"asset_id":1,"amount":"43000000000000000000"}]
+        "#;
 
-    #[test]
-    fn in_out_works() {
-        assert_eq!(
-            calculate_in_given_out(
-                String::from("1000"),
-                String::from("2000"),
-                String::from("500"),
-                String::from("100"),
-                String::from("1"),
-            ),
-            "503"
+        let result = calculate_shares(
+            data.to_string(),
+            assets.to_string(),
+            "1000".to_string(),
+            "64839594451719860".to_string(),
         );
-        assert_eq!(
-            calculate_in_given_out(
-                String::from("0"),
-                String::from("1"),
-                String::from("0"),
-                "100".to_string(),
-                "1".to_string()
-            ),
-            "0"
-        );
-    }
 
-     */
+        assert_eq!(result, "371626154620907".to_string());
+    }
 }
 
 #[cfg(feature = "liquidity-mining")]
