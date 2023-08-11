@@ -1788,7 +1788,7 @@ pub mod ema {
 #[cfg(feature = "staking")]
 pub mod staking {
     use super::*;
-    use sp_arithmetic::{FixedU128, Permill};
+    use sp_arithmetic::{FixedU128, Permill, Perbill};
 
     macro_rules! parse_into {
         ($x:ty, $y:expr, $e:expr) => {{
@@ -1857,7 +1857,7 @@ pub mod staking {
             to_u128!(position_created_at, now, action_points, slashed_points);
         let time_points_per_period = time_points_per_period.parse::<u8>().unwrap_or(0);
         let time_points_weight = Permill::from_float(parse_into!(f64, time_points_weight, error()));
-        let action_points_weight = Permill::from_float(parse_into!(f64, action_points_weight, error()));
+        let action_points_weight = Perbill::from_float(parse_into!(f64, action_points_weight, error()));
 
         match hydra_dx_math::staking::calculate_points(
             position_created_at,

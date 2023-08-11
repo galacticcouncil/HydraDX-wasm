@@ -144,7 +144,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 [[package]]
 name = "hydra-dx-math"
 version = "7.5.0"
-source = "git+https://github.com/galacticcouncil/HydraDX-node?rev=a1fa93ac93da7173893e0ee32bb0c8d6396f6dbd#a1fa93ac93da7173893e0ee32bb0c8d6396f6dbd"
+source = "git+https://github.com/galacticcouncil/HydraDX-node?rev=aecefb9e319b16a802a2029c275df259346ca341#aecefb9e319b16a802a2029c275df259346ca341"
 dependencies = [
  "fixed",
  "num-traits",

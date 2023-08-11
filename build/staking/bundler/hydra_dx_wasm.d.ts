@@ -1,6 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
+/**
 * @param {string} current_reward_per_stake
 * @param {string} pending_rewards
 * @param {string} total_stake
@@ -52,10 +59,3 @@ export function calculate_rewards(accumulated_reward_per_stake: string, reward_p
 * @returns {string}
 */
 export function calculate_percentage_amount(amount: string, percentage: string): string;
-/**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
