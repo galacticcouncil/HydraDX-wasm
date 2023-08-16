@@ -16,7 +16,7 @@ serde = { version = "1.0.169", features = ["derive"] }
 serde_json = "1.0.100"
 serde-aux = "4.2.0"
 sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
-hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="0a6400eb41c922ec13f2806387f81cf8a5fb5eaa"}
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="aecefb9e319b16a802a2029c275df259346ca341"}
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
@@ -38,3 +38,4 @@ stableswap = []
 liquidity-mining = []
 omnipool = []
 ema = []
+staking = []
