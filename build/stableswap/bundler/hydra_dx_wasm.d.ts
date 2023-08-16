@@ -43,6 +43,11 @@ export function calculate_shares(reserves: string, assets: string, amplification
 */
 export function pool_account_name(share_asset_id: number): string;
 /**
+* @param {string} share_asset_id
+* @returns {string}
+*/
+export function stable_pool_account_name(share_asset_id: string): string;
+/**
 * @param {string} reserves
 * @param {string} shares
 * @param {number} asset_out

@@ -866,7 +866,7 @@ dependencies = [
 
 [[package]]
 name = "hydra-dx-wasm"
-version = "4.1.0"
+version = "4.2.0"
 dependencies = [
  "hydra-dx-math",
  "serde",
