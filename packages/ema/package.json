@@ -1,7 +1,7 @@
 {
-  "name": "@galacticcouncil/math-liquidity-mining",
+  "name": "@galacticcouncil/math-ema",
   "version": "0.1.4-beta.0",
-  "description": "Liquidity mining math",
+  "description": "EMA math",
   "main": "index.js",
   "module": "index.esm.js",
   "types": "index.d.ts"
