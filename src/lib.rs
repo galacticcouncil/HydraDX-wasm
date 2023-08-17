@@ -537,50 +537,23 @@ pub mod stableswap {
     }
 
     #[wasm_bindgen]
-    pub fn pool_account_name(share_asset_id: u32) -> String {
+    pub fn pool_account_name(share_asset_id: u32) -> Vec<u8>{
         let mut name = "sts".as_bytes().to_vec();
         name.extend_from_slice(&(share_asset_id).to_le_bytes());
-        unsafe {
-            let result = String::from_utf8_unchecked(name);
-            return result;
-        }
-    }
-
-    #[wasm_bindgen]
-    pub fn stable_pool_account_name(share_asset_id: String) -> String {
-        let share_asset_id = parse_into!(u32, share_asset_id);
-        let mut name = "sts".as_bytes().to_vec();
-        name.extend_from_slice(&(share_asset_id).to_le_bytes());
-        unsafe {
-            let result = String::from_utf8_unchecked(name);
-            return result;
-        }
+        return name;
     }
 
     #[test]
     fn test_account_derive() {
         let share_asset_id: u32 = 2000;
         let account_name = pool_account_name(share_asset_id);
-        let hashed = sp_runtime::traits::BlakeTwo256::hash(&account_name.as_bytes());
+        let hashed = sp_runtime::traits::BlakeTwo256::hash(&account_name);
         let account = <<sp_runtime::MultiSignature as sp_runtime::traits::Verify>::Signer as IdentifyAccount>::AccountId::unchecked_from(hashed);
         assert_eq!(
             account.to_string(),
             "5CmwA9nfiBThjkLw1PSBbEQmZMdGMtd3WHtxJLy4hdT6LtRu".to_string()
         );
     }
-
-    #[test]
-    fn test_account_derive_with_string() {
-        let share_asset_id= "2000".to_string();
-        let account_name = stable_pool_account_name(share_asset_id);
-        let hashed = sp_runtime::traits::BlakeTwo256::hash(&account_name.as_bytes());
-        let account = <<sp_runtime::MultiSignature as sp_runtime::traits::Verify>::Signer as IdentifyAccount>::AccountId::unchecked_from(hashed);
-        assert_eq!(
-            account.to_string(),
-            "5CmwA9nfiBThjkLw1PSBbEQmZMdGMtd3WHtxJLy4hdT6LtRu".to_string()
-        );
-    }
-
 
     #[wasm_bindgen]
     pub fn calculate_liquidity_out_one_asset(
