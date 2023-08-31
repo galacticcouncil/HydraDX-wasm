@@ -1,8 +1,0 @@
-{
-  "name": "@galacticcouncil/math-liquidity-mining",
-  "version": "0.1.4",
-  "description": "Liquidity mining math",
-  "main": "index.js",
-  "module": "index.esm.js",
-  "types": "index.d.ts"
-}

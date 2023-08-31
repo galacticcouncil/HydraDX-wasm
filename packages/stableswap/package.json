@@ -1,8 +1,0 @@
-{
-  "name": "@galacticcouncil/math-stableswap",
-  "version": "0.1.4",
-  "description": "Stableswap pool math",
-  "main": "index.js",
-  "module": "index.esm.js",
-  "types": "index.d.ts"
-}

@@ -40,27 +40,6 @@ build-bundler-release:
 	rm ./build/xyk/bundler/LICENSE ./build/lbp/bundler/LICENSE ./build/stableswap/bundler/LICENSE ./build/liquidity-mining/bundler/LICENSE ./build/omnipool/bundler/LICENSE ./build/ema/bundler/LICENSE ./build/staking/bundler/LICENSE
 	rm ./build/xyk/bundler/README.md ./build/lbp/bundler/README.md ./build/stableswap/bundler/README.md ./build/liquidity-mining/bundler/README.md ./build/omnipool/bundler/README.md  ./build/ema/bundler/README.md ./build/staking/bundler/README.md
 
-
-.PHONY: build-package 
-build-package: 
-	bash ./build-package.sh xyk
-	bash ./build-package.sh lbp
-	bash ./build-package.sh stableswap
-	bash ./build-package.sh liquidity-mining
-	bash ./build-package.sh omnipool
-	bash ./build-package.sh ema
-	bash ./build-package.sh staking
-
-.PHONY: clean-package 
-clean-package: 
-	bash ./clean-package.sh xyk
-	bash ./clean-package.sh lbp
-	bash ./clean-package.sh stableswap
-	bash ./clean-package.sh liquidity-mining
-	bash ./clean-package.sh omnipool
-	bash ./clean-package.sh ema
-	bash ./clean-package.sh staking
-
 .PHONY: test
 test:
 	cargo test --all-features

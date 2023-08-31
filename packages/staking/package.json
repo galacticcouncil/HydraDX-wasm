@@ -1,8 +1,0 @@
-{
-  "name": "@galacticcouncil/math-staking",
-  "version": "0.1.4",
-  "description": "Staking math",
-  "main": "index.js",
-  "module": "index.esm.js",
-  "types": "index.d.ts"
-}
