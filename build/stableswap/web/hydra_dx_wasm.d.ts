@@ -43,11 +43,6 @@ export function calculate_shares(reserves: string, assets: string, amplification
 */
 export function pool_account_name(share_asset_id: number): Uint8Array;
 /**
-* @param {string} share_asset_id
-* @returns {string}
-*/
-export function stable_pool_account_name(share_asset_id: string): string;
-/**
 * @param {string} reserves
 * @param {string} shares
 * @param {number} asset_out
@@ -74,7 +69,6 @@ export interface InitOutput {
   readonly calculate_amplification: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_shares: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly pool_account_name: (a: number, b: number) => void;
-  readonly stable_pool_account_name: (a: number, b: number, c: number) => void;
   readonly calculate_liquidity_out_one_asset: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => void;
   readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
