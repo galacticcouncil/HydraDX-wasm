@@ -282,7 +282,7 @@ pub mod lbp {
                 String::from("2000"),
                 String::from("500"),
             ),
-            "358"
+            "367"
         );
         assert_eq!(
             lbp::calculate_out_given_in(
@@ -306,7 +306,7 @@ pub mod lbp {
                 String::from("2000"),
                 String::from("500"),
             ),
-            "782"
+            "779"
         );
         assert_eq!(
             lbp::calculate_in_given_out(
@@ -316,7 +316,7 @@ pub mod lbp {
                 String::from("2000"),
                 String::from("0"),
             ),
-            "9"
+            "1"
         );
     }
 
@@ -338,6 +338,7 @@ pub mod lbp {
 #[cfg(feature = "stableswap")]
 pub mod stableswap {
     pub use super::*;
+    use hydra_dx_math::stableswap::types::AssetReserve;
     use std::collections::HashMap;
 
     use serde::Deserialize;
@@ -366,6 +367,23 @@ pub mod stableswap {
 
     #[derive(Deserialize, Copy, Clone, Debug)]
     pub struct AssetBalance {
+        asset_id: u32,
+        #[serde(deserialize_with = "deserialize_number_from_string")]
+        amount: u128,
+        decimals: u8,
+    }
+
+    impl From<&AssetBalance> for AssetReserve {
+        fn from(value: &AssetBalance) -> Self {
+            Self {
+                amount: value.amount,
+                decimals: value.decimals,
+            }
+        }
+    }
+
+    #[derive(Deserialize, Copy, Clone, Debug)]
+    pub struct AssetAmount {
         asset_id: u32,
         #[serde(deserialize_with = "deserialize_number_from_string")]
         amount: u128,
@@ -398,7 +416,7 @@ pub mod stableswap {
         let amplification = parse_into!(u128, amplification);
         let fee = Permill::from_float(parse_into!(f64, fee));
 
-        let balances: Vec<u128> = reserves.iter().map(|v| v.amount).collect();
+        let balances: Vec<AssetReserve> = reserves.iter().map(|v| v.into()).collect();
 
         let result = hydra_dx_math::stableswap::calculate_out_given_in_with_fee::<D_ITERATIONS, Y_ITERATIONS>(
             &balances,
@@ -443,7 +461,7 @@ pub mod stableswap {
         let amplification = parse_into!(u128, amplification);
         let fee = Permill::from_float(parse_into!(f64, fee));
 
-        let balances: Vec<u128> = reserves.iter().map(|v| v.amount).collect();
+        let balances: Vec<AssetReserve> = reserves.iter().map(|v| v.into()).collect();
 
         let result = hydra_dx_math::stableswap::calculate_in_given_out_with_fee::<D_ITERATIONS, Y_ITERATIONS>(
             &balances,
@@ -486,7 +504,13 @@ pub mod stableswap {
     }
 
     #[wasm_bindgen]
-    pub fn calculate_shares(reserves: String, assets: String, amplification: String, share_issuance: String) -> String {
+    pub fn calculate_shares(
+        reserves: String,
+        assets: String,
+        amplification: String,
+        share_issuance: String,
+        fee: String,
+    ) -> String {
         let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
         if reserves.is_err() {
             return error();
@@ -494,7 +518,7 @@ pub mod stableswap {
         let mut reserves = reserves.unwrap();
         reserves.sort_by_key(|v| v.asset_id);
 
-        let assets: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&assets);
+        let assets: serde_json::Result<Vec<AssetAmount>> = serde_json::from_str(&assets);
         if assets.is_err() {
             return error();
         }
@@ -517,16 +541,18 @@ pub mod stableswap {
                 reserve.amount += v;
             }
         }
-        let balances: Vec<u128> = reserves.iter().map(|v| v.amount).collect();
-        let updated_balances: Vec<u128> = updated_reserves.iter().map(|v| v.amount).collect();
+        let balances: Vec<AssetReserve> = reserves.iter().map(|v| v.into()).collect();
+        let updated_balances: Vec<AssetReserve> = updated_reserves.iter().map(|v| v.into()).collect();
         let amplification = parse_into!(u128, amplification);
         let issuance = parse_into!(u128, share_issuance);
+        let fee = Permill::from_float(parse_into!(f64, fee));
 
         let result = hydra_dx_math::stableswap::calculate_shares::<D_ITERATIONS>(
             &balances,
             &updated_balances,
             amplification,
             issuance,
+            fee,
         );
 
         if let Some(r) = result {
@@ -537,7 +563,7 @@ pub mod stableswap {
     }
 
     #[wasm_bindgen]
-    pub fn pool_account_name(share_asset_id: u32) -> Vec<u8>{
+    pub fn pool_account_name(share_asset_id: u32) -> Vec<u8> {
         let mut name = "sts".as_bytes().to_vec();
         name.extend_from_slice(&(share_asset_id).to_le_bytes());
         return name;
@@ -581,7 +607,7 @@ pub mod stableswap {
         let issuance = parse_into!(u128, share_issuance);
         let fee = Permill::from_float(parse_into!(f64, withdraw_fee));
 
-        let balances: Vec<u128> = reserves.iter().map(|v| v.amount).collect();
+        let balances: Vec<AssetReserve> = reserves.iter().map(|v| v.into()).collect();
 
         let result = hydra_dx_math::stableswap::calculate_withdraw_one_asset::<D_ITERATIONS, Y_ITERATIONS>(
             &balances,
@@ -604,11 +630,13 @@ pub mod stableswap {
         let data = r#"
         [{
             "asset_id": 1,
-            "amount": "1000000000000"
+            "amount": "1000000000000",
+            "decimals": 12
         },
         {
             "asset_id": 0,
-            "amount": "1000000000000"
+            "amount": "1000000000000",
+            "decimals": 12
         }
         ]"#;
         let result = calculate_out_given_in(
@@ -620,7 +648,7 @@ pub mod stableswap {
             "0".to_string(),
         );
 
-        assert_eq!(result, "999666774".to_string());
+        assert_eq!(result, "999500248".to_string());
     }
 
     #[test]
@@ -628,11 +656,13 @@ pub mod stableswap {
         let data = r#"
         [{
             "asset_id": 0,
-            "amount":"90000000000"
+            "amount":"90000000000",
+            "decimals": 12
         },
         {
             "asset_id": 1,
-            "amount": "5000000000000000000000"
+            "amount": "5000000000000000000000",
+            "decimals": 12
         }
         ]"#;
         let assets = r#"
@@ -644,9 +674,10 @@ pub mod stableswap {
             assets.to_string(),
             "1000".to_string(),
             "64839594451719860".to_string(),
+            "0".to_string(),
         );
 
-        assert_eq!(result, "371626154620907".to_string());
+        assert_eq!(result, "371541351762585".to_string());
     }
 }
 
@@ -1983,7 +2014,7 @@ pub mod ema {
 #[cfg(feature = "staking")]
 pub mod staking {
     use super::*;
-    use sp_arithmetic::{FixedU128, Permill, Perbill};
+    use sp_arithmetic::{FixedU128, Perbill, Permill};
 
     macro_rules! parse_into {
         ($x:ty, $y:expr, $e:expr) => {{
