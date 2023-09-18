@@ -562,6 +562,7 @@ pub mod stableswap {
         }
     }
 
+    #[wasm_bindgen]
     pub fn calculate_shares_for_amount(
         reserves: String,
         asset_in: u32,

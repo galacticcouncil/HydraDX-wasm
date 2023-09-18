@@ -47,6 +47,16 @@ export function calculate_amplification(initial_amplification: string, final_amp
 export function calculate_shares(reserves: string, assets: string, amplification: string, share_issuance: string, fee: string): string;
 /**
 * @param {string} reserves
+* @param {number} asset_in
+* @param {string} amount
+* @param {string} amplification
+* @param {string} share_issuance
+* @param {string} fee
+* @returns {string}
+*/
+export function calculate_shares_for_amount(reserves: string, asset_in: number, amount: string, amplification: string, share_issuance: string, fee: string): string;
+/**
+* @param {string} reserves
 * @param {string} shares
 * @param {number} asset_in
 * @param {string} amplification

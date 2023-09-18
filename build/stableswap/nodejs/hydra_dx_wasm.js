@@ -248,6 +248,42 @@ module.exports.calculate_shares = function(reserves, assets, amplification, shar
 
 /**
 * @param {string} reserves
+* @param {number} asset_in
+* @param {string} amount
+* @param {string} amplification
+* @param {string} share_issuance
+* @param {string} fee
+* @returns {string}
+*/
+module.exports.calculate_shares_for_amount = function(reserves, asset_in, amount, amplification, share_issuance, fee) {
+    let deferred6_0;
+    let deferred6_1;
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        const ptr0 = passStringToWasm0(reserves, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(amount, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(amplification, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ptr3 = passStringToWasm0(share_issuance, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len3 = WASM_VECTOR_LEN;
+        const ptr4 = passStringToWasm0(fee, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len4 = WASM_VECTOR_LEN;
+        wasm.calculate_shares_for_amount(retptr, ptr0, len0, asset_in, ptr1, len1, ptr2, len2, ptr3, len3, ptr4, len4);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        deferred6_0 = r0;
+        deferred6_1 = r1;
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(deferred6_0, deferred6_1, 1);
+    }
+};
+
+/**
+* @param {string} reserves
 * @param {string} shares
 * @param {number} asset_in
 * @param {string} amplification
