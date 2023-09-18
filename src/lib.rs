@@ -562,6 +562,88 @@ pub mod stableswap {
         }
     }
 
+    pub fn calculate_shares_for_amount(
+        reserves: String,
+        asset_in: u32,
+        amount: String,
+        amplification: String,
+        share_issuance: String,
+        fee: String,
+    ) -> String {
+        let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
+        if reserves.is_err() {
+            return error();
+        }
+        let mut reserves = reserves.unwrap();
+        reserves.sort_by_key(|v| v.asset_id);
+        let idx_in = reserves.iter().position(|v| v.asset_id == asset_in);
+        if idx_in.is_none() {
+            return error();
+        }
+        let amount_in = parse_into!(u128, amount);
+        let balances: Vec<AssetReserve> = reserves.iter().map(|v| v.into()).collect();
+        let amplification = parse_into!(u128, amplification);
+        let issuance = parse_into!(u128, share_issuance);
+        let fee = Permill::from_float(parse_into!(f64, fee));
+
+        let result = hydra_dx_math::stableswap::calculate_shares_for_amount::<D_ITERATIONS>(
+            &balances,
+            idx_in.unwrap(),
+            amount_in,
+            amplification,
+            issuance,
+            fee,
+        );
+
+        if let Some(r) = result {
+            r.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_add_one_asset(
+        reserves: String,
+        shares: String,
+        asset_in: u32,
+        amplification: String,
+        share_issuance: String,
+        fee: String,
+    ) -> String {
+        let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
+        if reserves.is_err() {
+            return error();
+        }
+        let mut reserves = reserves.unwrap();
+        reserves.sort_by_key(|v| v.asset_id);
+        let idx_in = reserves.iter().position(|v| v.asset_id == asset_in);
+        if idx_in.is_none() {
+            return error();
+        }
+
+        let balances: Vec<AssetReserve> = reserves.iter().map(|v| v.into()).collect();
+        let shares = parse_into!(u128, shares);
+        let amplification = parse_into!(u128, amplification);
+        let issuance = parse_into!(u128, share_issuance);
+        let fee = Permill::from_float(parse_into!(f64, fee));
+
+        let result = hydra_dx_math::stableswap::calculate_add_one_asset::<D_ITERATIONS, Y_ITERATIONS>(
+            &balances,
+            shares,
+            idx_in.unwrap(),
+            issuance,
+            amplification,
+            fee,
+        );
+
+        if let Some(r) = result {
+            r.0.to_string()
+        } else {
+            error()
+        }
+    }
+
     #[wasm_bindgen]
     pub fn pool_account_name(share_asset_id: u32) -> Vec<u8> {
         let mut name = "sts".as_bytes().to_vec();
