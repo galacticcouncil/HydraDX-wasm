@@ -46,6 +46,16 @@ export function calculate_amplification(initial_amplification: string, final_amp
 */
 export function calculate_shares(reserves: string, assets: string, amplification: string, share_issuance: string, fee: string): string;
 /**
+* @param {string} reserves
+* @param {string} shares
+* @param {number} asset_in
+* @param {string} amplification
+* @param {string} share_issuance
+* @param {string} fee
+* @returns {string}
+*/
+export function calculate_add_one_asset(reserves: string, shares: string, asset_in: number, amplification: string, share_issuance: string, fee: string): string;
+/**
 * @param {number} share_asset_id
 * @returns {Uint8Array}
 */

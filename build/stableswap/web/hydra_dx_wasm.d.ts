@@ -46,6 +46,16 @@ export function calculate_amplification(initial_amplification: string, final_amp
 */
 export function calculate_shares(reserves: string, assets: string, amplification: string, share_issuance: string, fee: string): string;
 /**
+* @param {string} reserves
+* @param {string} shares
+* @param {number} asset_in
+* @param {string} amplification
+* @param {string} share_issuance
+* @param {string} fee
+* @returns {string}
+*/
+export function calculate_add_one_asset(reserves: string, shares: string, asset_in: number, amplification: string, share_issuance: string, fee: string): string;
+/**
 * @param {number} share_asset_id
 * @returns {Uint8Array}
 */
@@ -70,6 +80,7 @@ export interface InitOutput {
   readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_amplification: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_shares: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
+  readonly calculate_add_one_asset: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => void;
   readonly pool_account_name: (a: number, b: number) => void;
   readonly calculate_liquidity_out_one_asset: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
