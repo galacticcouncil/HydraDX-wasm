@@ -14,6 +14,7 @@ fn error() -> String {
 
 #[cfg(feature = "xyk")]
 pub mod xyk {
+
     pub use super::*;
 
     #[wasm_bindgen]
