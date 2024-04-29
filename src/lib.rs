@@ -1878,6 +1878,25 @@ pub mod omnipool {
     }
 
     #[wasm_bindgen]
+    pub fn calculate_lrna_spot_price_with_fee(asset_reserve: String, asset_hub_reserve: String, asset_fee: String) -> String {
+        let reserve = parse_into!(u128, asset_reserve, error());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
+
+        let asset = AssetReserveState {
+            reserve,
+            hub_reserve,
+            ..Default::default()
+        };
+
+        if let Some(result) = hydra_dx_math::omnipool::calculate_lrna_spot_sprice(&asset, Some(asset_fee)) {
+            result.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
     pub fn calculate_cap_difference(
         asset_reserve: String,
         asset_hub_reserve: String,
@@ -2173,6 +2192,37 @@ pub mod omnipool {
     }
 
 
+    #[test]
+    fn calculate_lrna_spot_price_should_work() {
+        let result = calculate_lrna_spot_price(
+            "2000".to_string(),
+            "500".to_string(),
+        );
+        assert_eq!(result, "4000000000000000000");
+
+        let result = calculate_lrna_spot_price(
+            "2000".to_string(),
+            "0".to_string(),
+        );
+        assert_eq!(result, "-1");
+    }
+
+    #[test]
+    fn calculate_lrna_spot_price_with_fee_should_work() {
+        let result = calculate_lrna_spot_price_with_fee(
+            "2000".to_string(),
+            "500".to_string(),
+            "0.01".to_string(),
+        );
+        assert_eq!(result, "3960000000000000000");
+
+        let result = calculate_lrna_spot_price_with_fee(
+            "2000".to_string(),
+            "0".to_string(),
+            "0.01".to_string(),
+        );
+        assert_eq!(result, "-1");
+    }
 }
 
 #[cfg(test)]
