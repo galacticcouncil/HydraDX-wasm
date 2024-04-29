@@ -8,13 +8,22 @@ macro_rules! to_u128 {
     );
 }
 
+macro_rules! to_u32 {
+        ($($x:expr),+) => (
+            {($($x.parse::<u32>().unwrap_or(0)),+)}
+        );
+    }
+
 fn error() -> String {
     "-1".to_string()
 }
 
 #[cfg(feature = "xyk")]
 pub mod xyk {
-
+    use hydra_dx_math::MathError;
+    use hydra_dx_math::MathError::ZeroReserve;
+    use num_traits::Zero;
+    use sp_arithmetic::{FixedU128, Permill};
     pub use super::*;
 
     #[wasm_bindgen]
@@ -24,6 +33,26 @@ pub mod xyk {
         let result = hydra_dx_math::xyk::calculate_spot_price(sell_reserve, buy_reserve, amount);
 
         result.unwrap_or(0).to_string()
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_spot_price(s: String, b: String) -> String {
+        let (sell_reserve, buy_reserve) = to_u128!(s, b);
+
+        let result = hydra_dx_math::xyk::spot_price(sell_reserve, buy_reserve, None);
+
+        result.unwrap_or(FixedU128::zero()).to_string()
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_spot_price_with_fee(s: String, b: String, fee_rate_n: String, fee_rate_d: String) -> String {
+        let (sell_reserve, buy_reserve) = to_u128!(s, b);
+
+        let (fee_rate_n, fee_rate_d) = to_u32!(fee_rate_n, fee_rate_d);
+
+        let result = hydra_dx_math::xyk::spot_price(sell_reserve, buy_reserve, Some((fee_rate_n, fee_rate_d)));
+
+        result.unwrap_or(FixedU128::zero()).to_string()
     }
 
     #[wasm_bindgen]
@@ -106,6 +135,35 @@ pub mod xyk {
         );
         assert_eq!(
             xyk::get_spot_price(String::from("1000"), String::from("0"), String::from("500")),
+            "0"
+        );
+    }
+
+    #[test]
+    fn calculate_spot_price_works() {
+        assert_eq!(
+            xyk::calculate_spot_price(String::from("1000"), String::from("2000")),
+            "2000000000000000000"
+        );
+        assert_eq!(
+            xyk::calculate_spot_price(String::from("1000"), String::from("0")),
+            "0"
+        );
+    }
+
+    #[test]
+    fn calculate_spot_price_with_fee_works() {
+        assert_eq!(
+            xyk::calculate_spot_price_with_fee(String::from("1000"), String::from("2000"), String::from("3"), String::from("1000")),
+            "1994000000000000000"
+        );
+        assert_eq!(
+            xyk::calculate_spot_price_with_fee(String::from("1000"), String::from("2000"), String::from("0"), String::from("0")),
+            "0"
+        );
+
+        assert_eq!(
+            xyk::calculate_spot_price_with_fee(String::from("1000"), String::from("0"), String::from("3"), String::from("1000")),
             "0"
         );
     }
@@ -194,12 +252,6 @@ pub mod xyk {
 #[cfg(feature = "lbp")]
 pub mod lbp {
     pub use super::*;
-
-    macro_rules! to_u32 {
-        ($($x:expr),+) => (
-            {($($x.parse::<u32>().unwrap_or(0)),+)}
-        );
-    }
 
     #[wasm_bindgen]
     pub fn get_spot_price(s: String, b: String, s_w: String, b_w: String, a: String) -> String {
@@ -501,7 +553,7 @@ pub mod stableswap {
             final_block,
             current_block,
         )
-        .to_string()
+            .to_string()
     }
 
     #[wasm_bindgen]
