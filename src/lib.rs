@@ -1668,7 +1668,7 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        if let Some(result) = hydra_dx_math::omnipool::calculate_spot_sprice(&asset_a, &asset_b) {
+        if let Some(result) = hydra_dx_math::omnipool::calculate_spot_sprice(&asset_a, &asset_b, None) {
             result.to_string()
         } else {
             error()
@@ -1686,7 +1686,7 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        if let Some(result) = hydra_dx_math::omnipool::calculate_lrna_spot_sprice(&asset) {
+        if let Some(result) = hydra_dx_math::omnipool::calculate_lrna_spot_sprice(&asset, None) {
             result.to_string()
         } else {
             error()
@@ -2132,11 +2132,12 @@ pub mod staking {
         current_stake: String,
         stake_increase: String,
         stake_weight: String,
+        min_slash_point: String
     ) -> String {
-        let (points, current_stake, stake_increase) = to_u128!(points, current_stake, stake_increase);
+        let (points, current_stake, stake_increase, min_slash_point) = to_u128!(points, current_stake, stake_increase, min_slash_point);
         let stake_weight = stake_weight.parse::<u8>().unwrap_or(0);
 
-        match hydra_dx_math::staking::calculate_slashed_points(points, current_stake, stake_increase, stake_weight) {
+        match hydra_dx_math::staking::calculate_slashed_points(points, current_stake, stake_increase, stake_weight, min_slash_point) {
             Some(slashed) => slashed.to_string(),
             None => error(),
         }
@@ -2242,7 +2243,8 @@ pub mod staking {
                     points.clone(),
                     1_000_000_000_000_000_u128.to_string(),
                     1_000_000_000_000_000_u128.to_string(),
-                    1.to_string()
+                    1.to_string(),
+                    0.to_string()
                 ),
                 10_000_000.to_string()
             );
@@ -2252,7 +2254,8 @@ pub mod staking {
                     points.clone(),
                     1_000_000_000_000_000_u128.to_string(),
                     1_000_000_000_000_000_u128.to_string(),
-                    2.to_string()
+                    2.to_string(),
+                    0.to_string()
                 ),
                 5_000_000.to_string()
             );
@@ -2262,7 +2265,8 @@ pub mod staking {
                     points,
                     10_000_000_000_000_000_000_u128.to_string(),
                     1_000_000_000_000_u128.to_string(),
-                    1.to_string()
+                    1.to_string(),
+                    0.to_string()
                 ),
                 1.to_string()
             );
@@ -2272,7 +2276,8 @@ pub mod staking {
                     0.to_string(),
                     1_000_000_000_000_000_u128.to_string(),
                     1_000_000_000_000_000_000_000_u128.to_string(),
-                    1.to_string()
+                    1.to_string(),
+                    0.to_string()
                 ),
                 0.to_string()
             );
