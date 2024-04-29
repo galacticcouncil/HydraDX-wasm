@@ -20,10 +20,8 @@ fn error() -> String {
 
 #[cfg(feature = "xyk")]
 pub mod xyk {
-    use hydra_dx_math::MathError;
-    use hydra_dx_math::MathError::ZeroReserve;
     use num_traits::Zero;
-    use sp_arithmetic::{FixedU128, Permill};
+    use sp_arithmetic::{FixedU128};
     pub use super::*;
 
     #[wasm_bindgen]
