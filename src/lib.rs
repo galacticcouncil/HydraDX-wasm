@@ -711,6 +711,96 @@ pub mod stableswap {
     }
 
     #[wasm_bindgen]
+    pub fn calculate_spot_price(
+        reserves: String,
+        amplification: String,
+        asset_in: String,
+        asset_out: String,
+    ) -> String {
+        let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
+        if reserves.is_err() {
+            return error();
+        }
+        let mut reserves = reserves.unwrap();
+        reserves.sort_by_key(|v| v.asset_id);
+
+        let balances: Vec<AssetReserve> = reserves.iter().map(|v| v.into()).collect();
+        let amplification = parse_into!(u128, amplification);
+        let (asset_in, asset_out) = to_u32!(asset_in, asset_out);
+
+        let Some(d) = hydra_dx_math::stableswap::calculate_d::<D_ITERATIONS>(&balances, amplification.clone()) else {
+            return error()
+        };
+
+        let idx_in = reserves.iter().position(|v| v.asset_id == asset_in);
+        let idx_out = reserves.iter().position(|v| v.asset_id == asset_out);
+        if idx_in.is_none() || idx_out.is_none() {
+            return error();
+        }
+
+        let result = hydra_dx_math::stableswap::calculate_spot_price(
+            &balances,
+            amplification,
+            d,
+            idx_in.unwrap(),
+            idx_out.unwrap(),
+            None,
+        );
+
+        if let Some(r) = result {
+            r.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_spot_price_with_fee(
+        reserves: String,
+        amplification: String,
+        asset_in: String,
+        asset_out: String,
+        fee: String,
+    ) -> String {
+        let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
+        if reserves.is_err() {
+            return error();
+        }
+        let mut reserves = reserves.unwrap();
+        reserves.sort_by_key(|v| v.asset_id);
+
+        let balances: Vec<AssetReserve> = reserves.iter().map(|v| v.into()).collect();
+        let amplification = parse_into!(u128, amplification);
+        let (asset_in, asset_out) = to_u32!(asset_in, asset_out);
+        let fee = Permill::from_float(parse_into!(f64, fee));
+
+        let Some(d) = hydra_dx_math::stableswap::calculate_d::<D_ITERATIONS>(&balances, amplification.clone()) else {
+            return error()
+        };
+
+        let idx_in = reserves.iter().position(|v| v.asset_id == asset_in);
+        let idx_out = reserves.iter().position(|v| v.asset_id == asset_out);
+        if idx_in.is_none() || idx_out.is_none() {
+            return error();
+        }
+
+        let result = hydra_dx_math::stableswap::calculate_spot_price(
+            &balances,
+            amplification,
+            d,
+            idx_in.unwrap(),
+            idx_out.unwrap(),
+            Some(fee),
+        );
+
+        if let Some(r) = result {
+            r.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
     pub fn calculate_shares_for_amount(
         reserves: String,
         asset_in: u32,
@@ -910,6 +1000,80 @@ pub mod stableswap {
 
         assert_eq!(result, "371541351762585".to_string());
     }
+
+    #[test]
+    fn calculate_spot_price_should_work() {
+        let data = r#"
+        [{
+            "asset_id": 0,
+            "amount":"90000000000",
+            "decimals": 12
+        },
+        {
+            "asset_id": 1,
+            "amount": "5000000000000000000000",
+            "decimals": 12
+        }
+        ]"#;
+
+
+        let result = calculate_spot_price(
+            data.to_string(),
+            100.to_string(),
+            "0".to_string(),
+            "1".to_string(),
+        );
+
+        assert_eq!(result, "36043643".to_string());
+
+        let result = calculate_spot_price(
+            "0".to_string(),
+            100.to_string(),
+            "0".to_string(),
+            "1".to_string(),
+        );
+
+        assert_eq!(result, "-1".to_string());
+    }
+
+    #[test]
+    fn calculate_spot_price_with_fee_should_work() {
+        let data = r#"
+        [{
+            "asset_id": 0,
+            "amount":"90000000000",
+            "decimals": 12
+        },
+        {
+            "asset_id": 1,
+            "amount": "5000000000000000000000",
+            "decimals": 12
+        }
+        ]"#;
+
+
+        let result = calculate_spot_price_with_fee(
+            data.to_string(),
+            100.to_string(),
+            "0".to_string(),
+            "1".to_string(),
+            "0.01".to_string(),
+        );
+
+        assert_eq!(result, "36407720".to_string());
+
+        let result = calculate_spot_price_with_fee(
+            "0".to_string(),
+            100.to_string(),
+            "0".to_string(),
+            "1".to_string(),
+            "0.01".to_string(),
+        );
+
+        assert_eq!(result, "-1".to_string());
+    }
+
+
 }
 
 #[cfg(feature = "liquidity-mining")]
