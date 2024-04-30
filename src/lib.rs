@@ -2133,7 +2133,7 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        if let Some(result) = hydra_dx_math::omnipool::calculate_spot_sprice(&asset_a, &asset_b, None) {
+        if let Some(result) = hydra_dx_math::omnipool::calculate_spot_price(&asset_a, &asset_b, None) {
             result.to_string()
         } else {
             error()
@@ -2170,7 +2170,7 @@ pub mod omnipool {
         };
 
 
-        if let Some(result) = hydra_dx_math::omnipool::calculate_spot_sprice(&asset_a, &asset_b, Some((protocol_fee, asset_fee))) {
+        if let Some(result) = hydra_dx_math::omnipool::calculate_spot_price(&asset_a, &asset_b, Some((protocol_fee, asset_fee))) {
             result.to_string()
         } else {
             error()
@@ -2188,7 +2188,7 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        if let Some(result) = hydra_dx_math::omnipool::calculate_lrna_spot_sprice(&asset, None) {
+        if let Some(result) = hydra_dx_math::omnipool::calculate_lrna_spot_price(&asset, None) {
             result.to_string()
         } else {
             error()
@@ -2207,7 +2207,7 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        if let Some(result) = hydra_dx_math::omnipool::calculate_lrna_spot_sprice(&asset, Some(asset_fee)) {
+        if let Some(result) = hydra_dx_math::omnipool::calculate_lrna_spot_price(&asset, Some(asset_fee)) {
             result.to_string()
         } else {
             error()
