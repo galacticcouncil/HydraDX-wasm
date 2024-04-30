@@ -37,7 +37,7 @@ pub mod xyk {
     pub fn calculate_spot_price(s: String, b: String) -> String {
         let (sell_reserve, buy_reserve) = to_u128!(s, b);
 
-        let result = hydra_dx_math::xyk::spot_price(sell_reserve, buy_reserve, None);
+        let result = hydra_dx_math::xyk::calculate_spot_price_with_fee(sell_reserve, buy_reserve, None);
 
         result.unwrap_or(FixedU128::zero()).to_string()
     }
@@ -48,7 +48,7 @@ pub mod xyk {
 
         let (fee_rate_n, fee_rate_d) = to_u32!(fee_rate_n, fee_rate_d);
 
-        let result = hydra_dx_math::xyk::spot_price(sell_reserve, buy_reserve, Some((fee_rate_n, fee_rate_d)));
+        let result = hydra_dx_math::xyk::calculate_spot_price_with_fee(sell_reserve, buy_reserve, Some((fee_rate_n, fee_rate_d)));
 
         result.unwrap_or(FixedU128::zero()).to_string()
     }
