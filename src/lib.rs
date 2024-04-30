@@ -488,7 +488,7 @@ pub mod stableswap {
     use std::collections::HashMap;
 
     use serde::Deserialize;
-    use sp_arithmetic::Permill;
+    use sp_arithmetic::{FixedPointNumber, FixedU128, Permill};
     #[cfg(test)]
     use sp_core::crypto::UncheckedFrom;
     #[cfg(test)]
@@ -799,6 +799,83 @@ pub mod stableswap {
     }
 
     #[wasm_bindgen]
+    pub fn calculate_spot_price_between_share_and_stableasset_with_fee(
+        reserves: String,
+        amplification: String,
+        asset_out: String,
+        share_issuance: String,
+        pool_fee: String
+    ) -> String {
+        let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
+        if reserves.is_err() {
+            return error();
+        }
+        let mut reserves = reserves.unwrap();
+        reserves.sort_by_key(|v| v.asset_id);
+
+        let balances: Vec<AssetReserve> = reserves.iter().map(|v| v.into()).collect();
+        let amplification = parse_into!(u128, amplification);
+        let asset_out = to_u32!(asset_out);
+        let issuance = parse_into!(u128, share_issuance);
+        let fee = Permill::from_float(parse_into!(f64, pool_fee));
+
+        let idx_out = reserves.iter().position(|v| v.asset_id == asset_out);
+        if idx_out.is_none(){
+            return error();
+        }
+
+        let reference_amount = 1000; //We use the  same MinTradingLimit we have configured to stableswap
+        let result = hydra_dx_math::stableswap::calculate_spot_price_between_share_and_stableasset(
+            &balances,
+            idx_out.unwrap(),
+            reference_amount,
+            amplification,
+            issuance,
+            fee
+        );
+
+        if let Some(r) = result {
+            r.to_string()
+        } else {
+            error()
+        }
+    }
+
+
+    #[wasm_bindgen]
+    pub fn calculate_spot_price_between_stableasset_and_share_with_fee(
+        reserves: String,
+        amplification: String,
+        asset_out: String,
+        share_issuance: String,
+        pool_fee: String
+    ) -> String {
+        let reference_amount = 1000; //We use the  same MinTradingLimit we have configured to stableswap
+
+        let assets = format!(
+            r#"[{{"asset_id":{},"amount":"{}"}}]"#,
+            asset_out, reference_amount
+        );
+
+        let shares_calculation = calculate_shares(
+            reserves,
+            assets,
+            amplification,
+            share_issuance,
+            pool_fee,
+        );
+
+        let shares = to_u128!(shares_calculation);
+
+        let Some(spot_price) = FixedU128::checked_from_rational(shares, reference_amount) else {
+            return error();
+        };
+
+        spot_price.to_string()
+    }
+
+
+    #[wasm_bindgen]
     pub fn calculate_shares_for_amount(
         reserves: String,
         asset_in: u32,
@@ -1069,6 +1146,83 @@ pub mod stableswap {
         );
 
         assert_eq!(result, "-1".to_string());
+    }
+
+    #[test]
+    fn calculate_spot_price_between_share_and_stable_with_fee_should_work() {
+        let data = r#"
+        [{
+            "asset_id": 0,
+            "amount":"90000000000",
+            "decimals": 12
+        },
+        {
+            "asset_id": 1,
+            "amount": "5000000000000000000000",
+            "decimals": 12
+        }
+        ]"#;
+
+
+        let result = calculate_spot_price_between_share_and_stableasset_with_fee(
+            data.to_string(),
+            100.to_string(),
+            "0".to_string(),
+            "2000000000".to_string(),
+            "0.01".to_string(),
+        );
+
+        assert_eq!(result, "125000000000000000000".to_string());
+
+        let result = calculate_spot_price_between_share_and_stableasset_with_fee(
+            data.to_string(),
+            100.to_string(),
+            "999".to_string(),
+            "2000000000".to_string(),
+            "0.01".to_string(),
+        );
+
+        assert_eq!(result, "-1".to_string());
+    }
+
+
+    #[test]
+    fn calculate_spot_price_between_stable_and_share_with_fee_should_work() {
+        let data = r#"
+        [{
+            "asset_id": 0,
+            "amount":"90000000000",
+            "decimals": 12
+        },
+        {
+            "asset_id": 1,
+            "amount": "5000000000000000000000",
+            "decimals": 12
+        }
+        ]"#;
+        let assets = r#"
+            [{"asset_id":1,"amount":"43000000000000000000"}]
+        "#;
+
+        let result = calculate_spot_price_between_stableasset_and_share_with_fee(
+            data.to_string(),
+            100.to_string(),
+            "1".to_string(),
+            "648395944517198603232".to_string(),
+            "0".to_string(),
+        );
+
+        assert_eq!(result, "86000000000000000".to_string());
+
+        let result = calculate_spot_price_between_stableasset_and_share_with_fee(
+            data.to_string(),
+            100.to_string(),
+            "9999".to_string(),
+            "648395944517198603232".to_string(),
+            "0".to_string(),
+        );
+
+        assert_eq!(result, "0".to_string());
     }
 
 
