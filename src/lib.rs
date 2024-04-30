@@ -270,7 +270,7 @@ pub mod lbp {
         let (sell_weight, buy_weight) = to_u32!(s_w, b_w);
 
         let result =
-            hydra_dx_math::lbp::spot_price(sell_reserve, buy_reserve, sell_weight, buy_weight, 0, 0, None);
+            hydra_dx_math::lbp::calculate_spot_price_with_fee(sell_reserve, buy_reserve, sell_weight, buy_weight, 0, 0, None);
 
         result.unwrap_or(FixedU128::zero()).to_string()
     }
@@ -282,7 +282,7 @@ pub mod lbp {
         let (sell_weight, buy_weight, fee_asset, asset_out, fee_rate_n, fee_rate_d) = to_u32!(s_w, b_w, fee_asset, asset_out, fee_rate_n, fee_rate_d);
 
         let result =
-            hydra_dx_math::lbp::spot_price(sell_reserve, buy_reserve, sell_weight, buy_weight, fee_asset, asset_out, Some((fee_rate_n, fee_rate_d)));
+            hydra_dx_math::lbp::calculate_spot_price_with_fee(sell_reserve, buy_reserve, sell_weight, buy_weight, fee_asset, asset_out, Some((fee_rate_n, fee_rate_d)));
 
         result.unwrap_or(FixedU128::zero()).to_string()
     }
@@ -1205,9 +1205,6 @@ pub mod stableswap {
             "decimals": 12
         }
         ]"#;
-        let assets = r#"
-            [{"asset_id":1,"amount":"43000000000000000000"}]
-        "#;
 
         let result = calculate_spot_price_between_stableasset_and_share_with_fee(
             data.to_string(),
