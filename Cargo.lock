@@ -1189,8 +1189,8 @@ dependencies = [
 
 [[package]]
 name = "hydra-dx-math"
-version = "8.1.0"
-source = "git+https://github.com/galacticcouncil/HydraDX-node?rev=5efaa8d4dd40ff4630404e56f72c9290abb86e60#5efaa8d4dd40ff4630404e56f72c9290abb86e60"
+version = "8.1.1"
+source = "git+https://github.com/galacticcouncil/HydraDX-node?rev=0d42e2bd19beea333a9fe6cbe0f68851e1b687c7#0d42e2bd19beea333a9fe6cbe0f68851e1b687c7"
 dependencies = [
  "fixed",
  "num-traits",

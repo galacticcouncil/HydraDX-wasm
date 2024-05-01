@@ -835,7 +835,7 @@ pub mod stableswap {
         );
 
         if let Some(spot_price) = result {
-            //We take reciprocal to get the price of stable/share
+            //We take reciprocal to get the price of share denomninated in stable asset (stable/share)
             if let Some(price) = spot_price.reciprocal() {
                 price.to_string()
             } else {
