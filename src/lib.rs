@@ -2,12 +2,14 @@ extern crate core;
 
 use wasm_bindgen::prelude::*;
 
+#[macro_export]
 macro_rules! to_u128 {
     ($($x:expr),+) => (
         {($($x.parse::<u128>().unwrap_or(0)),+)}
     );
 }
 
+#[macro_export]
 macro_rules! to_u32 {
         ($($x:expr),+) => (
             {($($x.parse::<u32>().unwrap_or(0)),+)}
