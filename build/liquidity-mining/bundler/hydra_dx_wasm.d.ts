@@ -2,6 +2,13 @@
 /* eslint-disable */
 /**
 * @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
+/**
+* @param {string} a
 * @param {string} b
 * @returns {string}
 */
@@ -82,10 +89,3 @@ export function calculate_yield_farm_delta_rpvs(yield_farm_rpz: string, global_f
 * @returns {string}
 */
 export function calculate_global_farm_rewards(total_shares_z: string, price_adjustment: string, yield_per_period: string, max_reward_per_period: string, periods_since_last_update: string): string;
-/**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
