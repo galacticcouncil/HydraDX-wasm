@@ -2,11 +2,19 @@ extern crate core;
 
 use wasm_bindgen::prelude::*;
 
+#[macro_export]
 macro_rules! to_u128 {
     ($($x:expr),+) => (
         {($($x.parse::<u128>().unwrap_or(0)),+)}
     );
 }
+
+#[macro_export]
+macro_rules! to_u32 {
+        ($($x:expr),+) => (
+            {($($x.parse::<u32>().unwrap_or(0)),+)}
+        );
+    }
 
 fn error() -> String {
     "-1".to_string()
@@ -14,6 +22,8 @@ fn error() -> String {
 
 #[cfg(feature = "xyk")]
 pub mod xyk {
+    use num_traits::Zero;
+    use sp_arithmetic::{FixedU128};
     pub use super::*;
 
     #[wasm_bindgen]
@@ -23,6 +33,26 @@ pub mod xyk {
         let result = hydra_dx_math::xyk::calculate_spot_price(sell_reserve, buy_reserve, amount);
 
         result.unwrap_or(0).to_string()
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_spot_price(s: String, b: String) -> String {
+        let (sell_reserve, buy_reserve) = to_u128!(s, b);
+
+        let result = hydra_dx_math::xyk::calculate_spot_price_with_fee(sell_reserve, buy_reserve, None);
+
+        result.unwrap_or(FixedU128::zero()).to_string()
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_spot_price_with_fee(s: String, b: String, fee_rate_n: String, fee_rate_d: String) -> String {
+        let (sell_reserve, buy_reserve) = to_u128!(s, b);
+
+        let (fee_rate_n, fee_rate_d) = to_u32!(fee_rate_n, fee_rate_d);
+
+        let result = hydra_dx_math::xyk::calculate_spot_price_with_fee(sell_reserve, buy_reserve, Some((fee_rate_n, fee_rate_d)));
+
+        result.unwrap_or(FixedU128::zero()).to_string()
     }
 
     #[wasm_bindgen]
@@ -110,6 +140,35 @@ pub mod xyk {
     }
 
     #[test]
+    fn calculate_spot_price_works() {
+        assert_eq!(
+            xyk::calculate_spot_price(String::from("1000"), String::from("2000")),
+            "2000000000000000000"
+        );
+        assert_eq!(
+            xyk::calculate_spot_price(String::from("1000"), String::from("0")),
+            "0"
+        );
+    }
+
+    #[test]
+    fn calculate_spot_price_with_fee_works() {
+        assert_eq!(
+            xyk::calculate_spot_price_with_fee(String::from("1000"), String::from("2000"), String::from("3"), String::from("1000")),
+            "1994000000000000000"
+        );
+        assert_eq!(
+            xyk::calculate_spot_price_with_fee(String::from("1000"), String::from("2000"), String::from("0"), String::from("0")),
+            "0"
+        );
+
+        assert_eq!(
+            xyk::calculate_spot_price_with_fee(String::from("1000"), String::from("0"), String::from("3"), String::from("1000")),
+            "0"
+        );
+    }
+
+    #[test]
     fn out_in_works() {
         assert_eq!(
             xyk::calculate_out_given_in(String::from("1000"), String::from("2000"), String::from("500")),
@@ -192,13 +251,9 @@ pub mod xyk {
 
 #[cfg(feature = "lbp")]
 pub mod lbp {
+    use num_traits::Zero;
+    use sp_arithmetic::FixedU128;
     pub use super::*;
-
-    macro_rules! to_u32 {
-        ($($x:expr),+) => (
-            {($($x.parse::<u32>().unwrap_or(0)),+)}
-        );
-    }
 
     #[wasm_bindgen]
     pub fn get_spot_price(s: String, b: String, s_w: String, b_w: String, a: String) -> String {
@@ -210,6 +265,30 @@ pub mod lbp {
 
         result.unwrap_or(0).to_string()
     }
+
+    #[wasm_bindgen]
+    pub fn calculate_spot_price(s: String, b: String, s_w: String, b_w: String) -> String {
+        let (sell_reserve, buy_reserve) = to_u128!(s, b);
+        let (sell_weight, buy_weight) = to_u32!(s_w, b_w);
+
+        let result =
+            hydra_dx_math::lbp::calculate_spot_price_with_fee(sell_reserve, buy_reserve, sell_weight, buy_weight, 0, 0, None);
+
+        result.unwrap_or(FixedU128::zero()).to_string()
+    }
+
+
+    #[wasm_bindgen]
+    pub fn calculate_spot_price_with_fee(s: String, b: String, s_w: String, b_w: String, fee_asset: String, asset_out: String, fee_rate_n: String, fee_rate_d: String ) -> String {
+        let (sell_reserve, buy_reserve) = to_u128!(s, b);
+        let (sell_weight, buy_weight, fee_asset, asset_out, fee_rate_n, fee_rate_d) = to_u32!(s_w, b_w, fee_asset, asset_out, fee_rate_n, fee_rate_d);
+
+        let result =
+            hydra_dx_math::lbp::calculate_spot_price_with_fee(sell_reserve, buy_reserve, sell_weight, buy_weight, fee_asset, asset_out, Some((fee_rate_n, fee_rate_d)));
+
+        result.unwrap_or(FixedU128::zero()).to_string()
+    }
+
 
     #[wasm_bindgen]
     pub fn calculate_out_given_in(s: String, b: String, s_w: String, b_w: String, a: String) -> String {
@@ -270,6 +349,75 @@ pub mod lbp {
             ),
             "0"
         );
+    }
+
+    #[test]
+    fn calculate_spot_price_works() {
+        assert_eq!(
+            lbp::calculate_spot_price(
+                String::from("1000"),
+                String::from("2000"),
+                String::from("1000"),
+                String::from("2000"),
+            ),
+            "1000000000000000000"
+        );
+
+        assert_eq!(
+            lbp::calculate_spot_price(
+                String::from("1000"),
+                String::from("2000"),
+                String::from("0"),
+                String::from("2000"),
+            ),
+            "0"
+        );
+    }
+
+    #[test]
+    fn calculate_spot_price_with_fee_works() {
+        assert_eq!(
+            lbp::calculate_spot_price_with_fee(
+                String::from("1000"),
+                String::from("2000"),
+                String::from("1000"),
+                String::from("2000"),
+                String::from("5"),
+                String::from("5"),
+                String::from("1"),
+                String::from("100")
+            ),
+            "990000000000000000"
+        );
+
+        assert_eq!(
+            lbp::calculate_spot_price_with_fee(
+                String::from("1000"),
+                String::from("2000"),
+                String::from("1000"),
+                String::from("2000"),
+                String::from("1"),
+                String::from("5"),
+                String::from("1"),
+                String::from("100")
+            ),
+            "1000000000000000000"
+        );
+
+        assert_eq!(
+            lbp::calculate_spot_price_with_fee(
+                String::from("1000"),
+                String::from("2000"),
+                String::from("1000"),
+                String::from("0"),
+                String::from("1"),
+                String::from("5"),
+                String::from("1"),
+                String::from("100")
+            ),
+            "0"
+        );
+
     }
 
     #[test]
@@ -342,7 +490,7 @@ pub mod stableswap {
     use std::collections::HashMap;
 
     use serde::Deserialize;
-    use sp_arithmetic::Permill;
+    use sp_arithmetic::{Permill};
     #[cfg(test)]
     use sp_core::crypto::UncheckedFrom;
     #[cfg(test)]
@@ -500,7 +648,7 @@ pub mod stableswap {
             final_block,
             current_block,
         )
-        .to_string()
+            .to_string()
     }
 
     #[wasm_bindgen]
@@ -553,6 +701,54 @@ pub mod stableswap {
             amplification,
             issuance,
             fee,
+        );
+
+        if let Some(r) = result {
+            r.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_spot_price_with_fee(
+        pool_id: String,
+        reserves: String,
+        amplification: String,
+        asset_in: String,
+        asset_out: String,
+        share_issuance: String,
+        fee: String,
+    ) -> String {
+        let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
+        if reserves.is_err() {
+            return error();
+        }
+        let mut reserves = reserves.unwrap();
+        reserves.sort_by_key(|v| v.asset_id);
+
+        let balances: Vec<(u32, AssetReserve)> = reserves.clone().into_iter().map(|v| (v.asset_id, AssetReserve::new(v.amount, v.decimals))).collect();
+        let amplification = parse_into!(u128, amplification);
+        let (pool_id, asset_in, asset_out) = to_u32!(pool_id, asset_in, asset_out);
+        let min_trade_limit = 1_000;//We use the same MinTradingLimit we have configured to stableswap runtime
+        let fee = Permill::from_float(parse_into!(f64, fee));
+        let issuance = parse_into!(u128, share_issuance);
+
+        let idx_in = reserves.iter().position(|v| v.asset_id == asset_in);
+        let idx_out = reserves.iter().position(|v| v.asset_id == asset_out);
+        if idx_in.is_none() || idx_out.is_none() {
+            return error();
+        }
+
+        let result = hydra_dx_math::stableswap::calculate_spot_price(
+            pool_id,
+            balances,
+            amplification,
+            asset_in,
+            asset_out,
+            issuance,
+                min_trade_limit,
+            Some(fee),
         );
 
         if let Some(r) = result {
@@ -762,6 +958,130 @@ pub mod stableswap {
 
         assert_eq!(result, "371541351762585".to_string());
     }
+
+    #[test]
+    fn calculate_spot_price_with_fee_should_work() {
+        let data = r#"
+        [{
+            "asset_id": 0,
+            "amount":"90000000000",
+            "decimals": 12
+        },
+        {
+            "asset_id": 1,
+            "amount": "5000000000000000000000",
+            "decimals": 12
+        }
+        ]"#;
+
+
+        let result = calculate_spot_price_with_fee(
+            100000002.to_string(),
+            data.to_string(),
+            100.to_string(),
+            "0".to_string(),
+            "1".to_string(),
+            "555555".to_string(),
+            "0.01".to_string(),
+        );
+
+        assert_eq!(result, "36407720".to_string());
+
+        let result = calculate_spot_price_with_fee(
+            100000002.to_string(),
+            "0".to_string(),
+            100.to_string(),
+            "0".to_string(),
+            "1".to_string(),
+            "555555".to_string(),
+            "0.01".to_string(),
+        );
+
+        assert_eq!(result, "-1".to_string());
+    }
+
+    #[test]
+    fn calculate_spot_price_between_share_and_stable_with_fee_should_work() {
+        let data = r#"
+        [{
+            "asset_id": 0,
+            "amount":"90000000000",
+            "decimals": 12
+        },
+        {
+            "asset_id": 1,
+            "amount": "5000000000000000000000",
+            "decimals": 12
+        }
+        ]"#;
+
+        let result = calculate_spot_price_with_fee(
+            1.to_string(),
+            data.to_string(),
+            100.to_string(),
+            "1".to_string(),
+            "0".to_string(),
+            "2000000000".to_string(),
+            "0.01".to_string(),
+        );
+
+        assert_eq!(result, "8000000000000000".to_string());
+
+        let result = calculate_spot_price_with_fee(
+            1.to_string(),
+            data.to_string(),
+            100.to_string(),
+            "9".to_string(),
+            "0".to_string(),
+            "2000000000".to_string(),
+            "0.01".to_string(),
+        );
+
+        assert_eq!(result, "-1".to_string());
+    }
+
+
+   #[test]
+    fn calculate_spot_price_between_stable_and_share_with_fee_should_work() {
+        let data = r#"
+        [{
+            "asset_id": 0,
+            "amount":"90000000000",
+            "decimals": 12
+        },
+        {
+            "asset_id": 1,
+            "amount": "5000000000000000000000",
+            "decimals": 12
+        }
+        ]"#;
+
+       let result = calculate_spot_price_with_fee(
+           0.to_string(),
+           data.to_string(),
+           100.to_string(),
+           "0".to_string(),
+           "1".to_string(),
+           "648395944517198603232".to_string(),
+           "0.01".to_string(),
+       );
+
+        assert_eq!(result, "87000000000000000".to_string());
+
+       let result = calculate_spot_price_with_fee(
+           0.to_string(),
+           data.to_string(),
+           100.to_string(),
+           "0".to_string(),
+           "9999".to_string(),
+           "648395944517198603232".to_string(),
+           "0.01".to_string(),
+       );
+
+        assert_eq!(result, "-1".to_string());
+    }
+
+
 }
 
 #[cfg(feature = "liquidity-mining")]
@@ -1667,7 +1987,44 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        if let Some(result) = hydra_dx_math::omnipool::calculate_spot_sprice(&asset_a, &asset_b) {
+        if let Some(result) = hydra_dx_math::omnipool::calculate_spot_price(&asset_a, &asset_b, None) {
+            result.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_spot_price_with_fee(
+        asset_a_reserve: String,
+        asset_a_hub_reserve: String,
+        asset_b_reserve: String,
+        asset_b_hub_reserve: String,
+        protocol_fee: String,
+        asset_fee: String
+    ) -> String {
+        let reserve_a = parse_into!(u128, asset_a_reserve, error());
+        let hub_reserve_a = parse_into!(u128, asset_a_hub_reserve, error());
+        let reserve_b = parse_into!(u128, asset_b_reserve, error());
+        let hub_reserve_b = parse_into!(u128, asset_b_hub_reserve, error());
+
+        let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee, error()));
+        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
+
+        let asset_a = AssetReserveState {
+            reserve: reserve_a,
+            hub_reserve: hub_reserve_a,
+            ..Default::default()
+        };
+
+        let asset_b = AssetReserveState {
+            reserve: reserve_b,
+            hub_reserve: hub_reserve_b,
+            ..Default::default()
+        };
+
+
+        if let Some(result) = hydra_dx_math::omnipool::calculate_spot_price(&asset_a, &asset_b, Some((protocol_fee, asset_fee))) {
             result.to_string()
         } else {
             error()
@@ -1685,7 +2042,26 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        if let Some(result) = hydra_dx_math::omnipool::calculate_lrna_spot_sprice(&asset) {
+        if let Some(result) = hydra_dx_math::omnipool::calculate_lrna_spot_price(&asset, None) {
+            result.to_string()
+        } else {
+            error()
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn calculate_lrna_spot_price_with_fee(asset_reserve: String, asset_hub_reserve: String, asset_fee: String) -> String {
+        let reserve = parse_into!(u128, asset_reserve, error());
+        let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
+        let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
+
+        let asset = AssetReserveState {
+            reserve,
+            hub_reserve,
+            ..Default::default()
+        };
+
+        if let Some(result) = hydra_dx_math::omnipool::calculate_lrna_spot_price(&asset, Some(asset_fee)) {
             result.to_string()
         } else {
             error()
@@ -1944,6 +2320,81 @@ pub mod omnipool {
         );
         assert_eq!(result, "0.11");
     }
+
+    #[test]
+    fn calculate_spot_price_should_work() {
+        let result = calculate_spot_price(
+            "2000".to_string(),
+            "500".to_string(),
+            "1000".to_string(),
+            "125".to_string(),
+        );
+        assert_eq!(result, "2000000000000000000");
+
+        let result = calculate_spot_price(
+            "2000".to_string(),
+            "0".to_string(),
+            "1000".to_string(),
+            "125".to_string(),
+        );
+        assert_eq!(result, "0");
+    }
+
+    #[test]
+    fn calculate_spot_price_with_fee_should_work() {
+        let result = calculate_spot_price_with_fee(
+            "2000".to_string(),
+            "500".to_string(),
+            "1000".to_string(),
+            "125".to_string(),
+            "0.01".to_string(),
+            "0.03".to_string(),
+        );
+        assert_eq!(result, "1920600000000000000");
+
+        let result = calculate_spot_price_with_fee(
+            "2000".to_string(),
+            "500".to_string(),
+            "0".to_string(),
+            "125".to_string(),
+            "0.01".to_string(),
+            "0.03".to_string(),
+        );
+        assert_eq!(result, "0");
+    }
+
+
+    #[test]
+    fn calculate_lrna_spot_price_should_work() {
+        let result = calculate_lrna_spot_price(
+            "2000".to_string(),
+            "500".to_string(),
+        );
+        assert_eq!(result, "4000000000000000000");
+
+        let result = calculate_lrna_spot_price(
+            "2000".to_string(),
+            "0".to_string(),
+        );
+        assert_eq!(result, "-1");
+    }
+
+    #[test]
+    fn calculate_lrna_spot_price_with_fee_should_work() {
+        let result = calculate_lrna_spot_price_with_fee(
+            "2000".to_string(),
+            "500".to_string(),
+            "0.01".to_string(),
+        );
+        assert_eq!(result, "3960000000000000000");
+
+        let result = calculate_lrna_spot_price_with_fee(
+            "2000".to_string(),
+            "0".to_string(),
+            "0.01".to_string(),
+        );
+        assert_eq!(result, "-1");
+    }
 }
 
 #[cfg(test)]
@@ -2131,11 +2582,12 @@ pub mod staking {
         current_stake: String,
         stake_increase: String,
         stake_weight: String,
+        min_slash_point: String
     ) -> String {
-        let (points, current_stake, stake_increase) = to_u128!(points, current_stake, stake_increase);
+        let (points, current_stake, stake_increase, min_slash_point) = to_u128!(points, current_stake, stake_increase, min_slash_point);
         let stake_weight = stake_weight.parse::<u8>().unwrap_or(0);
 
-        match hydra_dx_math::staking::calculate_slashed_points(points, current_stake, stake_increase, stake_weight) {
+        match hydra_dx_math::staking::calculate_slashed_points(points, current_stake, stake_increase, stake_weight, min_slash_point) {
             Some(slashed) => slashed.to_string(),
             None => error(),
         }
@@ -2241,7 +2693,8 @@ pub mod staking {
                     points.clone(),
                     1_000_000_000_000_000_u128.to_string(),
                     1_000_000_000_000_000_u128.to_string(),
-                    1.to_string()
+                    1.to_string(),
+                    0.to_string()
                 ),
                 10_000_000.to_string()
             );
@@ -2251,7 +2704,8 @@ pub mod staking {
                     points.clone(),
                     1_000_000_000_000_000_u128.to_string(),
                     1_000_000_000_000_000_u128.to_string(),
-                    2.to_string()
+                    2.to_string(),
+                    0.to_string()
                 ),
                 5_000_000.to_string()
             );
@@ -2261,7 +2715,8 @@ pub mod staking {
                     points,
                     10_000_000_000_000_000_000_u128.to_string(),
                     1_000_000_000_000_u128.to_string(),
-                    1.to_string()
+                    1.to_string(),
+                    0.to_string()
                 ),
                 1.to_string()
             );
@@ -2271,7 +2726,8 @@ pub mod staking {
                     0.to_string(),
                     1_000_000_000_000_000_u128.to_string(),
                     1_000_000_000_000_000_000_000_u128.to_string(),
-                    1.to_string()
+                    1.to_string(),
+                    0.to_string()
                 ),
                 0.to_string()
             );

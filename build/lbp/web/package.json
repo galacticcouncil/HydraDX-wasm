@@ -16,5 +16,7 @@
   ],
   "module": "hydra_dx_wasm.js",
   "types": "hydra_dx_wasm.d.ts",
-  "sideEffects": false
+  "sideEffects": [
+    "./snippets/*"
+  ]
 }

@@ -15,13 +15,16 @@ wee_alloc = "0.4.5"
 serde = { version = "1.0.169", features = ["derive"] }
 serde_json = "1.0.100"
 serde-aux = "4.2.0"
-sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
-hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="9e733374233e2bdef039d5b3e73c5e939d7512f4"}
+sp-arithmetic = { git = "https://github.com/paritytech/polkadot-sdk", rev = "c8d2251cafadc108ba2f1f8a3208dc547ff38901", default-features = false }
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="301c53021e7e317a8641615e8315c1a79f8485b4"}
+num-traits = {default-features = false, version = "0.2.14"}
+# Added because of use of the FixedU128, used to implement `Ratio`
+scale-info = { version = "2.1.1", default-features = false, features = ["derive"] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false}
-sp-runtime  = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
+sp-core ={ git = "https://github.com/paritytech/polkadot-sdk", rev = "c8d2251cafadc108ba2f1f8a3208dc547ff38901", default-features = false }
+sp-runtime  = { git = "https://github.com/paritytech/polkadot-sdk", rev = "c8d2251cafadc108ba2f1f8a3208dc547ff38901", default-features = false }
 
 [profile.release]
 opt-level = "s"
@@ -31,7 +34,7 @@ wasm-opt = ["-Oz", "--enable-mutable-globals"]
 
 [features]
 default = ["std"]
-std = ["sp-arithmetic/std", "sp-runtime/std"]
+std = [ "sp-arithmetic/std", "sp-runtime/std"]
 xyk = []
 lbp = []
 stableswap = []

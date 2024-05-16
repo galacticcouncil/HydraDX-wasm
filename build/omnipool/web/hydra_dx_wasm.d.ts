@@ -118,11 +118,28 @@ export function calculate_lrna_in_given_out(asset_reserve: string, asset_hub_res
 */
 export function calculate_spot_price(asset_a_reserve: string, asset_a_hub_reserve: string, asset_b_reserve: string, asset_b_hub_reserve: string): string;
 /**
+* @param {string} asset_a_reserve
+* @param {string} asset_a_hub_reserve
+* @param {string} asset_b_reserve
+* @param {string} asset_b_hub_reserve
+* @param {string} protocol_fee
+* @param {string} asset_fee
+* @returns {string}
+*/
+export function calculate_spot_price_with_fee(asset_a_reserve: string, asset_a_hub_reserve: string, asset_b_reserve: string, asset_b_hub_reserve: string, protocol_fee: string, asset_fee: string): string;
+/**
 * @param {string} asset_reserve
 * @param {string} asset_hub_reserve
 * @returns {string}
 */
 export function calculate_lrna_spot_price(asset_reserve: string, asset_hub_reserve: string): string;
+/**
+* @param {string} asset_reserve
+* @param {string} asset_hub_reserve
+* @param {string} asset_fee
+* @returns {string}
+*/
+export function calculate_lrna_spot_price_with_fee(asset_reserve: string, asset_hub_reserve: string, asset_fee: string): string;
 /**
 * @param {string} asset_reserve
 * @param {string} asset_hub_reserve
@@ -200,7 +217,9 @@ export interface InitOutput {
   readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number, p: number, q: number, r: number, s: number) => void;
   readonly calculate_lrna_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_spot_price: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
+  readonly calculate_spot_price_with_fee: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number) => void;
   readonly calculate_lrna_spot_price: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly calculate_lrna_spot_price_with_fee: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly calculate_cap_difference: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly verify_asset_cap: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => number;
   readonly calculate_tvl_cap_difference: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number) => void;
@@ -211,9 +230,9 @@ export interface InitOutput {
   readonly is_remove_liquidity_allowed: (a: number) => number;
   readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
-  readonly __wbindgen_malloc: (a: number) => number;
-  readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
-  readonly __wbindgen_free: (a: number, b: number) => void;
+  readonly __wbindgen_malloc: (a: number, b: number) => number;
+  readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;
