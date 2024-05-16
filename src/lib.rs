@@ -166,6 +166,11 @@ pub mod xyk {
             xyk::calculate_spot_price_with_fee(String::from("1000"), String::from("0"), String::from("3"), String::from("1000")),
             "0"
         );
+
+        assert_ne!(
+            xyk::calculate_spot_price_with_fee(String::from("5039030951140853"), String::from("6987280000000000"), String::from("3"), String::from("1000")),
+            "0"
+        );
     }
 
     #[test]
