@@ -1,13 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {string} a
-* @param {number} fee_numerator
-* @param {number} fee_denominator
-* @returns {string}
-*/
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
-/**
 * @param {string} reserves
 * @param {number} asset_in
 * @param {number} asset_out
@@ -46,6 +39,17 @@ export function calculate_amplification(initial_amplification: string, final_amp
 */
 export function calculate_shares(reserves: string, assets: string, amplification: string, share_issuance: string, fee: string): string;
 /**
+* @param {string} pool_id
+* @param {string} reserves
+* @param {string} amplification
+* @param {string} asset_in
+* @param {string} asset_out
+* @param {string} share_issuance
+* @param {string} fee
+* @returns {string}
+*/
+export function calculate_spot_price_with_fee(pool_id: string, reserves: string, amplification: string, asset_in: string, asset_out: string, share_issuance: string, fee: string): string;
+/**
 * @param {string} reserves
 * @param {number} asset_in
 * @param {string} amount
@@ -80,20 +84,28 @@ export function pool_account_name(share_asset_id: number): Uint8Array;
 * @returns {string}
 */
 export function calculate_liquidity_out_one_asset(reserves: string, shares: string, asset_out: number, amplification: string, share_issuance: string, withdraw_fee: string): string;
+/**
+* @param {string} a
+* @param {number} fee_numerator
+* @param {number} fee_denominator
+* @returns {string}
+*/
+export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_out_given_in: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_in_given_out: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_amplification: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_shares: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
+  readonly calculate_spot_price_with_fee: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => void;
   readonly calculate_shares_for_amount: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => void;
   readonly calculate_add_one_asset: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => void;
   readonly pool_account_name: (a: number, b: number) => void;
   readonly calculate_liquidity_out_one_asset: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number) => void;
+  readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

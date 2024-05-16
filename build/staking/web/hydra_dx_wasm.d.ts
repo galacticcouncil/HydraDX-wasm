@@ -19,9 +19,10 @@ export function calculate_accumulated_rps(current_reward_per_stake: string, pend
 * @param {string} current_stake
 * @param {string} stake_increase
 * @param {string} stake_weight
+* @param {string} min_slash_point
 * @returns {string}
 */
-export function calculate_slashed_points(points: string, current_stake: string, stake_increase: string, stake_weight: string): string;
+export function calculate_slashed_points(points: string, current_stake: string, stake_increase: string, stake_weight: string, min_slash_point: string): string;
 /**
 * @param {string} period_length
 * @param {string} block_number
@@ -66,7 +67,7 @@ export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_accumulated_rps: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
-  readonly calculate_slashed_points: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
+  readonly calculate_slashed_points: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_period_number: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_points: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number, o: number) => void;
   readonly sigmoid: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
