@@ -418,7 +418,9 @@ pub extern "C" fn sswap_calc_withdraw_one_asset(
     );
 
     if let Some(r) = result {
-        CString::new(r.0.to_string()).unwrap().into_raw()
+        CString::new([r.0.to_string(), r.1.to_string()].join("#"))
+            .unwrap()
+            .into_raw()
     } else {
         error()
     }
