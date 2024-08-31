@@ -1,3 +1,4 @@
+use sp_arithmetic::FixedPointNumber;
 use sp_arithmetic::FixedU128;
 use std::collections::HashMap;
 use std::ffi::{CStr, CString};
@@ -21,6 +22,13 @@ macro_rules! parse_into {
         r
     }};
 }
+
+#[macro_export]
+macro_rules! to_u32 {
+        ($($x:expr),+) => (
+            {($($x.parse::<u32>().unwrap_or(0)),+)}
+        );
+    }
 
 use hydra_dx_math::stableswap::types::AssetReserve;
 
@@ -85,7 +93,7 @@ pub extern "C" fn op_calc_spot_price(
         ..Default::default()
     };
 
-    if let Some(result) = hydra_dx_math::omnipool::calculate_spot_sprice(&asset_a, &asset_b) {
+    if let Some(result) = hydra_dx_math::omnipool::calculate_spot_price(&asset_a, &asset_b, None) {
         CString::new(result.to_string()).unwrap().into_raw()
     } else {
         error()
@@ -254,39 +262,62 @@ pub extern "C" fn op_calc_sell_state_changes(
 
 #[no_mangle]
 pub extern "C" fn sswap_calc_spot_price(
+    pool_id: *const libc::c_char,
     reserves: *const libc::c_char,
     amplification: *const libc::c_char,
-    asset_idx: *const libc::c_char,
+    asset_in: *const libc::c_char,
+    asset_out: *const libc::c_char,
+    share_issuance: *const libc::c_char,
+    fee: *const libc::c_char,
+    trade_amount: *const libc::c_char,
 ) -> *const libc::c_char {
-    let r = std::str::from_utf8(unsafe { CStr::from_ptr(reserves) }.to_bytes()).unwrap();
-    let a = std::str::from_utf8(unsafe { CStr::from_ptr(amplification) }.to_bytes()).unwrap();
-    let a_idx = std::str::from_utf8(unsafe { CStr::from_ptr(asset_idx) }.to_bytes()).unwrap();
+    let pool_id = std::str::from_utf8(unsafe { CStr::from_ptr(pool_id) }.to_bytes()).unwrap();
+    let reserves = std::str::from_utf8(unsafe { CStr::from_ptr(reserves) }.to_bytes()).unwrap();
+    let amplification = std::str::from_utf8(unsafe { CStr::from_ptr(amplification) }.to_bytes()).unwrap();
+    let asset_in = std::str::from_utf8(unsafe { CStr::from_ptr(asset_in) }.to_bytes()).unwrap();
+    let asset_out = std::str::from_utf8(unsafe { CStr::from_ptr(asset_out) }.to_bytes()).unwrap();
+    let share_issuance = std::str::from_utf8(unsafe { CStr::from_ptr(share_issuance) }.to_bytes()).unwrap();
+    let fee = std::str::from_utf8(unsafe { CStr::from_ptr(fee) }.to_bytes()).unwrap();
+    let trade_amount = std::str::from_utf8(unsafe { CStr::from_ptr(trade_amount) }.to_bytes()).unwrap();
 
-    let ampl = parse_into!(u128, a, error());
-    let a_idx = parse_into!(usize, a_idx, error());
-    let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&r);
+    let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
     if reserves.is_err() {
         return error();
     }
     let mut reserves = reserves.unwrap();
     reserves.sort_by_key(|v| v.asset_id);
-    let reserves: Vec<AssetReserve> = reserves.iter().map(|v| v.into()).collect();
 
-    let d = if let Some(r) = hydra_dx_math::stableswap::calculate_d::<D_ITERATIONS>(&reserves, ampl) {
-        r
+    let balances: Vec<(u32, AssetReserve)> = reserves
+        .clone()
+        .into_iter()
+        .map(|v| (v.asset_id, AssetReserve::new(v.amount, v.decimals)))
+        .collect();
+    let amplification = parse_into!(u128, amplification, error());
+    let (pool_id, asset_in, asset_out) = to_u32!(pool_id, asset_in, asset_out);
+    let fee = Permill::from_rational(parse_into!(u32, fee, error()), 1_000_000);
+    let issuance = parse_into!(u128, share_issuance, error());
+    let trade_amount = parse_into!(u128, trade_amount, error());
+
+    let fee = if fee.is_zero() { None } else { Some(fee) };
+
+    //NOTE: stableswap returns spot price in differnt denomination than omnipool so I'm flipping it
+    let result = hydra_dx_math::stableswap::calculate_spot_price(
+        pool_id,
+        balances,
+        amplification,
+        asset_in,
+        asset_out,
+        issuance,
+        trade_amount,
+        fee,
+    )
+    .and_then(|p| p.reciprocal());
+
+    if let Some(result) = result {
+        CString::new(result.to_string()).unwrap().into_raw()
     } else {
-        return error();
-    };
-
-    let (num, denom) = if let Some(r) = hydra_dx_math::stableswap::calculate_spot_price(&reserves, ampl, d, a_idx) {
-        r
-    } else {
-        return CString::new("-2".to_string()).unwrap().into_raw();
-    };
-
-    CString::new([num.to_string(), denom.to_string()].join("#"))
-        .unwrap()
-        .into_raw()
+        error()
+    }
 }
 
 #[no_mangle]
