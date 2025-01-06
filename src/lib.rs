@@ -748,7 +748,7 @@ pub mod stableswap {
 
         let idx_in = reserves.iter().position(|v| v.asset_id == asset_in);
         let idx_out = reserves.iter().position(|v| v.asset_id == asset_out);
-        if idx_in.is_none() || idx_out.is_none() {
+        if idx_in.is_none() && idx_out.is_none() {
             return error();
         }
 
@@ -1016,28 +1016,28 @@ pub mod stableswap {
     fn calculate_spot_price_between_share_and_stable_with_fee_should_work() {
         let data = r#"
         [{
-            "asset_id": 0,
+            "asset_id": 1,
             "amount":"90000000000",
             "decimals": 12
         },
         {
-            "asset_id": 1,
-            "amount": "5000000000000000000000",
+            "asset_id": 2,
+            "amount":"400000000000",
             "decimals": 12
         }
         ]"#;
 
         let result = calculate_spot_price_with_fee(
-            1.to_string(),
+            0.to_string(),
             data.to_string(),
             100.to_string(),
-            "1".to_string(),
             "0".to_string(),
+            "1".to_string(),
             "2000000000".to_string(),
             "0.01".to_string(),
         );
 
-        assert_eq!(result, "8000000000000000".to_string());
+        assert_eq!(result, "5000000000000000".to_string());
 
         let result = calculate_spot_price_with_fee(
             1.to_string(),
@@ -1057,7 +1057,7 @@ pub mod stableswap {
     fn calculate_spot_price_between_stable_and_share_with_fee_should_work() {
         let data = r#"
         [{
-            "asset_id": 0,
+            "asset_id": 2,
             "amount":"90000000000",
             "decimals": 12
         },
