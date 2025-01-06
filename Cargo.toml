@@ -15,11 +15,11 @@ wee_alloc = "0.4.5"
 serde = { version = "1.0.169", features = ["derive"] }
 serde_json = "1.0.100"
 serde-aux = "4.2.0"
-sp-arithmetic = { git = "https://github.com/paritytech/polkadot-sdk", rev = "c8d2251cafadc108ba2f1f8a3208dc547ff38901", default-features = false }
-hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="301c53021e7e317a8641615e8315c1a79f8485b4"}
+sp-arithmetic = { git = "https://github.com/galacticcouncil/polkadot-sdk", branch = "release-polkadot-v1.11.0-patch4", default-features = false}
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="06a3f52da40ff248a8fd765ffb053567387eb531"}
 num-traits = {default-features = false, version = "0.2.14"}
 # Added because of use of the FixedU128, used to implement `Ratio`
-scale-info = { version = "2.1.1", default-features = false, features = ["derive"] }
+scale-info = { version = "2.11.1", default-features = false, features = ["derive"] }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
