@@ -716,7 +716,7 @@ pub mod stableswap {
         );
 
         if let Some(r) = result {
-            r.to_string()
+            r.0.to_string()
         } else {
             error()
         }
@@ -810,7 +810,7 @@ pub mod stableswap {
         );
 
         if let Some(r) = result {
-            r.to_string()
+            r.0.to_string()
         } else {
             error()
         }
