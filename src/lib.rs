@@ -502,7 +502,7 @@ pub mod stableswap {
     use std::collections::HashMap;
 
     use serde::Deserialize;
-    use sp_arithmetic::{Permill};
+    use sp_arithmetic::{FixedPointNumber, Permill};
     #[cfg(test)]
     use sp_core::crypto::UncheckedFrom;
     #[cfg(test)]
@@ -764,7 +764,12 @@ pub mod stableswap {
         );
 
         if let Some(r) = result {
-            r.to_string()
+            //Temp fix to return data correctly, reserve it when this issue `https://github.com/galacticcouncil/hydration-node/issues/1009` is fixed in runtime
+            if let Some(price) =  r.reciprocal() {
+                price.to_string()
+            } else {
+                error()
+            }
         } else {
             error()
         }
@@ -997,7 +1002,7 @@ pub mod stableswap {
             "0.01".to_string(),
         );
 
-        assert_eq!(result, "36407720".to_string());
+        assert_eq!(result, "27466702117023532371705781081".to_string());
 
         let result = calculate_spot_price_with_fee(
             100000002.to_string(),
@@ -1037,7 +1042,7 @@ pub mod stableswap {
             "0.01".to_string(),
         );
 
-        assert_eq!(result, "5000000000000000".to_string());
+        assert_eq!(result, "200000000000000000000".to_string());
 
         let result = calculate_spot_price_with_fee(
             1.to_string(),
@@ -1078,7 +1083,7 @@ pub mod stableswap {
            "0.01".to_string(),
        );
 
-        assert_eq!(result, "87000000000000000".to_string());
+        assert_eq!(result, "11494252873563218390".to_string());
 
        let result = calculate_spot_price_with_fee(
            0.to_string(),
