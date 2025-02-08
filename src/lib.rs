@@ -22,9 +22,9 @@ fn error() -> String {
 
 #[cfg(feature = "xyk")]
 pub mod xyk {
-    use num_traits::Zero;
-    use sp_arithmetic::{FixedU128};
     pub use super::*;
+    use num_traits::Zero;
+    use sp_arithmetic::FixedU128;
 
     #[wasm_bindgen]
     pub fn get_spot_price(s: String, b: String, a: String) -> String {
@@ -50,7 +50,11 @@ pub mod xyk {
 
         let (fee_rate_n, fee_rate_d) = to_u32!(fee_rate_n, fee_rate_d);
 
-        let result = hydra_dx_math::xyk::calculate_spot_price_with_fee(sell_reserve, buy_reserve, Some((fee_rate_n, fee_rate_d)));
+        let result = hydra_dx_math::xyk::calculate_spot_price_with_fee(
+            sell_reserve,
+            buy_reserve,
+            Some((fee_rate_n, fee_rate_d)),
+        );
 
         result.unwrap_or(FixedU128::zero()).to_string()
     }
@@ -145,25 +149,37 @@ pub mod xyk {
             xyk::calculate_spot_price(String::from("1000"), String::from("2000")),
             "2000000000000000000"
         );
-        assert_eq!(
-            xyk::calculate_spot_price(String::from("1000"), String::from("0")),
-            "0"
-        );
+        assert_eq!(xyk::calculate_spot_price(String::from("1000"), String::from("0")), "0");
     }
 
     #[test]
     fn calculate_spot_price_with_fee_works() {
         assert_eq!(
-            xyk::calculate_spot_price_with_fee(String::from("1000"), String::from("2000"), String::from("3"), String::from("1000")),
+            xyk::calculate_spot_price_with_fee(
+                String::from("1000"),
+                String::from("2000"),
+                String::from("3"),
+                String::from("1000")
+            ),
             "1994000000000000000"
         );
         assert_eq!(
-            xyk::calculate_spot_price_with_fee(String::from("1000"), String::from("2000"), String::from("0"), String::from("0")),
+            xyk::calculate_spot_price_with_fee(
+                String::from("1000"),
+                String::from("2000"),
+                String::from("0"),
+                String::from("0")
+            ),
             "0"
         );
 
         assert_eq!(
-            xyk::calculate_spot_price_with_fee(String::from("1000"), String::from("0"), String::from("3"), String::from("1000")),
+            xyk::calculate_spot_price_with_fee(
+                String::from("1000"),
+                String::from("0"),
+                String::from("3"),
+                String::from("1000")
+            ),
             "0"
         );
     }
@@ -175,7 +191,11 @@ pub mod xyk {
             "0"
         );
         assert_eq!(
-            xyk::get_spot_price(String::from("5039030951140853000"), String::from("6987280000000000"), String::from("100")),
+            xyk::get_spot_price(
+                String::from("5039030951140853000"),
+                String::from("6987280000000000"),
+                String::from("100")
+            ),
             "0"
         );
     }
@@ -263,9 +283,9 @@ pub mod xyk {
 
 #[cfg(feature = "lbp")]
 pub mod lbp {
+    pub use super::*;
     use num_traits::Zero;
     use sp_arithmetic::FixedU128;
-    pub use super::*;
 
     #[wasm_bindgen]
     pub fn get_spot_price(s: String, b: String, s_w: String, b_w: String, a: String) -> String {
@@ -283,24 +303,46 @@ pub mod lbp {
         let (sell_reserve, buy_reserve) = to_u128!(s, b);
         let (sell_weight, buy_weight) = to_u32!(s_w, b_w);
 
-        let result =
-            hydra_dx_math::lbp::calculate_spot_price_with_fee(sell_reserve, buy_reserve, sell_weight, buy_weight, 0, 0, None);
+        let result = hydra_dx_math::lbp::calculate_spot_price_with_fee(
+            sell_reserve,
+            buy_reserve,
+            sell_weight,
+            buy_weight,
+            0,
+            0,
+            None,
+        );
 
         result.unwrap_or(FixedU128::zero()).to_string()
     }
-
 
     #[wasm_bindgen]
-    pub fn calculate_spot_price_with_fee(s: String, b: String, s_w: String, b_w: String, fee_asset: String, asset_out: String, fee_rate_n: String, fee_rate_d: String ) -> String {
+    pub fn calculate_spot_price_with_fee(
+        s: String,
+        b: String,
+        s_w: String,
+        b_w: String,
+        fee_asset: String,
+        asset_out: String,
+        fee_rate_n: String,
+        fee_rate_d: String,
+    ) -> String {
         let (sell_reserve, buy_reserve) = to_u128!(s, b);
-        let (sell_weight, buy_weight, fee_asset, asset_out, fee_rate_n, fee_rate_d) = to_u32!(s_w, b_w, fee_asset, asset_out, fee_rate_n, fee_rate_d);
+        let (sell_weight, buy_weight, fee_asset, asset_out, fee_rate_n, fee_rate_d) =
+            to_u32!(s_w, b_w, fee_asset, asset_out, fee_rate_n, fee_rate_d);
 
-        let result =
-            hydra_dx_math::lbp::calculate_spot_price_with_fee(sell_reserve, buy_reserve, sell_weight, buy_weight, fee_asset, asset_out, Some((fee_rate_n, fee_rate_d)));
+        let result = hydra_dx_math::lbp::calculate_spot_price_with_fee(
+            sell_reserve,
+            buy_reserve,
+            sell_weight,
+            buy_weight,
+            fee_asset,
+            asset_out,
+            Some((fee_rate_n, fee_rate_d)),
+        );
 
         result.unwrap_or(FixedU128::zero()).to_string()
     }
-
 
     #[wasm_bindgen]
     pub fn calculate_out_given_in(s: String, b: String, s_w: String, b_w: String, a: String) -> String {
@@ -429,7 +471,6 @@ pub mod lbp {
             ),
             "0"
         );
-
     }
 
     #[test]
@@ -660,7 +701,7 @@ pub mod stableswap {
             final_block,
             current_block,
         )
-            .to_string()
+        .to_string()
     }
 
     #[wasm_bindgen]
@@ -739,10 +780,14 @@ pub mod stableswap {
         let mut reserves = reserves.unwrap();
         reserves.sort_by_key(|v| v.asset_id);
 
-        let balances: Vec<(u32, AssetReserve)> = reserves.clone().into_iter().map(|v| (v.asset_id, AssetReserve::new(v.amount, v.decimals))).collect();
+        let balances: Vec<(u32, AssetReserve)> = reserves
+            .clone()
+            .into_iter()
+            .map(|v| (v.asset_id, AssetReserve::new(v.amount, v.decimals)))
+            .collect();
         let amplification = parse_into!(u128, amplification);
         let (pool_id, asset_in, asset_out) = to_u32!(pool_id, asset_in, asset_out);
-        let min_trade_limit = 1_000;//We use the same MinTradingLimit we have configured to stableswap runtime
+        let min_trade_limit = 1_000; //We use the same MinTradingLimit we have configured to stableswap runtime
         let fee = Permill::from_float(parse_into!(f64, fee));
         let issuance = parse_into!(u128, share_issuance);
 
@@ -759,13 +804,13 @@ pub mod stableswap {
             asset_in,
             asset_out,
             issuance,
-                min_trade_limit,
+            min_trade_limit,
             Some(fee),
         );
 
         if let Some(r) = result {
             //Temp fix to return data correctly, reserve it when this issue `https://github.com/galacticcouncil/hydration-node/issues/1009` is fixed in runtime
-            if let Some(price) =  r.reciprocal() {
+            if let Some(price) = r.reciprocal() {
                 price.to_string()
             } else {
                 error()
@@ -991,7 +1036,6 @@ pub mod stableswap {
         }
         ]"#;
 
-
         let result = calculate_spot_price_with_fee(
             100000002.to_string(),
             data.to_string(),
@@ -1057,8 +1101,7 @@ pub mod stableswap {
         assert_eq!(result, "-1".to_string());
     }
 
-
-   #[test]
+    #[test]
     fn calculate_spot_price_between_stable_and_share_with_fee_should_work() {
         let data = r#"
         [{
@@ -1073,32 +1116,30 @@ pub mod stableswap {
         }
         ]"#;
 
-       let result = calculate_spot_price_with_fee(
-           0.to_string(),
-           data.to_string(),
-           100.to_string(),
-           "0".to_string(),
-           "1".to_string(),
-           "648395944517198603232".to_string(),
-           "0.01".to_string(),
-       );
+        let result = calculate_spot_price_with_fee(
+            0.to_string(),
+            data.to_string(),
+            100.to_string(),
+            "0".to_string(),
+            "1".to_string(),
+            "648395944517198603232".to_string(),
+            "0.01".to_string(),
+        );
 
         assert_eq!(result, "11494252873563218390".to_string());
 
-       let result = calculate_spot_price_with_fee(
-           0.to_string(),
-           data.to_string(),
-           100.to_string(),
-           "0".to_string(),
-           "9999".to_string(),
-           "648395944517198603232".to_string(),
-           "0.01".to_string(),
-       );
+        let result = calculate_spot_price_with_fee(
+            0.to_string(),
+            data.to_string(),
+            100.to_string(),
+            "0".to_string(),
+            "9999".to_string(),
+            "648395944517198603232".to_string(),
+            "0.01".to_string(),
+        );
 
         assert_eq!(result, "-1".to_string());
     }
-
-
 }
 
 #[cfg(feature = "liquidity-mining")]
@@ -1454,7 +1495,7 @@ pub mod liquidity_mining {
 pub mod omnipool {
     pub use super::*;
     use hydra_dx_math::dynamic_fees::types::{FeeParams, OracleEntry};
-    use hydra_dx_math::omnipool::types::{AssetReserveState, Position as OmnipoolPosition, I129};
+    use hydra_dx_math::omnipool::types::{AssetReserveState, Position as OmnipoolPosition};
     use sp_arithmetic::{FixedPointNumber, FixedU128, Permill};
 
     macro_rules! parse_into {
@@ -1487,15 +1528,7 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        if let Some(state_changes) = hydra_dx_math::omnipool::calculate_add_liquidity_state_changes(
-            &state,
-            amount,
-            I129 {
-                value: 0u128,
-                negative: false,
-            },
-            0u128,
-        ) {
+        if let Some(state_changes) = hydra_dx_math::omnipool::calculate_add_liquidity_state_changes(&state, amount) {
             (*state_changes.asset.delta_shares).to_string()
         } else {
             error()
@@ -1548,11 +1581,6 @@ pub mod omnipool {
             &state,
             shares_amount,
             &position,
-            I129 {
-                value: 0u128,
-                negative: false,
-            },
-            0u128,
             withdrawal_fee,
         ) {
             (*state_changes.asset.delta_reserve).to_string()
@@ -1598,11 +1626,6 @@ pub mod omnipool {
             &state,
             shares_amount,
             &position,
-            I129 {
-                value: 0u128,
-                negative: false,
-            },
-            0u128,
             withdrawal_fee,
         ) {
             state_changes.lp_hub_amount.to_string()
@@ -1613,9 +1636,11 @@ pub mod omnipool {
 
     #[wasm_bindgen]
     pub fn recalculate_asset_fee(
-        asset_amount_in: String,
-        asset_amount_out: String,
-        asset_liquidity: String,
+        oracle_amount_in: String,
+        oracle_amount_out: String,
+        oracle_liquidity: String,
+        oracle_period: String,
+        current_asset_liquidity: String,
         previous_fee: String,
         block_difference: String,
         min_fee: String,
@@ -1623,9 +1648,14 @@ pub mod omnipool {
         decay: String,
         amplification: String,
     ) -> String {
-        let amount_in = parse_into!(u128, asset_amount_in, error());
-        let amount_out = parse_into!(u128, asset_amount_out, error());
-        let liquidity = parse_into!(u128, asset_liquidity, error());
+        // oracle entry
+        let amount_in = parse_into!(u128, oracle_amount_in, error());
+        let amount_out = parse_into!(u128, oracle_amount_out, error());
+        let liquidity = parse_into!(u128, oracle_liquidity, error());
+        let period = parse_into!(u128, oracle_period, error());
+
+        let current_liquidity = parse_into!(u128, current_asset_liquidity, error());
+
         let block_difference = parse_into!(u128, block_difference, error());
         let previous_fee = Permill::from_float(parse_into!(f64, previous_fee, error()));
         let min_fee = Permill::from_float(parse_into!(f64, min_fee, error()));
@@ -1633,14 +1663,18 @@ pub mod omnipool {
         let decay = FixedU128::from_rational(parse_into!(u128, decay, error()), FixedU128::DIV);
         let amplification = FixedU128::from_rational(parse_into!(u128, amplification, error()), FixedU128::DIV);
 
+        let decay_factor = FixedU128::from_rational(2, period + 1);
+
         let entry = OracleEntry {
             amount_in,
             amount_out,
             liquidity,
+            decay_factor,
         };
 
         let result = hydra_dx_math::dynamic_fees::recalculate_asset_fee(
             entry,
+            current_liquidity,
             previous_fee,
             block_difference,
             FeeParams {
@@ -1655,9 +1689,11 @@ pub mod omnipool {
 
     #[wasm_bindgen]
     pub fn recalculate_protocol_fee(
-        asset_amount_in: String,
-        asset_amount_out: String,
-        asset_liquidity: String,
+        oracle_amount_in: String,
+        oracle_amount_out: String,
+        oracle_liquidity: String,
+        oracle_period: String,
+        current_asset_liquidity: String,
         previous_fee: String,
         block_difference: String,
         min_fee: String,
@@ -1665,9 +1701,13 @@ pub mod omnipool {
         decay: String,
         amplification: String,
     ) -> String {
-        let amount_in = parse_into!(u128, asset_amount_in, error());
-        let amount_out = parse_into!(u128, asset_amount_out, error());
-        let liquidity = parse_into!(u128, asset_liquidity, error());
+        let amount_in = parse_into!(u128, oracle_amount_in, error());
+        let amount_out = parse_into!(u128, oracle_amount_out, error());
+        let liquidity = parse_into!(u128, oracle_liquidity, error());
+        let period = parse_into!(u128, oracle_period, error());
+
+        let current_liquidity = parse_into!(u128, current_asset_liquidity, error());
+
         let block_difference = parse_into!(u128, block_difference, error());
         let previous_fee = Permill::from_float(parse_into!(f64, previous_fee, error()));
         let min_fee = Permill::from_float(parse_into!(f64, min_fee, error()));
@@ -1675,14 +1715,18 @@ pub mod omnipool {
         let decay = FixedU128::from_rational(parse_into!(u128, decay, error()), FixedU128::DIV);
         let amplification = FixedU128::from_rational(parse_into!(u128, amplification, error()), FixedU128::DIV);
 
+        let decay_factor = FixedU128::from_rational(2, period + 1);
+
         let entry = OracleEntry {
             amount_in,
             amount_out,
             liquidity,
+            decay_factor,
         };
 
         let result = hydra_dx_math::dynamic_fees::recalculate_protocol_fee(
             entry,
+            current_liquidity,
             previous_fee,
             block_difference,
             FeeParams {
@@ -1836,7 +1880,7 @@ pub mod omnipool {
             amount,
             asset_fee,
             protocol_fee,
-            0u128,
+            Permill::zero(),
         ) {
             r
         } else {
@@ -1868,20 +1912,12 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_sell_hub_state_changes(
-            &asset,
-            amount,
-            asset_fee,
-            I129 {
-                value: 0,
-                negative: false,
-            },
-            1_000_000u128, // This is not relevant here,but it cant be 0
-        ) {
-            r
-        } else {
-            return error();
-        };
+        let state_changes =
+            if let Some(r) = hydra_dx_math::omnipool::calculate_sell_hub_state_changes(&asset, amount, asset_fee) {
+                r
+            } else {
+                return error();
+            };
 
         (*state_changes.asset.delta_reserve).to_string()
     }
@@ -1930,7 +1966,7 @@ pub mod omnipool {
             amount,
             asset_fee,
             protocol_fee,
-            0u128,
+            Permill::zero(),
         ) {
             r
         } else {
@@ -1962,16 +1998,9 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_buy_for_hub_asset_state_changes(
-            &asset,
-            amount,
-            asset_fee,
-            I129 {
-                value: 0,
-                negative: false,
-            },
-            1_000_000u128, // This is not relevant here,but it cant be 0
-        ) {
+        let state_changes = if let Some(r) =
+            hydra_dx_math::omnipool::calculate_buy_for_hub_asset_state_changes(&asset, amount, asset_fee)
+        {
             r
         } else {
             return error();
@@ -2018,7 +2047,7 @@ pub mod omnipool {
         asset_b_reserve: String,
         asset_b_hub_reserve: String,
         protocol_fee: String,
-        asset_fee: String
+        asset_fee: String,
     ) -> String {
         let reserve_a = parse_into!(u128, asset_a_reserve, error());
         let hub_reserve_a = parse_into!(u128, asset_a_hub_reserve, error());
@@ -2040,8 +2069,9 @@ pub mod omnipool {
             ..Default::default()
         };
 
-
-        if let Some(result) = hydra_dx_math::omnipool::calculate_spot_price(&asset_a, &asset_b, Some((protocol_fee, asset_fee))) {
+        if let Some(result) =
+            hydra_dx_math::omnipool::calculate_spot_price(&asset_a, &asset_b, Some((protocol_fee, asset_fee)))
+        {
             result.to_string()
         } else {
             error()
@@ -2067,7 +2097,11 @@ pub mod omnipool {
     }
 
     #[wasm_bindgen]
-    pub fn calculate_lrna_spot_price_with_fee(asset_reserve: String, asset_hub_reserve: String, asset_fee: String) -> String {
+    pub fn calculate_lrna_spot_price_with_fee(
+        asset_reserve: String,
+        asset_hub_reserve: String,
+        asset_fee: String,
+    ) -> String {
         let reserve = parse_into!(u128, asset_reserve, error());
         let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
         let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
@@ -2197,15 +2231,7 @@ pub mod omnipool {
             ..Default::default()
         };
 
-        if let Some(state_changes) = hydra_dx_math::omnipool::calculate_add_liquidity_state_changes(
-            &state,
-            amount,
-            I129 {
-                value: 0u128,
-                negative: false,
-            },
-            0u128,
-        ) {
+        if let Some(state_changes) = hydra_dx_math::omnipool::calculate_add_liquidity_state_changes(&state, amount) {
             (*state_changes.asset.delta_hub_reserve).to_string()
         } else {
             error()
@@ -2312,6 +2338,8 @@ pub mod omnipool {
             "25".to_string(),
             "20".to_string(),
             "1000".to_string(),
+            "9".to_string(),
+            "1000".to_string(),
             "0.1".to_string(),
             "1".to_string(),
             "0.01".to_string(),
@@ -2327,6 +2355,8 @@ pub mod omnipool {
         let result = recalculate_protocol_fee(
             "25".to_string(),
             "20".to_string(),
+            "1000".to_string(),
+            "9".to_string(),
             "1000".to_string(),
             "0.1".to_string(),
             "1".to_string(),
@@ -2380,36 +2410,21 @@ pub mod omnipool {
         assert_eq!(result, "0");
     }
 
-
     #[test]
     fn calculate_lrna_spot_price_should_work() {
-        let result = calculate_lrna_spot_price(
-            "2000".to_string(),
-            "500".to_string(),
-        );
+        let result = calculate_lrna_spot_price("2000".to_string(), "500".to_string());
         assert_eq!(result, "4000000000000000000");
 
-        let result = calculate_lrna_spot_price(
-            "2000".to_string(),
-            "0".to_string(),
-        );
+        let result = calculate_lrna_spot_price("2000".to_string(), "0".to_string());
         assert_eq!(result, "-1");
     }
 
     #[test]
     fn calculate_lrna_spot_price_with_fee_should_work() {
-        let result = calculate_lrna_spot_price_with_fee(
-            "2000".to_string(),
-            "500".to_string(),
-            "0.01".to_string(),
-        );
+        let result = calculate_lrna_spot_price_with_fee("2000".to_string(), "500".to_string(), "0.01".to_string());
         assert_eq!(result, "3960000000000000000");
 
-        let result = calculate_lrna_spot_price_with_fee(
-            "2000".to_string(),
-            "0".to_string(),
-            "0.01".to_string(),
-        );
+        let result = calculate_lrna_spot_price_with_fee("2000".to_string(), "0".to_string(), "0.01".to_string());
         assert_eq!(result, "-1");
     }
 }
@@ -2492,14 +2507,26 @@ pub mod ema {
         incoming_d: String,
         smoothing: String,
     ) -> String {
-        let Ok(iterations) = iterations.parse::<u32>() else { return error() };
-        let Ok(prev_n) = prev_n.parse::<u128>() else { return error() };
-        let Ok(prev_d) = prev_d.parse::<u128>() else { return error() };
+        let Ok(iterations) = iterations.parse::<u32>() else {
+            return error();
+        };
+        let Ok(prev_n) = prev_n.parse::<u128>() else {
+            return error();
+        };
+        let Ok(prev_d) = prev_d.parse::<u128>() else {
+            return error();
+        };
         let prev = EmaPrice::new(prev_n, prev_d);
-        let Ok(incoming_n) = incoming_n.parse::<u128>() else { return error() };
-        let Ok(incoming_d) = incoming_d.parse::<u128>() else { return error() };
+        let Ok(incoming_n) = incoming_n.parse::<u128>() else {
+            return error();
+        };
+        let Ok(incoming_d) = incoming_d.parse::<u128>() else {
+            return error();
+        };
         let incoming = EmaPrice::new(incoming_n, incoming_d);
-        let Ok(smoothing) = smoothing.parse::<u128>().map(Fraction::from_bits) else { return error() };
+        let Ok(smoothing) = smoothing.parse::<u128>().map(Fraction::from_bits) else {
+            return error();
+        };
         let price = hydra_dx_math::ema::iterated_price_ema(iterations, prev, incoming, smoothing);
         FixedU128::from_rational(price.n, price.d).to_string()
     }
@@ -2514,10 +2541,18 @@ pub mod ema {
     /// Returns the new oracle value as a serialized `u128`.
     #[wasm_bindgen]
     pub fn iterated_balance_ema(iterations: String, prev: String, incoming: String, smoothing: String) -> String {
-        let Ok(iterations) = iterations.parse::<u32>() else { return error() };
-        let Ok(prev) = prev.parse::<Balance>() else { return error() };
-        let Ok(incoming) = incoming.parse::<Balance>() else { return error() };
-        let Ok(smoothing) = smoothing.parse::<u128>().map(Fraction::from_bits) else { return error() };
+        let Ok(iterations) = iterations.parse::<u32>() else {
+            return error();
+        };
+        let Ok(prev) = prev.parse::<Balance>() else {
+            return error();
+        };
+        let Ok(incoming) = incoming.parse::<Balance>() else {
+            return error();
+        };
+        let Ok(smoothing) = smoothing.parse::<u128>().map(Fraction::from_bits) else {
+            return error();
+        };
         let balance = hydra_dx_math::ema::iterated_balance_ema(iterations, prev, incoming, smoothing);
         balance.to_string()
     }
@@ -2599,12 +2634,19 @@ pub mod staking {
         current_stake: String,
         stake_increase: String,
         stake_weight: String,
-        min_slash_point: String
+        min_slash_point: String,
     ) -> String {
-        let (points, current_stake, stake_increase, min_slash_point) = to_u128!(points, current_stake, stake_increase, min_slash_point);
+        let (points, current_stake, stake_increase, min_slash_point) =
+            to_u128!(points, current_stake, stake_increase, min_slash_point);
         let stake_weight = stake_weight.parse::<u8>().unwrap_or(0);
 
-        match hydra_dx_math::staking::calculate_slashed_points(points, current_stake, stake_increase, stake_weight, min_slash_point) {
+        match hydra_dx_math::staking::calculate_slashed_points(
+            points,
+            current_stake,
+            stake_increase,
+            stake_weight,
+            min_slash_point,
+        ) {
             Some(slashed) => slashed.to_string(),
             None => error(),
         }
