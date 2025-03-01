@@ -104,61 +104,51 @@ pub extern "C" fn op_calc_spot_price(
 pub extern "C" fn op_calc_buy_state_changes(
     asset_in_reserve: *const libc::c_char,
     asset_in_hub_reserve: *const libc::c_char,
-    asset_in_shares: *const libc::c_char,
     asset_out_reserve: *const libc::c_char,
     asset_out_hub_reserve: *const libc::c_char,
-    asset_out_shares: *const libc::c_char,
     amount_out: *const libc::c_char,
     asset_fee: *const libc::c_char,
     protocol_fee: *const libc::c_char,
+    m: *const libc::c_char,
 ) -> *const libc::c_char {
     //TODO: handle unwraps
     let air = std::str::from_utf8(unsafe { CStr::from_ptr(asset_in_reserve) }.to_bytes()).unwrap();
     let aihr = std::str::from_utf8(unsafe { CStr::from_ptr(asset_in_hub_reserve) }.to_bytes()).unwrap();
-    let ais = std::str::from_utf8(unsafe { CStr::from_ptr(asset_in_shares) }.to_bytes()).unwrap();
     let aor = std::str::from_utf8(unsafe { CStr::from_ptr(asset_out_reserve) }.to_bytes()).unwrap();
     let aohr = std::str::from_utf8(unsafe { CStr::from_ptr(asset_out_hub_reserve) }.to_bytes()).unwrap();
-    let aos = std::str::from_utf8(unsafe { CStr::from_ptr(asset_out_shares) }.to_bytes()).unwrap();
     let ao = std::str::from_utf8(unsafe { CStr::from_ptr(amount_out) }.to_bytes()).unwrap();
     let af = std::str::from_utf8(unsafe { CStr::from_ptr(asset_fee) }.to_bytes()).unwrap();
     let pf = std::str::from_utf8(unsafe { CStr::from_ptr(protocol_fee) }.to_bytes()).unwrap();
+    let m = std::str::from_utf8(unsafe { CStr::from_ptr(m) }.to_bytes()).unwrap();
 
     let e = error();
 
     let reserve_in = parse_into!(u128, air, e);
     let hub_reserve_in = parse_into!(u128, aihr, e);
-    let shares_in = parse_into!(u128, ais, e);
 
     let reserve_out = parse_into!(u128, aor, e);
     let hub_reserve_out = parse_into!(u128, aohr, e);
-    let shares_out = parse_into!(u128, aos, e);
 
     let amount = parse_into!(u128, ao, e);
     let asset_fee = Permill::from_rational(parse_into!(u32, af, e), 1_000_000);
     let protocol_fee = Permill::from_rational(parse_into!(u32, pf, e), 1_000_000);
+    let m = Permill::from_rational(parse_into!(u32, m, e), 1_000_000);
 
     let asset_in = AssetReserveState {
         reserve: reserve_in,
         hub_reserve: hub_reserve_in,
-        shares: shares_in,
         ..Default::default()
     };
 
     let asset_out = AssetReserveState {
         reserve: reserve_out,
         hub_reserve: hub_reserve_out,
-        shares: shares_out,
         ..Default::default()
     };
 
-    let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_buy_state_changes(
-        &asset_in,
-        &asset_out,
-        amount,
-        asset_fee,
-        protocol_fee,
-        0u128,
-    ) {
+    let state_changes = if let Some(r) =
+        hydra_dx_math::omnipool::calculate_buy_state_changes(&asset_in, &asset_out, amount, asset_fee, protocol_fee, m)
+    {
         r
     } else {
         return e;
@@ -170,7 +160,6 @@ pub extern "C" fn op_calc_buy_state_changes(
             (*state_changes.asset_in.delta_hub_reserve).to_string(),
             (*state_changes.asset_out.delta_reserve).to_string(),
             (*state_changes.asset_out.delta_hub_reserve).to_string(),
-            (state_changes.hdx_hub_amount).to_string(),
             (state_changes.fee.protocol_fee).to_string(),
             (state_changes.fee.asset_fee).to_string(),
         ]
@@ -184,61 +173,51 @@ pub extern "C" fn op_calc_buy_state_changes(
 pub extern "C" fn op_calc_sell_state_changes(
     asset_in_reserve: *const libc::c_char,
     asset_in_hub_reserve: *const libc::c_char,
-    asset_in_shares: *const libc::c_char,
     asset_out_reserve: *const libc::c_char,
     asset_out_hub_reserve: *const libc::c_char,
-    asset_out_shares: *const libc::c_char,
     amount_in: *const libc::c_char,
     asset_fee: *const libc::c_char,
     protocol_fee: *const libc::c_char,
+    m: *const libc::c_char,
 ) -> *const libc::c_char {
     //TODO: handle unwraps
     let air = std::str::from_utf8(unsafe { CStr::from_ptr(asset_in_reserve) }.to_bytes()).unwrap();
     let aihr = std::str::from_utf8(unsafe { CStr::from_ptr(asset_in_hub_reserve) }.to_bytes()).unwrap();
-    let ais = std::str::from_utf8(unsafe { CStr::from_ptr(asset_in_shares) }.to_bytes()).unwrap();
     let aor = std::str::from_utf8(unsafe { CStr::from_ptr(asset_out_reserve) }.to_bytes()).unwrap();
     let aohr = std::str::from_utf8(unsafe { CStr::from_ptr(asset_out_hub_reserve) }.to_bytes()).unwrap();
-    let aos = std::str::from_utf8(unsafe { CStr::from_ptr(asset_out_shares) }.to_bytes()).unwrap();
     let ai = std::str::from_utf8(unsafe { CStr::from_ptr(amount_in) }.to_bytes()).unwrap();
     let af = std::str::from_utf8(unsafe { CStr::from_ptr(asset_fee) }.to_bytes()).unwrap();
     let pf = std::str::from_utf8(unsafe { CStr::from_ptr(protocol_fee) }.to_bytes()).unwrap();
+    let m = std::str::from_utf8(unsafe { CStr::from_ptr(m) }.to_bytes()).unwrap();
 
     let e = error();
 
     let reserve_in = parse_into!(u128, air, e);
     let hub_reserve_in = parse_into!(u128, aihr, e);
-    let shares_in = parse_into!(u128, ais, e);
 
     let reserve_out = parse_into!(u128, aor, e);
     let hub_reserve_out = parse_into!(u128, aohr, e);
-    let shares_out = parse_into!(u128, aos, e);
 
     let amount = parse_into!(u128, ai, e);
     let asset_fee = Permill::from_rational(parse_into!(u32, af, e), 1_000_000);
     let protocol_fee = Permill::from_rational(parse_into!(u32, pf, e), 1_000_000);
+    let m = Permill::from_rational(parse_into!(u32, m, e), 1_000_000);
 
     let asset_in = AssetReserveState {
         reserve: reserve_in,
         hub_reserve: hub_reserve_in,
-        shares: shares_in,
         ..Default::default()
     };
 
     let asset_out = AssetReserveState {
         reserve: reserve_out,
         hub_reserve: hub_reserve_out,
-        shares: shares_out,
         ..Default::default()
     };
 
-    let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_sell_state_changes(
-        &asset_in,
-        &asset_out,
-        amount,
-        asset_fee,
-        protocol_fee,
-        0u128,
-    ) {
+    let state_changes = if let Some(r) =
+        hydra_dx_math::omnipool::calculate_sell_state_changes(&asset_in, &asset_out, amount, asset_fee, protocol_fee, m)
+    {
         r
     } else {
         return e;
@@ -250,7 +229,6 @@ pub extern "C" fn op_calc_sell_state_changes(
             (*state_changes.asset_in.delta_hub_reserve).to_string(),
             (*state_changes.asset_out.delta_reserve).to_string(),
             (*state_changes.asset_out.delta_hub_reserve).to_string(),
-            (state_changes.hdx_hub_amount).to_string(),
             (state_changes.fee.protocol_fee).to_string(),
             (state_changes.fee.asset_fee).to_string(),
         ]
@@ -565,7 +543,7 @@ pub extern "C" fn sswap_calc_shares(
     );
 
     if let Some(r) = result {
-        CString::new(r.to_string()).unwrap().into_raw()
+        CString::new(r.0.to_string()).unwrap().into_raw()
     } else {
         error()
     }
@@ -615,7 +593,7 @@ pub extern "C" fn sswap_calc_shares_for_amount(
     );
 
     if let Some(r) = result {
-        CString::new(r.to_string()).unwrap().into_raw()
+        CString::new(r.0.to_string()).unwrap().into_raw()
     } else {
         error()
     }
