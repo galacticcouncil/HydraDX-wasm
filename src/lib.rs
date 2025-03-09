@@ -156,12 +156,14 @@ pub extern "C" fn op_calc_buy_state_changes(
 
     CString::new(
         [
-            (*state_changes.asset_in.delta_reserve).to_string(),
-            (*state_changes.asset_in.delta_hub_reserve).to_string(),
-            (*state_changes.asset_out.delta_reserve).to_string(),
-            (*state_changes.asset_out.delta_hub_reserve).to_string(),
-            (state_changes.fee.protocol_fee).to_string(),
-            (state_changes.fee.asset_fee).to_string(),
+            state_changes.asset_in.delta_reserve.to_string(),
+            state_changes.asset_in.delta_hub_reserve.to_string(),
+            state_changes.asset_out.delta_reserve.to_string(),
+            state_changes.asset_out.delta_hub_reserve.to_string(),
+            state_changes.fee.protocol_fee.to_string(),
+            state_changes.fee.asset_fee.to_string(),
+            state_changes.asset_out.extra_hub_reserve_amount.to_string(),
+            state_changes.extra_protocol_fee_amount.to_string(),
         ]
         .join("#"),
     )
