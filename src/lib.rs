@@ -1170,7 +1170,6 @@ pub mod stableswap {
 #[cfg(feature = "stableswap-drift")]
 pub mod stableswap_drift {
     pub use super::*;
-    use hydra_dx_math::stableswap::recalculate_pegs;
     use hydra_dx_math::stableswap::types::AssetReserve;
     use serde::Deserialize;
     use sp_arithmetic::{FixedPointNumber, Permill};
