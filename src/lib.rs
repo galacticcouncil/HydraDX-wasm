@@ -1646,16 +1646,43 @@ pub mod stableswap_drift {
         max_peg_update: String,
         pool_fee: String,
     ) -> String {
-        let current_pegs: serde_json::Result<Vec<(u128, u128)>> = serde_json::from_str(&current_pegs);
+        let current_pegs: serde_json::Result<Vec<(String, String)>> = serde_json::from_str(&current_pegs);
         if current_pegs.is_err() {
             return error();
         }
         let current_pegs = current_pegs.unwrap();
 
-        let target_pegs: serde_json::Result<Vec<((u128, u128), u128)>> = serde_json::from_str(&target_pegs);
+        let target_pegs: serde_json::Result<Vec<((String, String), String)>> = serde_json::from_str(&target_pegs);
         if target_pegs.is_err() {
             return error();
         }
+        let target_pegs = target_pegs.unwrap();
+
+        let current_pegs: Option<Vec<(u128, u128)>> = current_pegs
+            .into_iter()
+            .map(|(first, second)| Some((first.parse::<u128>().ok()?, second.parse::<u128>().ok()?)))
+            .collect();
+
+        if current_pegs.is_none() {
+            return error();
+        }
+
+        let current_pegs = current_pegs.unwrap();
+
+        let target_pegs: Option<Vec<((u128, u128), u128)>> = target_pegs
+            .into_iter()
+            .map(|((first, second), block)| {
+                Some((
+                    (first.parse::<u128>().ok()?, second.parse::<u128>().ok()?),
+                    block.parse::<u128>().ok()?,
+                ))
+            })
+            .collect();
+
+        if target_pegs.is_none() {
+            return error();
+        }
+
         let target_pegs = target_pegs.unwrap();
 
         let block = parse_into!(u128, current_block);
@@ -1666,6 +1693,14 @@ pub mod stableswap_drift {
             hydra_dx_math::stableswap::recalculate_pegs(&current_pegs, &target_pegs, block, max_peg_update, fee);
 
         if let Some(r) = result {
+            // Serialized the result to string, u128 to string too
+            let fee = r.0;
+            let fee = fee.deconstruct() as f64 / 1_000_000f64;
+            let pegs =
+                r.1.into_iter()
+                    .map(|(a, b)| (a.to_string(), b.to_string()))
+                    .collect::<Vec<(String, String)>>();
+            let r = (fee, pegs);
             serde_json::to_string(&r).unwrap()
         } else {
             error()
@@ -1894,8 +1929,8 @@ pub mod stableswap_drift {
 
     #[test]
     fn recalculate_pegs_should_work_correctly() {
-        let current_pegs = "[[85473939039997170,57767685517430457],[1,1]]".to_string();
-        let target_pegs = "[[[85561836215176576,57778334052239089],10],[[1,1],10]]".to_string();
+        let current_pegs = "[[\"85473939039997170\",\"57767685517430457\"],[\"1\",\"1\"]]".to_string();
+        let target_pegs = "[[[\"85561836215176576\",\"57778334052239089\"],\"10\"],[[\"1\",\"1\"],\"10\"]]".to_string();
 
         let result = crate::stableswap_drift::recalculate_peg(
             current_pegs,
@@ -1906,7 +1941,7 @@ pub mod stableswap_drift {
         );
 
         let expected_result =
-            "[20000,[[259686997534693321553635504599698430064,175361852389992385604687093330695209669],[1,1]]]";
+        "[0.02,[[\"259686997534693321553635504599698430064\",\"175361852389992385604687093330695209669\"],[\"1\",\"1\"]]]";
         assert_eq!(result, expected_result.to_string());
     }
 }
