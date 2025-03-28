@@ -1170,9 +1170,8 @@ pub mod stableswap {
 #[cfg(feature = "stableswap-drift")]
 pub mod stableswap_drift {
     pub use super::*;
+    use hydra_dx_math::stableswap::recalculate_pegs;
     use hydra_dx_math::stableswap::types::AssetReserve;
-    use std::collections::HashMap;
-
     use serde::Deserialize;
     use sp_arithmetic::{FixedPointNumber, Permill};
     #[cfg(test)]
@@ -1181,6 +1180,8 @@ pub mod stableswap_drift {
     use sp_core::Hasher;
     #[cfg(test)]
     use sp_runtime::traits::IdentifyAccount;
+    use std::collections::HashMap;
+    use std::thread::current;
 
     use serde_aux::prelude::*;
 
@@ -1662,7 +1663,8 @@ pub mod stableswap_drift {
         let max_peg_update = Permill::from_float(parse_into!(f64, max_peg_update));
         let fee = Permill::from_float(parse_into!(f64, pool_fee));
 
-        let result = hydra_dx_math::stableswap::recalculate_pegs(&current_pegs, &target_pegs, block, max_peg_update, fee);
+        let result =
+            hydra_dx_math::stableswap::recalculate_pegs(&current_pegs, &target_pegs, block, max_peg_update, fee);
 
         if let Some(r) = result {
             serde_json::to_string(&r).unwrap()
@@ -1889,6 +1891,24 @@ pub mod stableswap_drift {
         );
 
         assert_eq!(result, "-1".to_string());
+    }
+
+    #[test]
+    fn recalculate_pegs_should_work_correctly() {
+        let current_pegs = "[[85473939039997170,57767685517430457],[1,1]]".to_string();
+        let target_pegs = "[[[85561836215176576,57778334052239089],10],[[1,1],10]]".to_string();
+
+        let result = crate::stableswap_drift::recalculate_peg(
+            current_pegs,
+            target_pegs,
+            "20".to_string(),
+            "0.01".to_string(),
+            "0.02".to_string(),
+        );
+
+        let expected_result =
+            "[20000,[[259686997534693321553635504599698430064,175361852389992385604687093330695209669],[1,1]]]";
+        assert_eq!(result, expected_result.to_string());
     }
 }
 
