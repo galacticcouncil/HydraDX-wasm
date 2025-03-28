@@ -1214,6 +1214,12 @@ pub mod stableswap_drift {
         }
     }
 
+    fn parse_pegs(pegs: Vec<(String, String)>) -> Option<Vec<(u128, u128)>> {
+        pegs.into_iter()
+            .map(|(first, second)| Some((first.parse::<u128>().ok()?, second.parse::<u128>().ok()?)))
+            .collect()
+    }
+
     #[derive(Deserialize, Copy, Clone, Debug)]
     pub struct AssetAmount {
         asset_id: u32,
@@ -1235,8 +1241,12 @@ pub mod stableswap_drift {
         if reserves.is_err() {
             return error();
         }
-        let pegs: serde_json::Result<Vec<(u128, u128)>> = serde_json::from_str(&pegs);
+        let pegs: serde_json::Result<Vec<(String, String)>> = serde_json::from_str(&pegs);
         if pegs.is_err() {
+            return error();
+        }
+        let pegs = parse_pegs(pegs.unwrap());
+        if pegs.is_none() {
             return error();
         }
         let pegs = pegs.unwrap();
@@ -1287,8 +1297,12 @@ pub mod stableswap_drift {
         if reserves.is_err() {
             return error();
         }
-        let pegs: serde_json::Result<Vec<(u128, u128)>> = serde_json::from_str(&pegs);
+        let pegs: serde_json::Result<Vec<(String, String)>> = serde_json::from_str(&pegs);
         if pegs.is_err() {
+            return error();
+        }
+        let pegs = parse_pegs(pegs.unwrap());
+        if pegs.is_none() {
             return error();
         }
         let pegs = pegs.unwrap();
@@ -1362,8 +1376,12 @@ pub mod stableswap_drift {
         if reserves.is_err() {
             return error();
         }
-        let pegs: serde_json::Result<Vec<(u128, u128)>> = serde_json::from_str(&pegs);
+        let pegs: serde_json::Result<Vec<(String, String)>> = serde_json::from_str(&pegs);
         if pegs.is_err() {
+            return error();
+        }
+        let pegs = parse_pegs(pegs.unwrap());
+        if pegs.is_none() {
             return error();
         }
         let pegs = pegs.unwrap();
@@ -1430,12 +1448,15 @@ pub mod stableswap_drift {
         if reserves.is_err() {
             return error();
         }
-        let pegs: serde_json::Result<Vec<(u128, u128)>> = serde_json::from_str(&pegs);
+        let pegs: serde_json::Result<Vec<(String, String)>> = serde_json::from_str(&pegs);
         if pegs.is_err() {
             return error();
         }
+        let pegs = parse_pegs(pegs.unwrap());
+        if pegs.is_none() {
+            return error();
+        }
         let pegs = pegs.unwrap();
-
         let mut reserves = reserves.unwrap();
         reserves.sort_by_key(|v| v.asset_id);
 
@@ -1494,8 +1515,12 @@ pub mod stableswap_drift {
         if reserves.is_err() {
             return error();
         }
-        let pegs: serde_json::Result<Vec<(u128, u128)>> = serde_json::from_str(&pegs);
+        let pegs: serde_json::Result<Vec<(String, String)>> = serde_json::from_str(&pegs);
         if pegs.is_err() {
+            return error();
+        }
+        let pegs = parse_pegs(pegs.unwrap());
+        if pegs.is_none() {
             return error();
         }
         let pegs = pegs.unwrap();
@@ -1543,8 +1568,12 @@ pub mod stableswap_drift {
         if reserves.is_err() {
             return error();
         }
-        let pegs: serde_json::Result<Vec<(u128, u128)>> = serde_json::from_str(&pegs);
+        let pegs: serde_json::Result<Vec<(String, String)>> = serde_json::from_str(&pegs);
         if pegs.is_err() {
+            return error();
+        }
+        let pegs = parse_pegs(pegs.unwrap());
+        if pegs.is_none() {
             return error();
         }
         let pegs = pegs.unwrap();
@@ -1600,8 +1629,12 @@ pub mod stableswap_drift {
         if reserves.is_err() {
             return error();
         }
-        let pegs: serde_json::Result<Vec<(u128, u128)>> = serde_json::from_str(&pegs);
+        let pegs: serde_json::Result<Vec<(String, String)>> = serde_json::from_str(&pegs);
         if pegs.is_err() {
+            return error();
+        }
+        let pegs = parse_pegs(pegs.unwrap());
+        if pegs.is_none() {
             return error();
         }
         let pegs = pegs.unwrap();
@@ -1658,10 +1691,7 @@ pub mod stableswap_drift {
         }
         let target_pegs = target_pegs.unwrap();
 
-        let current_pegs: Option<Vec<(u128, u128)>> = current_pegs
-            .into_iter()
-            .map(|(first, second)| Some((first.parse::<u128>().ok()?, second.parse::<u128>().ok()?)))
-            .collect();
+        let current_pegs = parse_pegs(current_pegs);
 
         if current_pegs.is_none() {
             return error();
@@ -1708,10 +1738,10 @@ pub mod stableswap_drift {
     }
 
     #[cfg(test)]
-    fn default_pegs(size: usize) -> Vec<(u128, u128)> {
+    fn default_pegs(size: usize) -> Vec<(String, String)> {
         let mut pegs = Vec::new();
         for _ in 0..size {
-            pegs.push((1_000_000_000, 1_000_000_000));
+            pegs.push(("1000000000".to_string(), "1000000000".to_string()));
         }
         pegs
     }
