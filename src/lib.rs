@@ -826,13 +826,8 @@ pub mod stableswap {
             &pegs,
         );
 
-        if let Some(r) = result {
-            //Temp fix to return data correctly, reserve it when this issue `https://github.com/galacticcouncil/hydration-node/issues/1009` is fixed in runtime
-            if let Some(price) = r.reciprocal() {
-                price.to_string()
-            } else {
-                error()
-            }
+        if let Some(p) = result {
+            p.to_string()
         } else {
             error()
         }
@@ -1489,13 +1484,8 @@ pub mod stableswap_drift {
             &pegs,
         );
 
-        if let Some(r) = result {
-            //Temp fix to return data correctly, reserve it when this issue `https://github.com/galacticcouncil/hydration-node/issues/1009` is fixed in runtime
-            if let Some(price) = r.reciprocal() {
-                price.to_string()
-            } else {
-                error()
-            }
+        if let Some(p) = result {
+            p.to_string()
         } else {
             error()
         }
