@@ -713,7 +713,7 @@ pub mod stableswap {
             final_block,
             current_block,
         )
-        .to_string()
+            .to_string()
     }
 
     #[wasm_bindgen]
@@ -1360,7 +1360,7 @@ pub mod stableswap_drift {
             final_block,
             current_block,
         )
-        .to_string()
+            .to_string()
     }
 
     #[wasm_bindgen]
@@ -1971,7 +1971,7 @@ pub mod stableswap_drift {
         );
 
         let expected_result =
-        "[0.02,[[\"259686997534693321553635504599698430064\",\"175361852389992385604687093330695209669\"],[\"1\",\"1\"]]]";
+            "[0.02,[[\"259686997534693321553635504599698430064\",\"175361852389992385604687093330695209669\"],[\"1\",\"1\"]]]";
         assert_eq!(result, expected_result.to_string());
     }
 }
@@ -3487,14 +3487,20 @@ pub mod staking {
     }
 
     #[wasm_bindgen]
-    pub fn calculate_period_number(period_length: String, block_number: String) -> String {
-        let (period_length, block_number) = to_u128!(period_length, block_number);
+    pub fn calculate_period_number(period_length: String, block_number: String, six_sec_block_since: String) -> String {
+        let (period_length, block_number, six_sec_block_since) =
+            to_u128!(period_length, block_number, six_sec_block_since);
         let period_length = match std::num::NonZeroU128::try_from(period_length) {
             Ok(v) => v,
             Err(_) => return error(),
         };
 
-        hydra_dx_math::staking::calculate_period_number(period_length, block_number).to_string()
+        let six_sec_block_since = match std::num::NonZeroU128::try_from(six_sec_block_since) {
+            Ok(v) => v,
+            Err(_) => return error(),
+        };
+
+        hydra_dx_math::staking::calculate_period_number(period_length, block_number, six_sec_block_since).to_string()
     }
 
     #[wasm_bindgen]
@@ -3629,22 +3635,22 @@ pub mod staking {
         #[test]
         fn calculate_period_number_should_work() {
             assert_eq!(
-                calculate_period_number(1_u128.to_string(), 12_341_u128.to_string()),
+                calculate_period_number(1_u128.to_string(), 12_341_u128.to_string(), 999_999u128.to_string()),
                 12_341_u128.to_string()
             );
 
             assert_eq!(
-                calculate_period_number(1_000_u128.to_string(), 12_341_u128.to_string()),
+                calculate_period_number(1_000_u128.to_string(), 12_341_u128.to_string(), 999_999u128.to_string()),
                 12_u128.to_string()
             );
 
             assert_eq!(
-                calculate_period_number(1_000_u128.to_string(), 1_u128.to_string()),
+                calculate_period_number(1_000_u128.to_string(), 1_u128.to_string(), 999_999u128.to_string()),
                 0_u128.to_string()
             );
 
             assert_eq!(
-                calculate_period_number(82_u128.to_string(), 12_341_u128.to_string()),
+                calculate_period_number(82_u128.to_string(), 12_341_u128.to_string(), 999_999u128.to_string()),
                 150_u128.to_string()
             );
         }

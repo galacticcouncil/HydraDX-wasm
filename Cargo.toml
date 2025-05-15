@@ -15,8 +15,8 @@ wee_alloc = "0.4.5"
 serde = { version = "1.0.169", features = ["derive"] }
 serde_json = "1.0.100"
 serde-aux = "4.2.0"
-sp-arithmetic = { git = "https://github.com/galacticcouncil/polkadot-sdk", branch = "stable2409-patch2", default-features = false }
-hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="379af69c77b887f52005a59375b9b00fb3be1f69"}
+sp-arithmetic = { git = "https://github.com/galacticcouncil/polkadot-sdk", branch = "stable2409-patch3", default-features = false }
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="572eb875cbc6541602ff92ad0c95924cdc184bba"}
 num-traits = {default-features = false, version = "0.2.14"}
 # Added because of use of the FixedU128, used to implement `Ratio`
 scale-info = { version = "2.11.1", default-features = false, features = ["derive"] }
@@ -24,8 +24,8 @@ codec = { package = "parity-scale-codec", version = "3.6.12", default-features =
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
-sp-core ={ git = "https://github.com/galacticcouncil/polkadot-sdk", branch = "stable2409-patch2", default-features = false }
-sp-runtime  = { git = "https://github.com/galacticcouncil/polkadot-sdk", branch = "stable2409-patch2", default-features = false }
+sp-core ={ git = "https://github.com/galacticcouncil/polkadot-sdk", branch = "stable2409-patch3", default-features = false }
+sp-runtime  = { git = "https://github.com/galacticcouncil/polkadot-sdk", branch = "stable2409-patch3", default-features = false }
 
 [profile.release]
 opt-level = "s"

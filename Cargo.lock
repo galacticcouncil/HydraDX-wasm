@@ -1109,8 +1109,8 @@ dependencies = [
 
 [[package]]
 name = "hydra-dx-math"
-version = "10.0.0"
-source = "git+https://github.com/galacticcouncil/HydraDX-node?rev=379af69c77b887f52005a59375b9b00fb3be1f69#379af69c77b887f52005a59375b9b00fb3be1f69"
+version = "10.0.2"
+source = "git+https://github.com/galacticcouncil/HydraDX-node?rev=572eb875cbc6541602ff92ad0c95924cdc184bba#572eb875cbc6541602ff92ad0c95924cdc184bba"
 dependencies = [
  "fixed",
  "num-traits",
@@ -2165,7 +2165,7 @@ checksum = "7fcf8323ef1faaee30a44a340193b1ac6814fd9b7b4e88e9d4519a3e4abe1cfd"
 [[package]]
 name = "sp-application-crypto"
 version = "38.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "parity-scale-codec",
  "scale-info",
@@ -2177,7 +2177,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "26.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "docify",
  "integer-sqrt",
@@ -2191,7 +2191,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "34.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "array-bytes",
  "bitflags 1.3.2",
@@ -2237,7 +2237,7 @@ dependencies = [
 [[package]]
 name = "sp-crypto-hashing"
 version = "0.1.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "blake2b_simd",
  "byteorder",
@@ -2250,7 +2250,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "14.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2260,7 +2260,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.29.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -2270,7 +2270,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "38.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "bytes",
  "docify",
@@ -2296,7 +2296,7 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.40.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "parity-scale-codec",
  "parking_lot",
@@ -2307,7 +2307,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "13.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "backtrace",
  "lazy_static",
@@ -2317,7 +2317,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "39.0.5"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "docify",
  "either",
@@ -2343,7 +2343,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "28.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "bytes",
  "impl-trait-for-tuples",
@@ -2362,7 +2362,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "18.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "Inflector",
  "expander",
@@ -2375,7 +2375,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.43.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "hash-db",
  "log",
@@ -2395,12 +2395,12 @@ dependencies = [
 [[package]]
 name = "sp-std"
 version = "14.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 
 [[package]]
 name = "sp-storage"
 version = "21.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -2412,7 +2412,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "17.0.1"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "parity-scale-codec",
  "tracing",
@@ -2423,7 +2423,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "37.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "ahash",
  "hash-db",
@@ -2446,7 +2446,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "21.0.1"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "anyhow",
  "impl-trait-for-tuples",
@@ -2457,7 +2457,7 @@ dependencies = [
 [[package]]
 name = "sp-weights"
 version = "31.0.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "bounded-collections",
  "parity-scale-codec",
@@ -2502,7 +2502,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 [[package]]
 name = "substrate-bip39"
 version = "0.6.0"
-source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch2#102d917df1356688ad83606c269814f1eeab6c9f"
+source = "git+https://github.com/galacticcouncil/polkadot-sdk?branch=stable2409-patch3#319855e4a5f8e72cf75138a5afa42c07e9943872"
 dependencies = [
  "hmac 0.12.1",
  "pbkdf2",
