@@ -3185,6 +3185,24 @@ pub mod omnipool {
     }
 
     #[test]
+    fn recalculate_asset_fee_should_return_previous_fee() {
+        let result = recalculate_asset_fee(
+            "3759268666376166".to_string(),
+            "1223845566372285".to_string(),
+            "80824957474306298463".to_string(),
+            "9".to_string(),
+            "80834934599602965807".to_string(),
+            "3.9905999999999997".to_string(),
+            "0".to_string(),
+            "0.15".to_string(),
+            "5".to_string(),
+            "100000000000000".to_string(),
+            "2000000000000000000".to_string(),
+        );
+        assert_eq!(result, "3.9905999999999997");
+    }
+
+    #[test]
     fn recalculate_protocol_fee_should_work_correctly() {
         let result = recalculate_protocol_fee(
             "25".to_string(),
