@@ -29,5 +29,6 @@ pub mod ema;
 #[cfg(feature = "staking")]
 pub mod staking;
 
-// Fee module doesn't need a feature flag as it's basic functionality
+// Fee module is available only when xyk or lbp features are enabled
+#[cfg(any(feature = "xyk", feature = "lbp"))]
 pub mod fee;
