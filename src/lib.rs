@@ -2,7 +2,7 @@ extern crate core;
 
 // Re-export macros
 #[macro_use]
-mod utils;
+pub(crate) mod utils;
 pub use utils::error;
 
 #[cfg(feature = "xyk")]
@@ -32,3 +32,7 @@ pub mod staking;
 // Fee module is available only when xyk or lbp features are enabled
 #[cfg(any(feature = "xyk", feature = "lbp"))]
 pub mod fee;
+
+#[cfg(feature = "hsm")]
+mod hsm;
+

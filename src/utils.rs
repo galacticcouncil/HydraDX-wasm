@@ -14,6 +14,19 @@ macro_rules! to_u32 {
     );
 }
 
+#[macro_export]
+macro_rules! parse_into2 {
+    ($x:ty, $y:expr, $e:expr) => {{
+        let r = if let Some(x) = $y.parse::<$x>().ok() {
+            x
+        } else {
+            return $e;
+        };
+        r
+    }};
+}
+
+
 pub fn error() -> String {
     "-1".to_string()
 }
