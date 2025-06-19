@@ -631,4 +631,39 @@ mod tests {
 
         assert_eq!(result, "-1".to_string());
     }
+    #[test]
+    fn haha() {
+        let data = r#"
+        [{
+            "asset_id": 0,
+            "amount":"1000000000000000",
+            "decimals": 12
+        },
+        {
+            "asset_id": 1,
+            "amount":"2000000000000000",
+            "decimals": 12
+        }
+        ]"#;
+        let assets2 = r#"
+            [{"asset_id":1,"amount":"1000000000000000"}]
+        "#;
+        let assets = r#"
+            [{"asset_id":0,"amount":"500000000000000"},
+            {"asset_id":1,"amount":"500000000000000"}
+            ]
+        "#;
+
+
+        let result = calculate_shares(
+            data.to_string(),
+            assets.to_string(),
+            "10".to_string(),
+            "3000000000000000".to_string(),
+            "0".to_string(),
+        );
+
+        assert_eq!(result, "1".to_string());
+    }
+
 }

@@ -1,6 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
 export function calculate_accumulated_rps(current_reward_per_stake: string, pending_rewards: string, total_stake: string): string;
 export function calculate_slashed_points(points: string, current_stake: string, stake_increase: string, stake_weight: string, min_slash_point: string): string;
 export function calculate_period_number(period_length: string, block_number: string, six_sec_block_since: string): string;
@@ -13,7 +12,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly calculate_accumulated_rps: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly calculate_slashed_points: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
   readonly calculate_period_number: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
