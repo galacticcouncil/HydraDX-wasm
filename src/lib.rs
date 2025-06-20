@@ -35,4 +35,3 @@ pub mod fee;
 
 #[cfg(feature = "hsm")]
 mod hsm;
-
