@@ -1,5 +1,5 @@
 # Features list
-FEATURES := xyk lbp stableswap stableswap-drift liquidity-mining omnipool ema staking
+FEATURES := xyk lbp stableswap stableswap-drift liquidity-mining omnipool ema staking hsm
 TARGETS := web nodejs bundler
 
 # Main build release target
