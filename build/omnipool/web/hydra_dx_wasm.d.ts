@@ -22,7 +22,6 @@ export function is_sell_allowed(bits: number): boolean;
 export function is_buy_allowed(bits: number): boolean;
 export function is_add_liquidity_allowed(bits: number): boolean;
 export function is_remove_liquidity_allowed(bits: number): boolean;
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -50,7 +49,6 @@ export interface InitOutput {
   readonly is_buy_allowed: (a: number) => number;
   readonly is_add_liquidity_allowed: (a: number) => number;
   readonly is_remove_liquidity_allowed: (a: number) => number;
-  readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

@@ -1,6 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
 /**
  * Calculate the iterated exponential moving average for the given prices.
  * + `iterations` is the number of iterations of the EMA to calculate (expected to be a serialized `u32`).
@@ -28,7 +27,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly low_precision_iterated_price_ema: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number) => void;
   readonly iterated_balance_ema: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
