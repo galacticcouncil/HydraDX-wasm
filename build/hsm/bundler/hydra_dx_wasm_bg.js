@@ -150,18 +150,18 @@ export function calculate_collateral_in_given_hollar_out(amount_out, collateral_
 
 /**
  * @param {string} amount_in
- * @param {string} execution_price
+ * @param {string} amount_out
  * @param {string} buyback_fee
  * @returns {string}
  */
-export function calculate_collateral_out_given_hollar_in(amount_in, execution_price, buyback_fee) {
+export function calculate_collateral_out_given_hollar_in(amount_in, amount_out, buyback_fee) {
     let deferred4_0;
     let deferred4_1;
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passStringToWasm0(amount_in, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passStringToWasm0(execution_price, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const ptr1 = passStringToWasm0(amount_out, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
         const ptr2 = passStringToWasm0(buyback_fee, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len2 = WASM_VECTOR_LEN;
@@ -179,18 +179,18 @@ export function calculate_collateral_out_given_hollar_in(amount_in, execution_pr
 
 /**
  * @param {string} amount_out
- * @param {string} execution_price
+ * @param {string} amount_in
  * @param {string} buyback_fee
  * @returns {string}
  */
-export function calculate_hollar_in_given_collateral_out(amount_out, execution_price, buyback_fee) {
+export function calculate_hollar_in_given_collateral_out(amount_out, amount_in, buyback_fee) {
     let deferred4_0;
     let deferred4_1;
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passStringToWasm0(amount_out, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ptr1 = passStringToWasm0(execution_price, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const ptr1 = passStringToWasm0(amount_in, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
         const ptr2 = passStringToWasm0(buyback_fee, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len2 = WASM_VECTOR_LEN;
