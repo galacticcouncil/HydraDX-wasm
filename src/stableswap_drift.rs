@@ -1,7 +1,7 @@
 pub use super::*;
 use hydra_dx_math::stableswap::types::AssetReserve;
 use serde::Deserialize;
-use sp_arithmetic::{FixedPointNumber, Permill};
+use sp_arithmetic::{FixedPointNumber, FixedU128, Permill};
 #[cfg(test)]
 use sp_core::crypto::UncheckedFrom;
 #[cfg(test)]
@@ -9,10 +9,11 @@ use sp_core::Hasher;
 #[cfg(test)]
 use sp_runtime::traits::IdentifyAccount;
 use std::collections::HashMap;
-use std::thread::current;
 use wasm_bindgen::prelude::*;
 
 use serde_aux::prelude::*;
+use sp_arithmetic::helpers_128bit::multiply_by_rational_with_rounding;
+use sp_arithmetic::Rounding;
 
 macro_rules! parse_into {
     ($x:ty, $y:expr) => {{
@@ -566,6 +567,71 @@ pub fn recalculate_peg(
     }
 }
 
+fn peg_reserves(reserves: &[u128], pegs: &[(u128, u128)]) -> Option<Vec<u128>> {
+    reserves
+        .iter()
+        .zip(pegs.iter())
+        .try_fold(Vec::with_capacity(reserves.len()), |mut acc, (v, peg)| {
+            if let Some(result) = multiply_by_rational_with_rounding(*v, peg.0, peg.1, Rounding::Down) {
+                acc.push(result);
+                Some(acc)
+            } else {
+                None
+            }
+        })
+}
+#[wasm_bindgen]
+pub fn calculate_proportional_amounts(reserves: String, asset_id: u32, amount: String, pegs: String) -> String {
+    let reserves: serde_json::Result<Vec<AssetBalance>> = serde_json::from_str(&reserves);
+    if reserves.is_err() {
+        return error();
+    }
+    let reserves = reserves.unwrap();
+    let pegs: serde_json::Result<Vec<(String, String)>> = serde_json::from_str(&pegs);
+    if pegs.is_err() {
+        return error();
+    }
+    let pegs = parse_pegs(pegs.unwrap());
+    if pegs.is_none() {
+        return error();
+    }
+    let pegs = pegs.unwrap();
+
+    let asset_idx = reserves.iter().position(|v| v.asset_id == asset_id);
+    if asset_idx.is_none() {
+        return error();
+    }
+    let asset_idx = asset_idx.unwrap();
+
+    let amount = parse_into!(u128, amount);
+
+    let just_reserves = reserves.iter().map(|v| v.amount).collect::<Vec<u128>>();
+
+    let normalized_reserves = peg_reserves(&just_reserves, &pegs);
+    if normalized_reserves.is_none() {
+        return error();
+    }
+    let normalized_reserves = normalized_reserves.unwrap();
+
+    let selected_asset_reserve = normalized_reserves[asset_idx];
+    let ratio = FixedU128::from_rational(amount, selected_asset_reserve);
+
+    let amounts: Vec<(u32, u128)> = normalized_reserves
+        .iter()
+        .enumerate()
+        .map(|(idx, reserve)| {
+            let amount = ratio.saturating_mul_int(*reserve);
+            (reserves[idx].asset_id, amount)
+        })
+        .collect();
+
+    if let Some(r) = serde_json::to_string(&amounts).ok() {
+        r
+    } else {
+        error()
+    }
+}
+
 #[cfg(test)]
 fn default_pegs(size: usize) -> Vec<(String, String)> {
     let mut pegs = Vec::new();
@@ -802,4 +868,109 @@ fn recalculate_pegs_should_work_correctly() {
     let expected_result =
         "[0.02,[[\"259686997534693321553635504599698430064\",\"175361852389992385604687093330695209669\"],[\"1\",\"1\"]]]";
     assert_eq!(result, expected_result.to_string());
+}
+
+#[test]
+fn calculate_proportional_amounts_should_work_correctly() {
+    let data = r#"
+    [{
+        "asset_id": 1,
+        "amount":"10000000000000000",
+        "decimals": 12
+    },
+    {
+        "asset_id": 2,
+        "amount":"10000000000000000",
+        "decimals": 12
+    },
+    {
+        "asset_id": 3,
+        "amount":"10000000000000000",
+        "decimals": 12
+    }
+    ]"#;
+
+    let pegs = vec![
+        (1u128.to_string(), 1u128.to_string()),
+        (1u128.to_string(), 1u128.to_string()),
+        (1u128.to_string(), 1u128.to_string()),
+    ];
+    let pegs = serde_json::to_string(&pegs).unwrap();
+
+    let result = calculate_proportional_amounts(data.to_string(), 1, "1000000000000000".to_string(), pegs.clone());
+
+    assert_eq!(
+        result,
+        "[[1,1000000000000000],[2,1000000000000000],[3,1000000000000000]]"
+    );
+}
+
+#[test]
+fn calculate_proportional_amounts_should_work_correctly_when_not_balanced() {
+    let data = r#"
+    [{
+        "asset_id": 1,
+        "amount":"5000000000000000",
+        "decimals": 12
+    },
+    {
+        "asset_id": 2,
+        "amount":"10000000000000000",
+        "decimals": 12
+    },
+    {
+        "asset_id": 3,
+        "amount":"10000000000000000",
+        "decimals": 12
+    }
+    ]"#;
+
+    let pegs = vec![
+        (1u128.to_string(), 1u128.to_string()),
+        (1u128.to_string(), 1u128.to_string()),
+        (1u128.to_string(), 1u128.to_string()),
+    ];
+    let pegs = serde_json::to_string(&pegs).unwrap();
+
+    let result = calculate_proportional_amounts(data.to_string(), 1, "1000000000000000".to_string(), pegs.clone());
+
+    assert_eq!(
+        result,
+        "[[1,1000000000000000],[2,2000000000000000],[3,2000000000000000]]"
+    );
+}
+
+#[test]
+fn calculate_proportional_amounts_should_work_correctly_when_not_balanced_and_different_peg() {
+    let data = r#"
+    [{
+        "asset_id": 1,
+        "amount":"5000000000000000",
+        "decimals": 12
+    },
+    {
+        "asset_id": 2,
+        "amount":"10000000000000000",
+        "decimals": 12
+    },
+    {
+        "asset_id": 3,
+        "amount":"10000000000000000",
+        "decimals": 12
+    }
+    ]"#;
+
+    let pegs = vec![
+        (1u128.to_string(), 1u128.to_string()),
+        (1u128.to_string(), 2u128.to_string()),
+        (1u128.to_string(), 1u128.to_string()),
+    ];
+    let pegs = serde_json::to_string(&pegs).unwrap();
+
+    let result = calculate_proportional_amounts(data.to_string(), 1, "1000000000000000".to_string(), pegs.clone());
+
+    assert_eq!(
+        result,
+        "[[1,1000000000000000],[2,1000000000000000],[3,2000000000000000]]"
+    );
 }

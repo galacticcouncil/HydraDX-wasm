@@ -10,3 +10,4 @@ export function calculate_add_one_asset(reserves: string, shares: string, asset_
 export function pool_account_name(share_asset_id: number): Uint8Array;
 export function calculate_liquidity_out_one_asset(reserves: string, shares: string, asset_out: number, amplification: string, share_issuance: string, withdraw_fee: string, pegs: string): string;
 export function recalculate_peg(current_pegs: string, target_pegs: string, current_block: string, max_peg_update: string, pool_fee: string): string;
+export function calculate_proportional_amounts(reserves: string, asset_id: number, amount: string, pegs: string): string;
