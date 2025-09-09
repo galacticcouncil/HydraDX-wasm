@@ -1,7 +1,7 @@
 pub use super::*;
 use hydra_dx_math::stableswap::types::AssetReserve;
 use serde::Deserialize;
-use sp_arithmetic::{FixedPointNumber, Permill};
+use sp_arithmetic::{FixedPointNumber, Permill, Perbill};
 #[cfg(test)]
 use sp_core::crypto::UncheckedFrom;
 #[cfg(test)]
@@ -9,7 +9,6 @@ use sp_core::Hasher;
 #[cfg(test)]
 use sp_runtime::traits::IdentifyAccount;
 use std::collections::HashMap;
-use std::thread::current;
 use wasm_bindgen::prelude::*;
 
 use serde_aux::prelude::*;
@@ -546,7 +545,7 @@ pub fn recalculate_peg(
     let target_pegs = target_pegs.unwrap();
 
     let block = parse_into!(u128, current_block);
-    let max_peg_update = Permill::from_float(parse_into!(f64, max_peg_update));
+    let max_peg_update = Perbill::from_float(parse_into!(f64, max_peg_update));
     let fee = Permill::from_float(parse_into!(f64, pool_fee));
 
     let result = hydra_dx_math::stableswap::recalculate_pegs(&current_pegs, &target_pegs, block, max_peg_update, fee);
