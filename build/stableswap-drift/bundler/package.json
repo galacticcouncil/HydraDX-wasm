@@ -1,5 +1,6 @@
 {
   "name": "hydra-dx-wasm",
+  "type": "module",
   "collaborators": [
     "GalacticCouncil"
   ],
@@ -15,7 +16,7 @@
     "hydra_dx_wasm_bg.js",
     "hydra_dx_wasm.d.ts"
   ],
-  "module": "hydra_dx_wasm.js",
+  "main": "hydra_dx_wasm.js",
   "types": "hydra_dx_wasm.d.ts",
   "sideEffects": [
     "./hydra_dx_wasm.js",
