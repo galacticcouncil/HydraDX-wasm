@@ -319,12 +319,7 @@ pub fn calculate_spot_price_with_fee(
     );
 
     if let Some(r) = result {
-        //Temp fix to return data correctly, reserve it when this issue `https://github.com/galacticcouncil/hydration-node/issues/1009` is fixed in runtime
-        if let Some(price) = r.reciprocal() {
-            price.to_string()
-        } else {
-            error()
-        }
+        r.to_string()
     } else {
         error()
     }

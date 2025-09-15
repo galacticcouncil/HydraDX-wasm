@@ -16,7 +16,7 @@ serde = { version = "1.0.169", features = ["derive"] }
 serde_json = "1.0.100"
 serde-aux = "4.2.0"
 sp-arithmetic = { git = "https://github.com/galacticcouncil/polkadot-sdk", branch = "stable2409-patch6", default-features = false }
-hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="9fe1dff2942200a46a9feeee160ffbfdadcb19c1", default-features = false}
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="605994d8f25517b79764546fea2838fb7b883f79", default-features = false}
 num-traits = {default-features = false, version = "0.2.14"}
 # Added because of use of the FixedU128, used to implement `Ratio`
 scale-info = { version = "2.11.1", default-features = false, features = ["derive"] }
