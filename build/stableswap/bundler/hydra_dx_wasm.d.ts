@@ -9,4 +9,3 @@ export function calculate_shares_for_amount(reserves: string, asset_in: number, 
 export function calculate_add_one_asset(reserves: string, shares: string, asset_in: number, amplification: string, share_issuance: string, fee: string): string;
 export function pool_account_name(share_asset_id: number): Uint8Array;
 export function calculate_liquidity_out_one_asset(reserves: string, shares: string, asset_out: number, amplification: string, share_issuance: string, withdraw_fee: string): string;
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;

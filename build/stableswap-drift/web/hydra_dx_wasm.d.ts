@@ -10,7 +10,6 @@ export function calculate_add_one_asset(reserves: string, shares: string, asset_
 export function pool_account_name(share_asset_id: number): Uint8Array;
 export function calculate_liquidity_out_one_asset(reserves: string, shares: string, asset_out: number, amplification: string, share_issuance: string, withdraw_fee: string, pegs: string): string;
 export function recalculate_peg(current_pegs: string, target_pegs: string, current_block: string, max_peg_update: string, pool_fee: string): string;
-export function calculate_pool_trade_fee(a: string, fee_numerator: number, fee_denominator: number): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -26,7 +25,6 @@ export interface InitOutput {
   readonly pool_account_name: (a: number, b: number) => void;
   readonly calculate_liquidity_out_one_asset: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number, l: number, m: number, n: number) => void;
   readonly recalculate_peg: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number, k: number) => void;
-  readonly calculate_pool_trade_fee: (a: number, b: number, c: number, d: number, e: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
