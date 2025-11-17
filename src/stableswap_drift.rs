@@ -1,7 +1,7 @@
 pub use super::*;
 use hydra_dx_math::stableswap::types::AssetReserve;
 use serde::Deserialize;
-use sp_arithmetic::{FixedPointNumber, Permill, Perbill};
+use sp_arithmetic::{FixedPointNumber, Perbill, Permill};
 #[cfg(test)]
 use sp_core::crypto::UncheckedFrom;
 #[cfg(test)]
@@ -503,6 +503,7 @@ pub fn calculate_liquidity_out_one_asset(
 #[wasm_bindgen]
 pub fn recalculate_peg(
     current_pegs: String,
+    current_pegs_updated_at: String,
     target_pegs: String,
     current_block: String,
     max_peg_update: String,
@@ -544,11 +545,19 @@ pub fn recalculate_peg(
 
     let target_pegs = target_pegs.unwrap();
 
+    let current_pegs_updated_at = parse_into!(u128, current_pegs_updated_at);
     let block = parse_into!(u128, current_block);
     let max_peg_update = Perbill::from_float(parse_into!(f64, max_peg_update));
     let fee = Permill::from_float(parse_into!(f64, pool_fee));
 
-    let result = hydra_dx_math::stableswap::recalculate_pegs(&current_pegs, &target_pegs, block, max_peg_update, fee);
+    let result = hydra_dx_math::stableswap::recalculate_pegs(
+        &current_pegs,
+        current_pegs_updated_at,
+        &target_pegs,
+        block,
+        max_peg_update,
+        fee,
+    );
 
     if let Some(r) = result {
         // Serialized the result to string, u128 to string too
@@ -792,6 +801,7 @@ fn recalculate_pegs_should_work_correctly() {
 
     let result = crate::stableswap_drift::recalculate_peg(
         current_pegs,
+        "10".to_string(),
         target_pegs,
         "20".to_string(),
         "0.01".to_string(),
