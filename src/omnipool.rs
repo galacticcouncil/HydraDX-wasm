@@ -2,7 +2,9 @@ use wasm_bindgen::prelude::*;
 
 pub use super::*;
 use hydra_dx_math::dynamic_fees::types::{FeeParams, OracleEntry};
-use hydra_dx_math::omnipool::types::{AssetReserveState, Position as OmnipoolPosition};
+use hydra_dx_math::omnipool::types::{
+    AssetReserveState, HubTradeSlipFees, Position as OmnipoolPosition, SignedBalance, TradeSlipFees,
+};
 use sp_arithmetic::{FixedPointNumber, FixedU128, Permill};
 
 macro_rules! parse_into {
@@ -341,6 +343,481 @@ mod tests {
         assert_eq!(lrna, 0.to_string());
         assert_eq!(out, "99999999998");
     }
+
+    // --- Trade function tests ---
+
+    fn to_string(n: u128) -> String {
+        n.to_string()
+    }
+
+    #[test]
+    fn sell_should_work_with_no_fees() {
+        // HDX: 10M reserve, 20M hub reserve, 10M shares
+        // DOT: 5M reserve, 5M hub reserve, 20M shares
+        // Sell 4M HDX, no fees, no slip
+        let result = calculate_out_given_in(
+            "10000000000000000000".to_string(), // 10M * UNIT
+            "20000000000000000000".to_string(), // 20M * UNIT
+            "10000000000000000000".to_string(), // 10M * UNIT
+            "5000000000000000000".to_string(),  // 5M * UNIT
+            "5000000000000000000".to_string(),  // 5M * UNIT
+            "20000000000000000000".to_string(), // 20M * UNIT
+            "4000000000000000".to_string(),     // 4M * UNIT
+            "0".to_string(),                    // no asset fee
+            "0".to_string(),                    // no protocol fee
+            "0".to_string(),                    // no slip fee
+        );
+        assert_ne!(result, "-1");
+        let amount_out: u128 = result.parse().unwrap();
+        // Expected: ~2666666666666 (from math tests with same inputs scaled)
+        assert!(amount_out > 0);
+    }
+
+    #[test]
+    fn sell_should_work_with_fees_and_no_slip() {
+        // Pool: HDX(10M/20M/10M), DOT(5M/5M/20M)
+        // Sell 4M HDX, 1% asset fee, no protocol fee, no slip
+        let no_fee_result = calculate_out_given_in(
+            to_string(10_000_000 * 1_000_000_000_000),
+            to_string(20_000_000 * 1_000_000_000_000),
+            to_string(10_000_000 * 1_000_000_000_000),
+            to_string(5_000_000 * 1_000_000_000_000),
+            to_string(5_000_000 * 1_000_000_000_000),
+            to_string(20_000_000 * 1_000_000_000_000),
+            to_string(4_000_000 * 1_000_000_000_000),
+            "0".to_string(),
+            "0".to_string(),
+            "0".to_string(),
+        );
+
+        let with_fee_result = calculate_out_given_in(
+            to_string(10_000_000 * 1_000_000_000_000),
+            to_string(20_000_000 * 1_000_000_000_000),
+            to_string(10_000_000 * 1_000_000_000_000),
+            to_string(5_000_000 * 1_000_000_000_000),
+            to_string(5_000_000 * 1_000_000_000_000),
+            to_string(20_000_000 * 1_000_000_000_000),
+            to_string(4_000_000 * 1_000_000_000_000),
+            "0.01".to_string(), // 1% asset fee
+            "0".to_string(),
+            "0".to_string(),
+        );
+
+        let no_fee: u128 = no_fee_result.parse().unwrap();
+        let with_fee: u128 = with_fee_result.parse().unwrap();
+        // Asset fee should reduce the output
+        assert!(with_fee < no_fee, "with_fee {} should be less than no_fee {}", with_fee, no_fee);
+    }
+
+    #[test]
+    fn sell_with_slip_fee_should_reduce_output() {
+        // Same pool, sell 100K HDX with and without slip
+        let unit: u128 = 1_000_000_000_000;
+        let no_slip = calculate_out_given_in(
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(100_000 * unit),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0".to_string(), // no slip
+        );
+
+        let with_slip = calculate_out_given_in(
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(100_000 * unit),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0.05".to_string(), // 5% max slip fee
+        );
+
+        assert_ne!(no_slip, "-1");
+        assert_ne!(with_slip, "-1");
+
+        let no_slip_out: u128 = no_slip.parse().unwrap();
+        let with_slip_out: u128 = with_slip.parse().unwrap();
+
+        assert!(
+            with_slip_out < no_slip_out,
+            "Slip fee should reduce output: {} < {}",
+            with_slip_out,
+            no_slip_out
+        );
+    }
+
+    #[test]
+    fn sell_with_zero_slip_fee_should_match_no_slip() {
+        let unit: u128 = 1_000_000_000_000;
+        let no_slip = calculate_out_given_in(
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(100_000 * unit),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0".to_string(),
+        );
+
+        let zero_slip = calculate_out_given_in(
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(100_000 * unit),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0.0".to_string(), // explicitly zero
+        );
+
+        assert_eq!(no_slip, zero_slip, "Zero max_slip_fee should behave identically to no slip");
+    }
+
+    #[test]
+    fn buy_should_work_with_no_fees() {
+        let unit: u128 = 1_000_000_000_000;
+        let result = calculate_in_given_out(
+            to_string(10_000_000 * unit),
+            to_string(20_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(20_000_000 * unit),
+            to_string(1_000_000 * unit), // buy 1M
+            "0".to_string(),
+            "0".to_string(),
+            "0".to_string(),
+        );
+        assert_ne!(result, "-1");
+        let amount_in: u128 = result.parse().unwrap();
+        assert!(amount_in > 0);
+    }
+
+    #[test]
+    fn buy_with_slip_fee_should_increase_cost() {
+        let unit: u128 = 1_000_000_000_000;
+        let no_slip = calculate_in_given_out(
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(1000 * unit), // buy 1000 DOT
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0".to_string(),
+        );
+
+        let with_slip = calculate_in_given_out(
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(1000 * unit),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0.05".to_string(), // 5% max slip fee
+        );
+
+        assert_ne!(no_slip, "-1");
+        assert_ne!(with_slip, "-1");
+
+        let no_slip_in: u128 = no_slip.parse().unwrap();
+        let with_slip_in: u128 = with_slip.parse().unwrap();
+
+        assert!(
+            with_slip_in > no_slip_in,
+            "Slip fee should increase cost: {} > {}",
+            with_slip_in,
+            no_slip_in
+        );
+    }
+
+    #[test]
+    fn buy_with_zero_slip_fee_should_match_no_slip() {
+        let unit: u128 = 1_000_000_000_000;
+        let no_slip = calculate_in_given_out(
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(1000 * unit),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0".to_string(),
+        );
+
+        let zero_slip = calculate_in_given_out(
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(1000 * unit),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0.0".to_string(),
+        );
+
+        assert_eq!(no_slip, zero_slip, "Zero max_slip_fee should behave identically to no slip");
+    }
+
+    #[test]
+    fn sell_lrna_should_work_with_no_slip() {
+        let unit: u128 = 1_000_000_000_000;
+        let result = calculate_out_given_lrna_in(
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(10_000 * unit), // sell 10K LRNA
+            "0.0025".to_string(),
+            "0".to_string(), // no slip
+        );
+        assert_ne!(result, "-1");
+        let amount_out: u128 = result.parse().unwrap();
+        assert!(amount_out > 0);
+    }
+
+    #[test]
+    fn sell_lrna_with_slip_should_reduce_output() {
+        let unit: u128 = 1_000_000_000_000;
+        let no_slip = calculate_out_given_lrna_in(
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(100_000 * unit),
+            "0.0025".to_string(),
+            "0".to_string(),
+        );
+
+        let with_slip = calculate_out_given_lrna_in(
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(100_000 * unit),
+            "0.0025".to_string(),
+            "0.05".to_string(), // 5% max slip fee
+        );
+
+        assert_ne!(no_slip, "-1");
+        assert_ne!(with_slip, "-1");
+
+        let no_slip_out: u128 = no_slip.parse().unwrap();
+        let with_slip_out: u128 = with_slip.parse().unwrap();
+
+        assert!(
+            with_slip_out < no_slip_out,
+            "Slip fee should reduce output: {} < {}",
+            with_slip_out,
+            no_slip_out
+        );
+    }
+
+    #[test]
+    fn sell_lrna_with_zero_slip_should_match_no_slip() {
+        let unit: u128 = 1_000_000_000_000;
+        let no_slip = calculate_out_given_lrna_in(
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(10_000 * unit),
+            "0.0025".to_string(),
+            "0".to_string(),
+        );
+
+        let zero_slip = calculate_out_given_lrna_in(
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(10_000 * unit),
+            "0.0025".to_string(),
+            "0.0".to_string(),
+        );
+
+        assert_eq!(no_slip, zero_slip, "Zero max_slip_fee should behave identically to no slip");
+    }
+
+    #[test]
+    fn buy_lrna_should_work_with_no_slip() {
+        let unit: u128 = 1_000_000_000_000;
+        let result = calculate_lrna_in_given_out(
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(1000 * unit), // buy 1000 DOT
+            "0.0025".to_string(),
+            "0".to_string(),
+        );
+        assert_ne!(result, "-1");
+        let lrna_cost: u128 = result.parse().unwrap();
+        assert!(lrna_cost > 0);
+    }
+
+    #[test]
+    fn buy_lrna_with_slip_should_increase_cost() {
+        // calculate_lrna_in_given_out returns delta_hub_reserve + protocol_fee (total LRNA cost).
+        // With slip, the protocol_fee includes the slip amount, so total cost increases.
+        let unit: u128 = 1_000_000_000_000;
+        let no_slip = calculate_lrna_in_given_out(
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(1000 * unit),
+            "0.0025".to_string(),
+            "0".to_string(),
+        );
+
+        let with_slip = calculate_lrna_in_given_out(
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(1000 * unit),
+            "0.0025".to_string(),
+            "0.05".to_string(),
+        );
+
+        assert_ne!(no_slip, "-1");
+        assert_ne!(with_slip, "-1");
+
+        let no_slip_cost: u128 = no_slip.parse().unwrap();
+        let with_slip_cost: u128 = with_slip.parse().unwrap();
+
+        assert!(
+            with_slip_cost > no_slip_cost,
+            "Slip fee should increase LRNA cost: {} > {}",
+            with_slip_cost,
+            no_slip_cost
+        );
+    }
+
+    #[test]
+    fn buy_lrna_with_zero_slip_should_match_no_slip() {
+        let unit: u128 = 1_000_000_000_000;
+        let no_slip = calculate_lrna_in_given_out(
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(1000 * unit),
+            "0.0025".to_string(),
+            "0".to_string(),
+        );
+
+        let zero_slip = calculate_lrna_in_given_out(
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(1000 * unit),
+            "0.0025".to_string(),
+            "0.0".to_string(),
+        );
+
+        assert_eq!(no_slip, zero_slip, "Zero max_slip_fee should behave identically to no slip");
+    }
+
+    #[test]
+    fn sell_buy_roundtrip_should_be_consistent() {
+        // Selling X tokens in, then buying that same output amount, should cost approximately X
+        let unit: u128 = 1_000_000_000_000;
+
+        let sell_result = calculate_out_given_in(
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(10_000 * unit), // sell 10K
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0.05".to_string(),
+        );
+        assert_ne!(sell_result, "-1");
+        let tokens_out: u128 = sell_result.parse().unwrap();
+
+        let buy_result = calculate_in_given_out(
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(10_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(5_000_000 * unit),
+            to_string(500_000 * unit),
+            to_string(tokens_out),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0.05".to_string(),
+        );
+        assert_ne!(buy_result, "-1");
+        let cost_back: u128 = buy_result.parse().unwrap();
+
+        // Due to rounding, cost_back should be close to 10K * UNIT (within 0.1%)
+        let original = 10_000 * unit;
+        let tolerance = original / 1000; // 0.1%
+        let diff = if cost_back > original {
+            cost_back - original
+        } else {
+            original - cost_back
+        };
+        assert!(
+            diff <= tolerance,
+            "Roundtrip should be approximately equal: sold {} got {} cost_back {} diff {}",
+            original,
+            tokens_out,
+            cost_back,
+            diff
+        );
+    }
+
+    #[test]
+    fn sell_returns_error_on_invalid_input() {
+        let result = calculate_out_given_in(
+            "invalid".to_string(),
+            "1000".to_string(),
+            "1000".to_string(),
+            "1000".to_string(),
+            "1000".to_string(),
+            "1000".to_string(),
+            "100".to_string(),
+            "0".to_string(),
+            "0".to_string(),
+            "0".to_string(),
+        );
+        assert_eq!(result, "-1");
+    }
+
+    #[test]
+    fn buy_returns_error_on_invalid_input() {
+        let result = calculate_in_given_out(
+            "1000".to_string(),
+            "1000".to_string(),
+            "1000".to_string(),
+            "1000".to_string(),
+            "1000".to_string(),
+            "1000".to_string(),
+            "invalid".to_string(),
+            "0".to_string(),
+            "0".to_string(),
+            "0".to_string(),
+        );
+        assert_eq!(result, "-1");
+    }
 }
 
 #[wasm_bindgen]
@@ -354,6 +831,7 @@ pub fn calculate_out_given_in(
     amount_in: String,
     asset_fee: String,
     protocol_fee: String,
+    max_slip_fee: String,
 ) -> String {
     let reserve_in = parse_into!(u128, asset_in_reserve, error());
     let hub_reserve_in = parse_into!(u128, asset_in_hub_reserve, error());
@@ -366,6 +844,7 @@ pub fn calculate_out_given_in(
     let amount = parse_into!(u128, amount_in, error());
     let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
     let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee, error()));
+    let max_slip_fee = Permill::from_float(parse_into!(f64, max_slip_fee, error()));
 
     let asset_in = AssetReserveState {
         reserve: reserve_in,
@@ -381,6 +860,18 @@ pub fn calculate_out_given_in(
         ..Default::default()
     };
 
+    let slip = if max_slip_fee == Permill::zero() {
+        None
+    } else {
+        Some(TradeSlipFees {
+            asset_in_hub_reserve: hub_reserve_in,
+            asset_in_delta: SignedBalance::zero(),
+            asset_out_hub_reserve: hub_reserve_out,
+            asset_out_delta: SignedBalance::zero(),
+            max_slip_fee,
+        })
+    };
+
     let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_sell_state_changes(
         &asset_in,
         &asset_out,
@@ -388,6 +879,7 @@ pub fn calculate_out_given_in(
         asset_fee,
         protocol_fee,
         Permill::zero(),
+        slip.as_ref(),
     ) {
         r
     } else {
@@ -404,6 +896,7 @@ pub fn calculate_out_given_lrna_in(
     asset_shares: String,
     amount_in: String,
     asset_fee: String,
+    max_slip_fee: String,
 ) -> String {
     let reserve = parse_into!(u128, asset_reserve, error());
     let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
@@ -411,6 +904,7 @@ pub fn calculate_out_given_lrna_in(
 
     let amount = parse_into!(u128, amount_in, error());
     let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
+    let max_slip_fee = Permill::from_float(parse_into!(f64, max_slip_fee, error()));
 
     let asset = AssetReserveState {
         reserve,
@@ -419,8 +913,18 @@ pub fn calculate_out_given_lrna_in(
         ..Default::default()
     };
 
+    let slip = if max_slip_fee == Permill::zero() {
+        None
+    } else {
+        Some(HubTradeSlipFees {
+            asset_hub_reserve: hub_reserve,
+            asset_delta: SignedBalance::zero(),
+            max_slip_fee,
+        })
+    };
+
     let state_changes =
-        if let Some(r) = hydra_dx_math::omnipool::calculate_sell_hub_state_changes(&asset, amount, asset_fee) {
+        if let Some(r) = hydra_dx_math::omnipool::calculate_sell_hub_state_changes(&asset, amount, asset_fee, slip.as_ref()) {
             r
         } else {
             return error();
@@ -440,6 +944,7 @@ pub fn calculate_in_given_out(
     amount_out: String,
     asset_fee: String,
     protocol_fee: String,
+    max_slip_fee: String,
 ) -> String {
     let reserve_in = parse_into!(u128, asset_in_reserve, error());
     let hub_reserve_in = parse_into!(u128, asset_in_hub_reserve, error());
@@ -452,6 +957,7 @@ pub fn calculate_in_given_out(
     let amount = parse_into!(u128, amount_out, error());
     let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
     let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee, error()));
+    let max_slip_fee = Permill::from_float(parse_into!(f64, max_slip_fee, error()));
 
     let asset_in = AssetReserveState {
         reserve: reserve_in,
@@ -467,6 +973,18 @@ pub fn calculate_in_given_out(
         ..Default::default()
     };
 
+    let slip = if max_slip_fee == Permill::zero() {
+        None
+    } else {
+        Some(TradeSlipFees {
+            asset_in_hub_reserve: hub_reserve_in,
+            asset_in_delta: SignedBalance::zero(),
+            asset_out_hub_reserve: hub_reserve_out,
+            asset_out_delta: SignedBalance::zero(),
+            max_slip_fee,
+        })
+    };
+
     let state_changes = if let Some(r) = hydra_dx_math::omnipool::calculate_buy_state_changes(
         &asset_in,
         &asset_out,
@@ -474,6 +992,7 @@ pub fn calculate_in_given_out(
         asset_fee,
         protocol_fee,
         Permill::zero(),
+        slip.as_ref(),
     ) {
         r
     } else {
@@ -490,6 +1009,7 @@ pub fn calculate_lrna_in_given_out(
     asset_shares: String,
     amount_out: String,
     asset_fee: String,
+    max_slip_fee: String,
 ) -> String {
     let reserve = parse_into!(u128, asset_reserve, error());
     let hub_reserve = parse_into!(u128, asset_hub_reserve, error());
@@ -497,6 +1017,7 @@ pub fn calculate_lrna_in_given_out(
 
     let amount = parse_into!(u128, amount_out, error());
     let asset_fee = Permill::from_float(parse_into!(f64, asset_fee, error()));
+    let max_slip_fee = Permill::from_float(parse_into!(f64, max_slip_fee, error()));
 
     let asset = AssetReserveState {
         reserve,
@@ -505,15 +1026,25 @@ pub fn calculate_lrna_in_given_out(
         ..Default::default()
     };
 
+    let slip = if max_slip_fee == Permill::zero() {
+        None
+    } else {
+        Some(HubTradeSlipFees {
+            asset_hub_reserve: hub_reserve,
+            asset_delta: SignedBalance::zero(),
+            max_slip_fee,
+        })
+    };
+
     let state_changes = if let Some(r) =
-        hydra_dx_math::omnipool::calculate_buy_for_hub_asset_state_changes(&asset, amount, asset_fee)
+        hydra_dx_math::omnipool::calculate_buy_for_hub_asset_state_changes(&asset, amount, asset_fee, slip.as_ref())
     {
         r
     } else {
         return error();
     };
 
-    (*state_changes.asset.delta_hub_reserve).to_string()
+    (*state_changes.asset.delta_hub_reserve + state_changes.fee.protocol_fee).to_string()
 }
 
 #[wasm_bindgen]
